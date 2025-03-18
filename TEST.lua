@@ -84,4 +84,3 @@ toggleButton.MouseButton1Click:Connect(function()
         toggleButton.Text = "เปิด การเก็บของ"
     end
 end)
-
