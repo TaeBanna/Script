@@ -8,7 +8,7 @@ local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local runtimeItems = workspace:WaitForChild("RuntimeItems")
 
 local pickupEnabled = false
-local pickupDistance = 10  -- ระยะห่างที่สามารถเก็บของได้
+local pickupDistance = 20  -- ระยะห่างที่สามารถเก็บของได้ (เพิ่มระยะห่าง)
 local scanning = false  -- ตัวแปรควบคุมการทำงาน
 local heartbeatConnection
 
@@ -28,17 +28,18 @@ local function scanAndPickUpItems()
         end
     end
     
-    -- หากพบรายการที่ต้องการเก็บ, ส่งคำสั่งเก็บทีละตัวเพื่อลดการโหลด
+    -- หากพบรายการที่ต้องการเก็บ, ส่งคำสั่งเก็บหลายๆ ตัวพร้อมกัน
     if #itemsToPickUp > 0 then
+        local args = {}
         for _, item in ipairs(itemsToPickUp) do
-            local args = { [1] = item }
-            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
-            task.wait(0.1)  -- เพิ่มดีเลย์เล็กน้อยเพื่อป้องกันการทำงานซ้ำบ่อยเกินไป
+            table.insert(args, item)
         end
+        -- ส่งคำสั่งเก็บหลายๆ รายการในครั้งเดียว
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
     end
 
-    -- รอ 0.5 วินาที ก่อนสแกนรอบถัดไป
-    task.wait(0.5)
+    -- รอ 0.1 วินาที ก่อนสแกนรอบถัดไป (ลดเวลาในการรอเพื่อเพิ่มความเร็ว)
+    task.wait(0.1)
     scanning = false
 end
 
