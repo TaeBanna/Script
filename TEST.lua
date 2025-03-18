@@ -1,45 +1,75 @@
--- LocalScript (เช่น ใน StarterPlayerScripts)
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService") -- รองรับมือถือ
+local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
-local playerCharacter = player.Character or player.CharacterAdded:Wait()
-local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- RemoteEvent สำหรับการทิ้งไอเทม
 local remotes = ReplicatedStorage:WaitForChild("Remotes")
 local dropItemEvent = remotes:WaitForChild("DropItem")
-local storeItemEvent = remotes:WaitForChild("StoreItem")
 
-local runtimeItems = Workspace:WaitForChild("RuntimeItems")
+-- สร้าง ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
 
--- ส่วนที่ 1: ฟังก์ชันการทิ้งไอเทมเมื่อผู้เล่นกดปุ่ม
+-- ฟังก์ชันการทิ้งไอเทม
 local function dropItem()
     dropItemEvent:FireServer()
 end
 
-local function createDropButton()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Parent = playerGui
+-- สร้างปุ่ม TextButton เป็นวงกลม
+local dropButton = Instance.new("TextButton")
+dropButton.Size = UDim2.new(0, 50, 0, 50)  -- ขนาดปุ่ม
+dropButton.Position = UDim2.new(0.5, -50, 0.8, -55)  -- ตำแหน่งปุ่ม
+dropButton.Text = "ทิ้งของทั้งหมด"
+dropButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+dropButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+dropButton.Font = Enum.Font.SourceSans
+dropButton.TextSize = 18
+dropButton.Parent = screenGui
 
-    local dropButton = Instance.new("TextButton")
-    dropButton.Size = UDim2.new(0, 200, 0, 50)
-    dropButton.Position = UDim2.new(0.5, -100, 0.8, -25)
-    dropButton.Text = "ทิ้งของทั้งหมด"
-    dropButton.Parent = screenGui
+-- ทำให้ปุ่มเป็นวงกลม
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 50)  -- ครึ่งหนึ่งของขนาดปุ่ม
+corner.Parent = dropButton
 
-    dropButton.MouseButton1Click:Connect(function()
-        for i = 1, 10 do
-            task.spawn(dropItem)
-        end
-    end)
-end
+-- ฟังก์ชันเมื่อคลิกปุ่ม
+dropButton.MouseButton1Click:Connect(function()
+    for i = 1, 10 do
+        task.spawn(dropItem)
+    end
+end)
 
--- ส่วนที่ 2: ฟังก์ชันการไฮไลต์ไอเทมที่ใกล้เคียง
+-- ทำให้ปุ่มสามารถลากได้
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+dropButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = dropButton.Position
+    end
+end)
+
+dropButton.InputChanged:Connect(function(input)
+    if dragging then
+        local delta = input.Position - dragStart
+        dropButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+dropButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- ฟังก์ชันเพิ่ม Highlight
 local highlights = {}
 local highlightEnabled = false
 
@@ -57,6 +87,36 @@ local function addHighlight(target)
     end
 end
 
+-- ฟังก์ชันเปิด/ปิดไฮไลต์
+local function toggleHighlights()
+    highlightEnabled = not highlightEnabled
+    for _, highlight in ipairs(highlights) do
+        highlight.Enabled = highlightEnabled
+    end
+end
+
+-- สร้างปุ่มเปิด/ปิดไฮไลต์
+local highlightButton = Instance.new("TextButton")
+highlightButton.Size = UDim2.new(0, 50, 0, 50)
+highlightButton.Position = UDim2.new(0.5, -50, 0.9, -25)
+highlightButton.Text = "เปิด/ปิด ไฮไลต์"
+highlightButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+highlightButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+highlightButton.Font = Enum.Font.SourceSans
+highlightButton.TextSize = 18
+highlightButton.Parent = screenGui
+
+-- ทำให้ปุ่มเป็นวงกลม
+local corner2 = Instance.new("UICorner")
+corner2.CornerRadius = UDim.new(0, 25)
+corner2.Parent = highlightButton
+
+highlightButton.MouseButton1Click:Connect(function()
+    toggleHighlights()
+    highlightButton.Text = highlightEnabled and "ปิด ไฮไลต์" or "เปิด ไฮไลต์"
+end)
+
+-- ฟังก์ชันสแกน RuntimeItems และเพิ่ม Highlight
 local function scanRuntimeItems()
     local runtimeItems = Workspace:FindFirstChild("RuntimeItems")
     if runtimeItems then
@@ -68,80 +128,63 @@ local function scanRuntimeItems()
     end
 end
 
-local function updateHighlights()
-    for _, highlight in ipairs(highlights) do
-        highlight.Enabled = highlightEnabled
+-- สแกน RuntimeItems เมื่อมีการเปลี่ยนแปลง
+RunService.Heartbeat:Connect(function()
+    local runtimeItems = Workspace:FindFirstChild("RuntimeItems")
+    if runtimeItems then
+        runtimeItems.ChildAdded:Connect(function(child)
+            if child:IsA("Model") then
+                addHighlight(child)
+            end
+        end)
     end
-end
+end)
 
-local function toggleHighlights()
-    highlightEnabled = not highlightEnabled
-    updateHighlights()
-end
+-- สแกน RuntimeItems เมื่อเริ่มต้น
+scanRuntimeItems()
 
-local function createHighlightButton()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Parent = playerGui
-
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 100, 0, 100)
-    button.Position = UDim2.new(0.5, -50, 0.8, -55)
-    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.SourceSans
-    button.TextSize = 18
-    button.Text = "เปิด/ปิด ไฮไลต์"
-    button.Parent = screenGui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 50)
-    corner.Parent = button
-
-    button.MouseButton1Click:Connect(function()
-        toggleHighlights()
-        button.Text = highlightEnabled and "ปิด ไฮไลต์" or "เปิด ไฮไลต์"
-    end)
-
-    UserInputService.TouchTap:Connect(function(input)
-        if button:IsPointInRegion2D(input.Position) then
-            button.MouseButton1Click:Fire()
-        end
-    end)
-end
-
--- ส่วนที่ 3: ฟังก์ชันเก็บไอเทมใกล้เคียง
+-- ฟังก์ชันเก็บของที่อยู่ใกล้
 local pickupEnabled = false
-local pickupDistance = 20
-local scanning = false
+local pickupDistance = 20  -- ระยะห่างที่สามารถเก็บของได้
+local scanning = false  -- ตัวแปรควบคุมการทำงาน
 local heartbeatConnection
 
 local function scanAndPickUpItems()
-    if not pickupEnabled or scanning then return end
-    scanning = true
+    if not pickupEnabled or scanning then return end  -- ถ้าไม่ได้เปิดหรือกำลังทำงานอยู่ ให้ข้าม
+    scanning = true  
 
+    -- ฟิลเตอร์รายการที่อยู่ใกล้กับผู้เล่นมากที่สุดก่อน
     local itemsToPickUp = {}
-    for _, item in ipairs(runtimeItems:GetChildren()) do
+    for _, item in ipairs(Workspace:FindFirstChild("RuntimeItems"):GetChildren()) do
         if item:IsA("Model") and item.PrimaryPart then
-            local distance = (item.PrimaryPart.Position - playerHumanoidRootPart.Position).magnitude
+            local distance = (item.PrimaryPart.Position - player.Character.HumanoidRootPart.Position).magnitude
             if distance <= pickupDistance then
                 table.insert(itemsToPickUp, item)
             end
         end
     end
-
+    
+    -- หากพบรายการที่ต้องการเก็บ, ส่งคำสั่งเก็บหลายๆ ตัวพร้อมกัน
     if #itemsToPickUp > 0 then
         local args = {}
-        for i = 1, math.min(5, #itemsToPickUp) do
+        -- ส่งคำสั่งเก็บหลายๆ รายการในครั้งเดียว
+        for i = 1, math.min(5, #itemsToPickUp) do  -- จำกัดจำนวนที่ส่งเป็น 5 รายการต่อรอบ
             table.insert(args, itemsToPickUp[i])
         end
-        storeItemEvent:FireServer(unpack(args))
+
+        -- ส่งคำสั่งเก็บ
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
+
+        -- หน่วงเวลาเล็กน้อยระหว่างการส่งคำสั่ง (ลดอาการแลค)
         task.wait(0.1)
     end
 
+    -- รอ 0.1 วินาที ก่อนสแกนรอบถัดไป (ลดเวลาในการรอเพื่อเพิ่มความเร็ว)
     task.wait(0.1)
     scanning = false
 end
 
+-- ฟังก์ชันเปิด/ปิดการเก็บของอัตโนมัติ
 local function togglePickupEnabled()
     pickupEnabled = not pickupEnabled
 
@@ -155,84 +198,27 @@ local function togglePickupEnabled()
     end
 end
 
-local function createPickupButton()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Parent = player.PlayerGui
+-- สร้าง GUI ปุ่มที่อยู่ทางซ้ายกลาง
+local pickupButton = Instance.new("TextButton")
+pickupButton.Size = UDim2.new(0, 50, 0, 50)  -- ขนาดของปุ่มเล็กลงเป็น 50x50
+pickupButton.Position = UDim2.new(0, 10, 0.5, -25)  -- ตำแหน่งซ้ายกลาง
+pickupButton.Text = "เปิด/ปิด การเก็บของ"
+pickupButton.TextSize = 12  -- ขนาดตัวอักษรลดลง
+pickupButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+pickupButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+pickupButton.Parent = screenGui
 
-    local toggleButton = Instance.new("TextButton")
-    toggleButton.Size = UDim2.new(0, 50, 0, 50)
-    toggleButton.Position = UDim2.new(0, 10, 0.5, -25)
-    toggleButton.Text = "เปิด/ปิด การเก็บของ"
-    toggleButton.TextSize = 12
-    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleButton.Parent = screenGui
+-- ทำให้ปุ่มเป็นวงกลม
+local corner3 = Instance.new("UICorner")
+corner3.CornerRadius = UDim.new(0, 25)  -- กำหนดมุมให้เป็นวงกลม
+corner3.Parent = pickupButton
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 25)
-    corner.Parent = toggleButton
-
-    toggleButton.MouseButton1Click:Connect(function()
-        togglePickupEnabled()
-        if pickupEnabled then
-            toggleButton.Text = "ปิด การเก็บของ"
-        else
-            toggleButton.Text = "เปิด การเก็บของ"
-        end
-    end)
-
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
-
-    toggleButton.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = toggleButton.Position
-        end
-    end)
-
-    toggleButton.InputChanged:Connect(function(input)
-        if dragging then
-            local delta = input.Position - dragStart
-            toggleButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    toggleButton.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-end
-
--- เรียกใช้งานฟังก์ชันทั้งหมด
-createDropButton()
-createHighlightButton()
-createPickupButton()
-
--- เริ่มการสแกนไอเทม
-scanRuntimeItems()
-
--- ติดตามการเปลี่ยนแปลงของ RuntimeItems
-RunService.Heartbeat:Connect(function()
-    local runtimeItems = Workspace:FindFirstChild("RuntimeItems")
-    if runtimeItems then
-        runtimeItems.ChildAdded:Connect(function(child)
-            if child:IsA("Model") then
-                addHighlight(child)
-                if highlightEnabled then
-                    local highlight = child:FindFirstChild("Highlight")
-                    if highlight then
-                        highlight.Enabled = true
-                    end
-                end
-            end
-        end)
-
-        runtimeItems.ChildRemoved:Connect(function()
-            scanRuntimeItems()
-        end)
+-- ฟังก์ชันเมื่อคลิกปุ่ม
+pickupButton.MouseButton1Click:Connect(function()
+    togglePickupEnabled()
+    if pickupEnabled then
+        pickupButton.Text = "ปิด การเก็บของ"
+    else
+        pickupButton.Text = "เปิด การเก็บของ"
     end
 end)
