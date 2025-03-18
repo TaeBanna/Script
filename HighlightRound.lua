@@ -59,23 +59,55 @@ local function createGui()
     end
 
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 200, 0, 50)
-    button.Position = UDim2.new(0, 10, 0.9, -25)
+    button.Size = UDim2.new(0, 50, 0, 50)  -- ขนาดปุ่ม (กว้าง 100, ยาว 100)
+    button.Position = UDim2.new(0, 10, 0.9, -55)  -- ตำแหน่งซ้ายกลาง
     button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Font = Enum.Font.SourceSans
-    button.TextSize = 24
+    button.TextSize = 18  -- ขนาดตัวอักษร
     button.Text = "เปิด/ปิด ไฮไลต์"
     button.Parent = screenGui
 
-    -- รองรับเมาส์ + สัมผัสหน้าจอ
+    -- เพิ่ม UICorner เพื่อทำให้ปุ่มเป็นวงกลม
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 50)  -- กำหนดมุมให้เป็นวงกลม (ครึ่งหนึ่งของขนาดปุ่ม)
+    corner.Parent = button
+
+    -- ฟังก์ชันเมื่อคลิกปุ่ม
     local function onButtonPress()
         toggleHighlights()
         button.Text = highlightEnabled and "ปิด ไฮไลต์" or "เปิด ไฮไลต์"
     end
 
+    -- กดปุ่มแล้วทำงาน
     button.MouseButton1Click:Connect(onButtonPress) -- สำหรับ PC
     UserInputService.TouchTap:Connect(onButtonPress) -- สำหรับมือถือ
+
+    -- ฟังก์ชันให้ปุ่มสามารถลากได้
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    button.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = button.Position
+        end
+    end)
+
+    button.InputChanged:Connect(function(input)
+        if dragging then
+            local delta = input.Position - dragStart
+            button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    button.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
 end
 
 -- ติดตามการเปลี่ยนแปลงของ RuntimeItems
