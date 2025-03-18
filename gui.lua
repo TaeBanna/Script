@@ -1,21 +1,20 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-
 local player = Players.LocalPlayer
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
 local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local runtimeItems = workspace:WaitForChild("RuntimeItems")
 
 local pickupEnabled = false
-local pickupDistance = 20  
-local scanning = false  
+local pickupDistance = 20
+local scanning = false
 local heartbeatConnection
 
+-- ฟังก์ชันเก็บของ
 local function scanAndPickUpItems()
-    if not pickupEnabled or scanning then return end  
-    scanning = true  
+    if not pickupEnabled or scanning then return end
+    scanning = true
 
     local itemsToPickUp = {}
     for _, item in ipairs(runtimeItems:GetChildren()) do
@@ -35,14 +34,13 @@ local function scanAndPickUpItems()
         ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
         task.wait(0.1)
     end
-
     task.wait(0.1)
     scanning = false
 end
 
+-- ฟังก์ชันเปิด/ปิด
 local function togglePickupEnabled()
     pickupEnabled = not pickupEnabled
-
     if pickupEnabled then
         heartbeatConnection = RunService.Heartbeat:Connect(scanAndPickUpItems)
     else
@@ -53,39 +51,60 @@ local function togglePickupEnabled()
     end
 end
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player.PlayerGui
+-- GUI
+local Main = script.Parent
+local Highlight = Instance.new("TextButton")
+local Pickup = Instance.new("TextButton")
+local Drop = Instance.new("TextButton")
+local UICorner_Highlight = Instance.new("UICorner")
+local UICorner_Pickup = Instance.new("UICorner")
+local UICorner_Drop = Instance.new("UICorner")
 
-local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 300, 0, 250)
-Main.Position = UDim2.new(0.35, 0, 0.3, 0)
-Main.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Main.Parent = screenGui
+-- ปุ่ม Highlight
+Highlight.Name = "Highlight"
+Highlight.Parent = Main
+Highlight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Highlight.Position = UDim2.new(0.295, 0, 0.064, 0)
+Highlight.Size = UDim2.new(0, 200, 0, 50)
+Highlight.Font = Enum.Font.SourceSans
+Highlight.Text = "Highlight"
+Highlight.TextColor3 = Color3.fromRGB(0, 0, 0)
+Highlight.TextSize = 14
+UICorner_Highlight.CornerRadius = UDim.new(0, 20)
+UICorner_Highlight.Parent = Highlight
 
-local function createButton(name, text, position, parent)
-    local button = Instance.new("TextButton")
-    button.Name = name
-    button.Parent = parent
-    button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    button.Position = position
-    button.Size = UDim2.new(0, 200, 0, 50)
-    button.Font = Enum.Font.SourceSans
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(0, 0, 0)
-    button.TextSize = 14
+-- ปุ่ม Pickup
+Pickup.Name = "Pickup"
+Pickup.Parent = Main
+Pickup.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Pickup.Position = UDim2.new(0.295, 0, 0.277, 0)
+Pickup.Size = UDim2.new(0, 200, 0, 50)
+Pickup.Font = Enum.Font.SourceSans
+Pickup.Text = "Pickup"
+Pickup.TextColor3 = Color3.fromRGB(0, 0, 0)
+Pickup.TextSize = 14
+UICorner_Pickup.CornerRadius = UDim.new(0, 20)
+UICorner_Pickup.Parent = Pickup
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 20)
-    corner.Parent = button
-
-    return button
-end
-
-local highlightButton = createButton("Highlight", "Highlight", UDim2.new(0.15, 0, 0.1, 0), Main)
-local pickupButton = createButton("Pickup", "Pickup", UDim2.new(0.15, 0, 0.35, 0), Main)
-local dropButton = createButton("Drop", "Drop", UDim2.new(0.15, 0, 0.6, 0), Main)
-
-pickupButton.MouseButton1Click:Connect(function()
+-- ฟังก์ชันกดปุ่ม Pickup
+Pickup.MouseButton1Click:Connect(function()
     togglePickupEnabled()
-    pickupButton.Text = pickupEnabled and "ปิด การเก็บของ" or "Pickup"
+    if pickupEnabled then
+        Pickup.Text = "ปิด การเก็บของ"
+    else
+        Pickup.Text = "Pickup"
+    end
 end)
+
+-- ปุ่ม Drop
+Drop.Name = "Drop"
+Drop.Parent = Main
+Drop.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Drop.Position = UDim2.new(0.295, 0, 0.488, 0)
+Drop.Size = UDim2.new(0, 200, 0, 50)
+Drop.Font = Enum.Font.SourceSans
+Drop.Text = "Drop"
+Drop.TextColor3 = Color3.fromRGB(0, 0, 0)
+Drop.TextSize = 14
+UICorner_Drop.CornerRadius = UDim.new(0, 20)
+UICorner_Drop.Parent = Drop
