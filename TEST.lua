@@ -1,32 +1,4 @@
--- ฟังก์ชันการลากปุ่ม
-local function makeDraggable(button)
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
-
-    button.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = button.Position
-        end
-    end)
-
-    button.InputChanged:Connect(function(input)
-        if dragging then
-            local delta = input.Position - dragStart
-            button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    button.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-end
-
--- สร้างปุ่มและฟังก์ชันการเปิด/ปิดไฮไลต์
+-- ฟังก์ชันการเปิด/ปิดไฮไลต์
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
@@ -100,9 +72,6 @@ local function createGui()
     corner2.CornerRadius = UDim.new(0, 25)
     corner2.Parent = highlightButton
 
-    -- ทำให้ปุ่มสามารถลากได้
-    makeDraggable(highlightButton)
-
     highlightButton.MouseButton1Click:Connect(function()
         toggleHighlights()
         highlightButton.Text = highlightEnabled and "ปิด ไฮไลต์" or "เปิด ไฮไลต์"
@@ -122,9 +91,6 @@ local function createGui()
     local corner3 = Instance.new("UICorner")
     corner3.CornerRadius = UDim.new(0, 25)
     corner3.Parent = pickupButton
-
-    -- ทำให้ปุ่มสามารถลากได้
-    makeDraggable(pickupButton)
 
     pickupButton.MouseButton1Click:Connect(function()
         togglePickupEnabled()
