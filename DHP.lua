@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
@@ -9,19 +8,28 @@ local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local runtimeItems = workspace:WaitForChild("RuntimeItems")
 
 local pickupEnabled = false
+local highlightEnabled = false
 local pickupDistance = 20
 local scanning = false
 local heartbeatConnection
 
--- ██████ ฟังก์ชันสำหรับ Highlight ██████
-local function highlightItems()
+-- ██████ ฟังก์ชันเปิด/ปิด Highlight ██████
+local function toggleHighlight()
+    highlightEnabled = not highlightEnabled
     for _, item in ipairs(runtimeItems:GetChildren()) do
         if item:IsA("Model") and item.PrimaryPart then
-            if not item:FindFirstChild("Highlight") then
-                local highlight = Instance.new("Highlight")
-                highlight.FillColor = Color3.fromRGB(255, 255, 0)
-                highlight.FillTransparency = 0.5
-                highlight.Parent = item
+            local highlight = item:FindFirstChild("Highlight")
+            if highlightEnabled then
+                if not highlight then
+                    highlight = Instance.new("Highlight")
+                    highlight.FillColor = Color3.fromRGB(255, 255, 0)
+                    highlight.FillTransparency = 0.5
+                    highlight.Parent = item
+                end
+            else
+                if highlight then
+                    highlight:Destroy()
+                end
             end
         end
     end
@@ -84,7 +92,7 @@ local function createButton(text, position, callback)
     return button
 end
 
-local pickupButton = createButton("เปิด/ปิด การเก็บของ", UDim2.new(0, 10, 0.4, -25), function()
+local pickupButton = createButton("เปิด การเก็บของ", UDim2.new(0, 10, 0.4, -25), function()
     pickupEnabled = not pickupEnabled
     if pickupEnabled then
         heartbeatConnection = RunService.Heartbeat:Connect(scanAndPickUpItems)
@@ -95,6 +103,13 @@ local pickupButton = createButton("เปิด/ปิด การเก็บ�
     end
 end)
 
-local highlightButton = createButton("ไฮไลท์ไอเทม", UDim2.new(0, 10, 0.5, -25), highlightItems)
+local highlightButton = createButton("เปิด ไฮไลท์ไอเทม", UDim2.new(0, 10, 0.5, -25), function()
+    toggleHighlight()
+    if highlightEnabled then
+        highlightButton.Text = "ปิด ไฮไลท์ไอเทม"
+    else
+        highlightButton.Text = "เปิด ไฮไลท์ไอเทม"
+    end
+end)
 
 local dropAllButton = createButton("ทิ้งของทั้งหมด", UDim2.new(0, 10, 0.6, -25), dropAllItems)
