@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -29,14 +28,17 @@ local function scanAndPickUpItems()
         end
     end
     
-    -- หากพบรายการที่ต้องการเก็บ
-    for _, item in ipairs(itemsToPickUp) do
-        local args = { [1] = item }
-        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
+    -- หากพบรายการที่ต้องการเก็บ, ส่งคำสั่งเก็บทีละตัวเพื่อลดการโหลด
+    if #itemsToPickUp > 0 then
+        for _, item in ipairs(itemsToPickUp) do
+            local args = { [1] = item }
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
+            task.wait(0.1)  -- เพิ่มดีเลย์เล็กน้อยเพื่อป้องกันการทำงานซ้ำบ่อยเกินไป
+        end
     end
 
-    -- รอ 1 วินาที เพื่อไม่ให้สแกนบ่อยเกินไป
-    task.wait(1)
+    -- รอ 0.5 วินาที ก่อนสแกนรอบถัดไป
+    task.wait(0.5)
     scanning = false
 end
 
