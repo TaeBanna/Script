@@ -1,82 +1,150 @@
--- โหลด Kavo UI Library
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("GLandCD", "Ocean") -- สร้างหน้าต่างหลัก
-local Tab = Window:NewTab("Game") -- สร้างแท็บ
-local Section = Tab:NewSection("Highlight") -- สร้างส่วนย่อยภายในแท็บ
+local air = Instance.new("ScreenGui")
+local ScreenGuiHIDESHOW = Instance.new("ScreenGui")
+local miniHIDESHOW = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
+local ScreenGui555 = Instance.new("ScreenGui")
+local Main = Instance.new("Frame")
+local Highlight = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+local UICorner_3 = Instance.new("UICorner")
+local Pickup = Instance.new("TextButton")
+local UICorner_4 = Instance.new("UICorner")
+local Drop = Instance.new("TextButton")
+local UICorner_5 = Instance.new("UICorner")
+local Creator = Instance.new("Frame")
+local UICorner_6 = Instance.new("UICorner")
+local Creator_2 = Instance.new("TextLabel")
+local UICorner_7 = Instance.new("UICorner")
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local runtimeItems = workspace:WaitForChild("RuntimeItems")
+-- Properties:
 
-local highlightEnabled = false -- สถานะเริ่มต้นคือไม่เปิดไฮไลท์
+air.Name = "air"
+air.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+air.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- ฟังก์ชันไฮไลท์
-local function highlightItems()
-    -- ลูปผ่านไอเทมใน RuntimeItems
-    for _, item in ipairs(runtimeItems:GetChildren()) do
-        if item:IsA("Model") and item.PrimaryPart then
-            local highlight = item:FindFirstChild("Highlight")
+ScreenGuiHIDESHOW.Name = "ScreenGuiHIDESHOW"
+ScreenGuiHIDESHOW.Parent = air
+ScreenGuiHIDESHOW.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-            -- ถ้ากดเปิดไฮไลท์
-            if highlightEnabled then
-                if not highlight then
-                    highlight = Instance.new("Highlight") -- สร้าง Highlight ใหม่
-                    highlight.FillColor = Color3.fromRGB(255, 255, 0) -- กำหนดสี
-                    highlight.FillTransparency = 0.5 -- กำหนดความโปร่งใส
-                    highlight.Parent = item -- เพิ่ม Highlight ลงในไอเทม
-                end
-            else
-                if highlight then
-                    highlight:Destroy() -- ลบ Highlight เมื่อปิด
-                end
-            end
-        end
-    end
+miniHIDESHOW.Name = "miniHIDESHOW"
+miniHIDESHOW.Parent = ScreenGuiHIDESHOW
+miniHIDESHOW.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+miniHIDESHOW.BorderColor3 = Color3.fromRGB(0, 0, 0)
+miniHIDESHOW.BorderSizePixel = 0
+miniHIDESHOW.Position = UDim2.new(0.477122813, 0, 0.0167112295, 0)
+miniHIDESHOW.Size = UDim2.new(0, 43, 0, 40)
+miniHIDESHOW.Image = "rbxassetid://74722061366512"
+
+UICorner.CornerRadius = UDim.new(0, 50)
+UICorner.Parent = miniHIDESHOW
+
+ScreenGui555.Name = "ScreenGui555"
+ScreenGui555.Parent = air
+ScreenGui555.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Main.Name = "Main"
+Main.Parent = ScreenGui555
+Main.BackgroundColor3 = Color3.fromRGB(55, 40, 57)
+Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderSizePixel = 0
+Main.Position = UDim2.new(0.249381661, 0, 0.24899736, 0)
+Main.Size = UDim2.new(0.5, 0, 0.5, 0)
+
+Highlight.Name = "Highlight"
+Highlight.Parent = Main
+Highlight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Highlight.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Highlight.BorderSizePixel = 0
+Highlight.Position = UDim2.new(0.294723809, 0, 0.0635026693, 0)
+Highlight.Size = UDim2.new(0, 200, 0, 50)
+Highlight.Font = Enum.Font.SourceSans
+Highlight.TextColor3 = Color3.fromRGB(0, 0, 0)
+Highlight.TextSize = 14.000
+
+UICorner_2.CornerRadius = UDim.new(0, 20)
+UICorner_2.Parent = Highlight
+
+UICorner_3.CornerRadius = UDim.new(0, 20)
+UICorner_3.Parent = Main
+
+Pickup.Name = "Pickup"
+Pickup.Parent = Main
+Pickup.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Pickup.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Pickup.BorderSizePixel = 0
+Pickup.Position = UDim2.new(0.294723809, 0, 0.277406394, 0)
+Pickup.Size = UDim2.new(0, 200, 0, 50)
+Pickup.Font = Enum.Font.SourceSans
+Pickup.TextColor3 = Color3.fromRGB(0, 0, 0)
+Pickup.TextSize = 14.000
+
+UICorner_4.CornerRadius = UDim.new(0, 20)
+UICorner_4.Parent = Pickup
+
+Drop.Name = "Drop"
+Drop.Parent = Main
+Drop.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Drop.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Drop.BorderSizePixel = 0
+Drop.Position = UDim2.new(0.294723809, 0, 0.487967908, 0)
+Drop.Size = UDim2.new(0, 200, 0, 50)
+Drop.Font = Enum.Font.SourceSans
+Drop.TextColor3 = Color3.fromRGB(0, 0, 0)
+Drop.TextSize = 14.000
+
+UICorner_5.CornerRadius = UDim.new(0, 20)
+UICorner_5.Parent = Drop
+
+Creator.Name = "Creator"
+Creator.Parent = ScreenGui555
+Creator.BackgroundColor3 = Color3.fromRGB(55, 40, 57)
+Creator.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Creator.BorderSizePixel = 0
+Creator.Position = UDim2.new(0.431780696, 0, 0.157085553, 0)
+Creator.Size = UDim2.new(0.135037139, 0, 0.0782754049, 0)
+
+UICorner_6.CornerRadius = UDim.new(0, 20)
+UICorner_6.Parent = Creator
+
+Creator_2.Name = "Creator"
+Creator_2.Parent = Creator
+Creator_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Creator_2.BackgroundTransparency = 1.000
+Creator_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Creator_2.BorderSizePixel = 0
+Creator_2.Position = UDim2.new(0.0730769485, 0, 0.0426985435, 0)
+Creator_2.Size = UDim2.new(0.848896265, 0, 0.896669447, 0)
+Creator_2.Font = Enum.Font.SourceSans
+Creator_2.Text = "By.TaeBanna"
+Creator_2.TextColor3 = Color3.fromRGB(220, 97, 187)
+Creator_2.TextSize = 24.000
+
+UICorner_7.CornerRadius = UDim.new(0, 20)
+UICorner_7.Parent = Creator_2
+
+-- Scripts:
+
+local function DXXIS_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility 
+	local script = Instance.new('LocalScript', miniHIDESHOW)
+
+	local button = script.Parent
+	local screenGui555 = game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("air"):WaitForChild("ScreenGui555")
+	
+	button.MouseButton1Click:Connect(function()
+		screenGui555.Enabled = not screenGui555.Enabled
+	end)
+end
+coroutine.wrap(DXXIS_fake_script)()
+
+-- ปุ่มเลื่อนเปิด-ปิด
+local function toggleHighlight()
+	local script = Instance.new('LocalScript', Highlight)
+	
+	local button = script.Parent
+	button.MouseButton1Click:Connect(function()
+		Main.Visible = not Main.Visible
+		Highlight.Text = Main.Visible and "Hide" or "Show"
+	end)
 end
 
--- สร้าง Toggle Switch
-Section:NewToggle("Highlight", "เปิด/ปิดการไฮไลท์ของไอเทม", function(state)
-    highlightEnabled = state -- ตั้งค่าการเปิด/ปิดตาม Toggle
-    highlightItems() -- เรียกฟังก์ชัน highlightItems เมื่อสถานะเปลี่ยนแปลง
-end)
-
--- เพิ่มปุ่มสำหรับมือถือ
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player.PlayerGui
-
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 200, 0, 50)
-toggleButton.Position = UDim2.new(0.5, -100, 0.8, -25) -- ตำแหน่งตรงกลางหน้าจอ
-toggleButton.Text = "เปิด/ปิด การไฮไลท์"
-toggleButton.TextSize = 20
-toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.Parent = screenGui
-
-toggleButton.MouseButton1Click:Connect(function()
-    highlightEnabled = not highlightEnabled
-    highlightItems()
-    if highlightEnabled then
-        toggleButton.Text = "ปิด การไฮไลท์"
-    else
-        toggleButton.Text = "เปิด การไฮไลท์"
-    end
-end)
-
--- สร้างปุ่มเปิด/ปิด GUI หลัก
-local toggleGuiButton = Instance.new("TextButton")
-toggleGuiButton.Size = UDim2.new(0, 100, 0, 50)
-toggleGuiButton.Position = UDim2.new(0.05, 0, 0.15, 0) -- ตำแหน่งปุ่มเปิด/ปิด GUI
-toggleGuiButton.Text = "Toggle GUI"
-toggleGuiButton.TextSize = 20
-toggleGuiButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- สีเขียว
-toggleGuiButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleGuiButton.Parent = screenGui
-
--- ฟังก์ชันเปิด/ปิด GUI หลัก
-local guiVisible = true -- สถานะเปิด/ปิด GUI
-toggleGuiButton.MouseButton1Click:Connect(function()
-    guiVisible = not guiVisible
-    Window.Visible = guiVisible -- เปลี่ยนสถานะการแสดงผลของ GUI หลัก
-    toggleGuiButton.Text = guiVisible and "ปิด GUI" or "เปิด GUI" -- เปลี่ยนข้อความตามสถานะ
-end)
+coroutine.wrap(toggleHighlight)()
