@@ -1,3 +1,5 @@
+-- LocalScript (เช่น ใน StarterPlayerScripts)
+
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -59,8 +61,8 @@ local function createGui()
     end
 
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 50, 0, 50)  -- ขนาดปุ่ม (กว้าง 100, ยาว 100)
-    button.Position = UDim2.new(0, 10, 0.9, -55)  -- ตำแหน่งซ้ายกลาง
+    button.Size = UDim2.new(0, 100, 0, 100)  -- ขนาดปุ่ม (100x100 ให้เป็นวงกลม)
+    button.Position = UDim2.new(0.5, -50, 0.8, -55)  -- ตำแหน่งตรงกลางด้านล่าง
     button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Font = Enum.Font.SourceSans
@@ -79,35 +81,15 @@ local function createGui()
         button.Text = highlightEnabled and "ปิด ไฮไลต์" or "เปิด ไฮไลต์"
     end
 
-    -- กดปุ่มแล้วทำงาน
+    -- เมื่อกดปุ่มจะทำงาน
     button.MouseButton1Click:Connect(onButtonPress) -- สำหรับ PC
-    UserInputService.TouchTap:Connect(onButtonPress) -- สำหรับมือถือ
-
-    -- ฟังก์ชันให้ปุ่มสามารถลากได้
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
-
-    button.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = button.Position
+    UserInputService.TouchTap:Connect(function(input)
+        -- เช็คว่ากดที่ปุ่มหรือไม่
+        if button:IsPointInRegion2D(input.Position) then
+            onButtonPress()
         end
-    end)
+    end) -- สำหรับมือถือ
 
-    button.InputChanged:Connect(function(input)
-        if dragging then
-            local delta = input.Position - dragStart
-            button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    button.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
 end
 
 -- ติดตามการเปลี่ยนแปลงของ RuntimeItems
