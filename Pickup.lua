@@ -30,17 +30,17 @@ local function scanAndPickUpItems()
     
     -- หากพบรายการที่ต้องการเก็บ, ส่งคำสั่งเก็บหลายๆ ตัวพร้อมกัน
     if #itemsToPickUp > 0 then
-        -- ปรับระยะเวลาในการส่งคำสั่งเก็บเพื่อไม่ให้แลค
         local args = {}
-        for _, item in ipairs(itemsToPickUp) do
-            table.insert(args, item)
+        -- ส่งคำสั่งเก็บหลายๆ รายการในครั้งเดียว
+        for i = 1, math.min(5, #itemsToPickUp) do  -- จำกัดจำนวนที่ส่งเป็น 5 รายการต่อรอบ
+            table.insert(args, itemsToPickUp[i])
         end
 
-        -- ส่งคำสั่งเก็บหลายๆ รายการในครั้งเดียว
+        -- ส่งคำสั่งเก็บ
         ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
 
         -- หน่วงเวลาเล็กน้อยระหว่างการส่งคำสั่ง (ลดอาการแลค)
-        task.wait(0.05)
+        task.wait(0.1)
     end
 
     -- รอ 0.1 วินาที ก่อนสแกนรอบถัดไป (ลดเวลาในการรอเพื่อเพิ่มความเร็ว)
