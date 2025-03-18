@@ -62,51 +62,26 @@ local function togglePickupEnabled()
     end
 end
 
--- สร้าง GUI ปุ่มวงกลมที่สามารถย้ายได้
+-- สร้าง GUI ปุ่มที่อยู่ทางซ้ายกลาง
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player.PlayerGui
 
 local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 50, 0, 50)  -- ขนาดปุ่มเป็นวงกลม
+toggleButton.Size = UDim2.new(0, 200, 0, 50)
 toggleButton.Position = UDim2.new(0, 10, 0.5, -25)  -- ตำแหน่งซ้ายกลาง
-toggleButton.Text = ""
+toggleButton.Text = "เปิด/ปิด การเก็บของ"
+toggleButton.TextSize = 18
 toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.BorderRadius = UDim.new(0, 25)  -- ทำให้ปุ่มเป็นวงกลม
 toggleButton.Parent = screenGui
 
 -- ฟังก์ชันเมื่อคลิกปุ่ม
 toggleButton.MouseButton1Click:Connect(function()
     togglePickupEnabled()
     if pickupEnabled then
-        toggleButton.Text = "ปิด"
+        toggleButton.Text = "ปิด การเก็บของ"
     else
-        toggleButton.Text = "เปิด"
+        toggleButton.Text = "เปิด การเก็บของ"
     end
 end)
 
--- ฟังก์ชันเพื่อย้ายปุ่ม
-local dragging = false
-local dragStart
-local startPos
-
-toggleButton.InputBegan:Connect(function(input, gameProcessed)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = toggleButton.Position
-    end
-end)
-
-toggleButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging then
-        local delta = input.Position - dragStart
-        toggleButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
