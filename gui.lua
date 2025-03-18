@@ -63,26 +63,6 @@ toggleButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- สร้างปุ่มวงกลมเพื่อปิดหน้าต่าง GUI
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 50, 0, 50)
-closeButton.Position = UDim2.new(0.05, 0, 0.05, 0) -- ตำแหน่งทางซ้ายบนของหน้าจอ
-closeButton.Text = "X"
-closeButton.TextSize = 25
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- สีแดง
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Parent = screenGui
-
--- ทำให้ปุ่มเป็นวงกลม
-local circleShape = Instance.new("UICorner") -- สร้างมุมกลม
-circleShape.CornerRadius = UDim.new(1, 0) -- ทำให้เป็นวงกลม
-circleShape.Parent = closeButton
-
--- ฟังก์ชันการคลิกปิดหน้าต่าง
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy() -- ลบหน้าจอ GUI ทั้งหมด
-end)
-
 -- สร้างปุ่มเปิด/ปิด GUI หลัก
 local toggleGuiButton = Instance.new("TextButton")
 toggleGuiButton.Size = UDim2.new(0, 100, 0, 50)
