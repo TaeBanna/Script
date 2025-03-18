@@ -59,3 +59,72 @@ Drop.TextSize = 14
 
 UICorner_Drop.CornerRadius = UDim.new(0, 20)
 UICorner_Drop.Parent = Drop
+
+-- Properties สำหรับการทำงานของ Pickup และ Drop
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local playerCharacter = player.Character or player.CharacterAdded:Wait()
+local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
+local runtimeItems = workspace:WaitForChild("RuntimeItems")
+
+local pickupEnabled = false
+local pickupDistance = 20
+local scanning = false
+local heartbeatConnection
+
+-- ฟังก์ชันเก็บของ
+local function scanAndPickUpItems()
+    if not pickupEnabled or scanning then return end
+    scanning = true
+
+    local itemsToPickUp = {}
+    for _, item in ipairs(runtimeItems:GetChildren()) do
+        if item:IsA("Model") and item.PrimaryPart then
+            local distance = (item.PrimaryPart.Position - playerHumanoidRootPart.Position).magnitude
+            if distance <= pickupDistance then
+                table.insert(itemsToPickUp, item)
+            end
+        end
+    end
+
+    if #itemsToPickUp > 0 then
+        local args = {}
+        for i = 1, math.min(5, #itemsToPickUp) do
+            table.insert(args, itemsToPickUp[i])
+        end
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(unpack(args))
+        task.wait(0.1)
+    end
+    task.wait(0.1)
+    scanning = false
+end
+
+-- ฟังก์ชันเปิด/ปิดการเก็บของ
+local function togglePickupEnabled()
+    pickupEnabled = not pickupEnabled
+    if pickupEnabled then
+        heartbeatConnection = RunService.Heartbeat:Connect(scanAndPickUpItems)
+    else
+        if heartbeatConnection then
+            heartbeatConnection:Disconnect()
+            heartbeatConnection = nil
+        end
+    end
+end
+
+-- ฟังก์ชันกดปุ่ม Pickup
+Pickup.MouseButton1Click:Connect(function()
+    togglePickupEnabled()
+    if pickupEnabled then
+        Pickup.Text = "ปิด การเก็บของ"
+    else
+        Pickup.Text = "Pickup"
+    end
+end)
+
+-- ฟังก์ชันกดปุ่ม Drop
+Drop.MouseButton1Click:Connect(function()
+    -- ฟังก์ชันที่ใช้ในการทำงานของปุ่ม Drop (สามารถเพิ่มฟังก์ชันได้ตามที่ต้องการ)
+end)
