@@ -6,7 +6,6 @@ if not success then
     warn("Failed to load GUI: " .. message)
 end
 
-
 game.CoreGui.GhostGui.MainFrame.Title.Text = "Menu"
 
 local RunService = game:GetService("RunService")
@@ -116,16 +115,15 @@ end
 
 -- ฟังก์ชัน Drop All 10 ครั้ง
 shared.dropAll = function()
-  local function dropItems()
-    for i = 1, 10 do
-        dropItemRemote:FireServer()
+    local function dropItems()
+        for i = 1, 10 do
+            dropItemRemote:FireServer()
+        end
     end
+    dropItems()  -- เรียกฟังก์ชันเพื่อทิ้งไอเทม 10 ครั้ง
 end
 
-
 ----------------------------
-
-
 
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
 
@@ -147,5 +145,3 @@ shared.togglePickup(false) -- ปิดใช้งาน
 AddContent("TextButton", "DropAllItem", [[
 shared.dropAll()  -- เรียกฟังก์ชันด้วยวงเล็บ
 ]])
-
-
