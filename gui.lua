@@ -17,8 +17,7 @@ local player = Players.LocalPlayer
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
 local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local runtimeItems = workspace:WaitForChild("RuntimeItems")
-local remotes = ReplicatedStorage:WaitForChild("Remotes")
-local dropItemEvent = remotes:WaitForChild("DropItem")
+local dropItemRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("DropItem")
 
 local highlightEnabled = false
 local pickupEnabled = false
@@ -115,23 +114,11 @@ shared.togglePickup = function(state)
     end
 end
 
--- ฟังก์ชัน Drop All
-local function dropAllItems()
-    -- ทิ้งทุกไอเทมที่อยู่ใน Backpack ของผู้เล่น
-    local player = game.Players.LocalPlayer
-    for _, item in ipairs(player.Backpack:GetChildren()) do
-        if item:IsA("Tool") then
-            dropItemEvent:FireServer(item)  -- ส่งคำสั่งทิ้งไปยังเซิร์ฟเวอร์
-            task.wait(0.1)  -- ป้องกัน Spam (ลดโหลดของเซิร์ฟเวอร์)
-        end
-    end
-end
-
 -- ฟังก์ชัน Drop All 10 ครั้ง
 shared.dropAll = function()
+  local function dropItems()
     for i = 1, 10 do
-        dropAllItems()  -- เรียกฟังก์ชันทิ้งของ
-        task.wait(0.2)  -- หน่วงเวลากัน Spam
+        dropItemRemote:FireServer()
     end
 end
 
