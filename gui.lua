@@ -86,9 +86,12 @@ local function scanAndPickUpItems()
 
     for _, item in ipairs(runtimeItems:GetChildren()) do
         if item:IsA("Model") and item.PrimaryPart then
-            local distance = (item.PrimaryPart.Position - playerHumanoidRootPart.Position).magnitude
-            if distance <= pickupDistance then
-                dropItemEvent:FireServer(item)
+            local primaryPart = item.PrimaryPart
+            if primaryPart and primaryPart:IsA("BasePart") then -- ตรวจสอบว่า PrimaryPart มีค่าและเป็น BasePart
+                local distance = (primaryPart.Position - playerHumanoidRootPart.Position).magnitude
+                if distance <= pickupDistance then
+                    dropItemEvent:FireServer(item)
+                end
             end
         end
     end
@@ -117,14 +120,16 @@ local function dropAllItems()
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
             dropItemEvent:FireServer(item)  -- ส่งคำสั่งทิ้งไปยังเซิร์ฟเวอร์
+            task.wait(0.1)  -- ป้องกัน Spam (ลดโหลดของเซิร์ฟเวอร์)
         end
     end
 end
 
--- เมื่อกดปุ่มจะทิ้งไอเทม 10 ครั้ง โดยใช้ delay หรือ task.spawn เพื่อให้ทิ้งเร็วขึ้น
+-- ฟังก์ชัน Drop All 10 ครั้ง
 shared.dropAll = function()
     for i = 1, 10 do
-        task.spawn(dropAllItems)  -- ใช้ task.spawn เพื่อให้ทิ้งไอเทมในเธรดใหม่
+        dropAllItems()  -- เรียกฟังก์ชันทิ้งของ
+        task.wait(0.2)  -- หน่วงเวลากัน Spam
     end
 end
 
@@ -149,8 +154,8 @@ shared.togglePickup(true) -- เปิดใช้งาน
 shared.togglePickup(false) -- ปิดใช้งาน
 ]])
 
+-- เพิ่มปุ่ม DropAllItem ที่เชื่อมกับฟังก์ชันที่ถูกต้อง
 AddContent("TextButton", "DropAllItem", [[
-shared.dropAllItems
+shared.dropAll  -- แก้ให้ไม่มีวงเล็บ
 ]])
-
 
