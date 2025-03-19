@@ -7,20 +7,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
-if not player then
-    return warn("❌ ไม่พบ Player ในเกม!")
-end
-
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
-local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart", 5)
-if not playerHumanoidRootPart then
-    return warn("❌ ไม่พบ HumanoidRootPart!")
-end
-
-local runtimeItems = workspace:FindFirstChild("RuntimeItems")
-if not runtimeItems then
-    return warn("❌ ไม่พบโฟลเดอร์ RuntimeItems ใน Workspace!")
-end
+local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
+local runtimeItems = workspace:WaitForChild("RuntimeItems")
 
 local highlightEnabled = false
 local pickupEnabled = false
@@ -30,15 +19,8 @@ local scanning = false
 local heartbeatConnection
 
 -- ดึงข้อมูลที่จำเป็นจาก ReplicatedStorage ไว้ข้างนอก
-local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-if not remotes then
-    return warn("❌ ไม่พบ Remotes ใน ReplicatedStorage!")
-end
-
-local dropItemEvent = remotes:FindFirstChild("DropItem")
-if not dropItemEvent then
-    return warn("❌ ไม่พบ DropItem RemoteEvent!")
-end
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local dropItemEvent = remotes:WaitForChild("DropItem")
 
 -- ฟังก์ชันทำความสะอาดไฮไลต์เก่าทั้งหมด
 local function cleanupHighlights()
@@ -104,12 +86,9 @@ local function scanAndPickUpItems()
 
     for _, item in ipairs(runtimeItems:GetChildren()) do
         if item:IsA("Model") and item.PrimaryPart then
-            local primaryPart = item.PrimaryPart
-            if primaryPart and primaryPart:IsA("BasePart") then -- ตรวจสอบว่า PrimaryPart มีค่าและเป็น BasePart
-                local distance = (primaryPart.Position - playerHumanoidRootPart.Position).magnitude
-                if distance <= pickupDistance then
-                    dropItemEvent:FireServer(item)
-                end
+            local distance = (item.PrimaryPart.Position - playerHumanoidRootPart.Position).magnitude
+            if distance <= pickupDistance then
+                ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StoreItem"):FireServer(item)
             end
         end
     end
@@ -134,6 +113,7 @@ end
 -- ฟังก์ชัน Drop All
 local function dropAllItems()
     -- ทิ้งทุกไอเทมที่อยู่ใน Backpack ของผู้เล่น
+    local player = game.Players.LocalPlayer
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
             dropItemEvent:FireServer(item)  -- ส่งคำสั่งทิ้งไปยังเซิร์ฟเวอร์
@@ -152,6 +132,8 @@ end
 
 
 ----------------------------
+
+
 
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
 
@@ -173,3 +155,4 @@ shared.togglePickup(false) -- ปิดใช้งาน
 AddContent("TextButton", "DropAllItem", [[
 shared.dropAll  -- แก้ให้ไม่มีวงเล็บ
 ]])
+
