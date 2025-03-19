@@ -24,11 +24,13 @@ local dropItemEvent = remotes:WaitForChild("DropItem")
 
 -- ฟังก์ชันทำความสะอาดไฮไลต์เก่าทั้งหมด
 local function cleanupHighlights()
-    for _, highlight in ipairs(highlights) do
-        highlight:Destroy()
+    if #highlights > 0 then
+        for _, highlight in ipairs(highlights) do
+            highlight:Destroy()
+        end
+        highlights = {}
     end
-    highlights = {}
-end
+    
 
 -- ฟังก์ชันเพิ่มไฮไลต์ให้ไอเทมที่พบ
 local function addHighlight(target)
