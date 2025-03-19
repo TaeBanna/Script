@@ -17,6 +17,8 @@ local player = Players.LocalPlayer
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
 local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local runtimeItems = workspace:WaitForChild("RuntimeItems")
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local dropItemEvent = remotes:WaitForChild("DropItem")
 
 local highlightEnabled = false
 local pickupEnabled = false
@@ -24,10 +26,6 @@ local pickupDistance = 10  -- ระยะที่สามารถเก็�
 local highlights = {}
 local scanning = false
 local heartbeatConnection
-
--- ดึงข้อมูลที่จำเป็นจาก ReplicatedStorage ไว้ข้างนอก
-local remotes = ReplicatedStorage:WaitForChild("Remotes")
-local dropItemEvent = remotes:WaitForChild("DropItem")
 
 -- ฟังก์ชันทำความสะอาดไฮไลต์เก่าทั้งหมด
 local function cleanupHighlights()
