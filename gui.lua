@@ -1,9 +1,11 @@
 local success, message = pcall(function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+    local uiScript = game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui')
+    print(uiScript)  -- ตรวจสอบว่ามีการโหลดข้อมูลมาหรือไม่
+    loadstring(uiScript)()
 end)
 
 if not success then
-    warn("Failed to load GUI: " .. message)
+    warn("Failed to load UI: " .. message)
 end
 
 game.CoreGui.GhostGui.MainFrame.Title.Text = "Menu"
