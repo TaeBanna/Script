@@ -24,13 +24,11 @@ local dropItemEvent = remotes:WaitForChild("DropItem")
 
 -- ฟังก์ชันทำความสะอาดไฮไลต์เก่าทั้งหมด
 local function cleanupHighlights()
-    if #highlights > 0 then
-        for _, highlight in ipairs(highlights) do
-            highlight:Destroy()
-        end
-        highlights = {}
+    for _, highlight in ipairs(highlights) do
+        highlight:Destroy()
     end
-    
+    highlights = {}
+end
 
 -- ฟังก์ชันเพิ่มไฮไลต์ให้ไอเทมที่พบ
 local function addHighlight(target)
@@ -124,7 +122,7 @@ local function dropAllItems()
 end
 
 -- เมื่อกดปุ่มจะทิ้งไอเทม 10 ครั้ง โดยใช้ delay หรือ task.spawn เพื่อให้ทิ้งเร็วขึ้น
-shared.dropAllItems = function()
+shared.dropAll = function()
     for i = 1, 10 do
         task.spawn(dropAllItems)  -- ใช้ task.spawn เพื่อให้ทิ้งไอเทมในเธรดใหม่
     end
