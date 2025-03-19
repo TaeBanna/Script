@@ -10,15 +10,17 @@ local player = Players.LocalPlayer
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
 local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
 local runtimeItems = workspace:WaitForChild("RuntimeItems")
-local remotes = ReplicatedStorage:WaitForChild("Remotes")
-local dropItemEvent = remotes:WaitForChild("DropItem")
 
 local highlightEnabled = false
 local pickupEnabled = false
-local pickupDistance = 20  -- ระยะที่สามารถเก็บของได้
+local pickupDistance = 10  -- ระยะที่สามารถเก็บของได้
 local highlights = {}
 local scanning = false
 local heartbeatConnection
+
+-- ดึงข้อมูลที่จำเป็นจาก ReplicatedStorage ไว้ข้างนอก
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local dropItemEvent = remotes:WaitForChild("DropItem")
 
 -- ฟังก์ชันทำความสะอาดไฮไลต์เก่าทั้งหมด
 local function cleanupHighlights()
@@ -108,8 +110,11 @@ shared.togglePickup = function(state)
     end
 end
 
--- ฟังก์ชัน Drop All (แชร์ไปให้ Ghost GUI ใช้ได้)
-shared.dropAllItems = function()
+----------------------------
+
+-- ฟังก์ชัน Drop All
+local function dropAllItems()
+    -- ทิ้งทุกไอเทมที่อยู่ใน Backpack ของผู้เล่น
     local player = game.Players.LocalPlayer
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
@@ -118,28 +123,33 @@ shared.dropAllItems = function()
     end
 end
 
-----------------------------
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
+
+-- ระบบ Highlights
 AddContent("Switch", "Highlights", [[
 shared.toggleHighlight(true) -- เปิดใช้งาน
 ]], [[
 shared.toggleHighlight(false) -- ปิดใช้งาน
 ]])
 
+-- ระบบ Pickup
 AddContent("Switch", "Auto Pickup", [[
 shared.togglePickup(true) -- เปิดใช้งาน
 ]], [[
 shared.togglePickup(false) -- ปิดใช้งาน
 ]])
 
-AddContent("Button", "Drop All Items", [[
-for i = 1, 10 do
-    task.spawn(shared.dropAllItems)  -- ทิ้งไอเทมทั้งหมด
-end
-]], [[]])
+-- ระบบ Drop All
+AddContent("Switch", "Drop All Items", [[
+dropAllItems() -- ทิ้งไอเทมทั้งหมด
+]], [[
+-- ไม่มีการปิดหรือหยุด
+]])
 
-----------------------------
--- LocalScript สำหรับ GUI แยก (เช่น ใน StarterPlayerScripts) --
+-- LocalScript (เช่น ใน StarterPlayerScripts)
+
+-- สร้าง ScreenGui และปุ่มบนหน้าจอ
+local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- สร้าง ScreenGui
@@ -153,30 +163,9 @@ dropButton.Position = UDim2.new(0.5, -100, 0.8, -25)  -- ตำแหน่ง�
 dropButton.Text = "ทิ้งของทั้งหมด"  -- ข้อความบนปุ่ม
 dropButton.Parent = screenGui
 
--- ทำให้ปุ่มลากได้
-local dragging, offset
-dropButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        offset = dropButton.Position - UDim2.new(0, input.Position.X, 0, input.Position.Y)
-    end
-end)
-
-dropButton.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        dropButton.Position = UDim2.new(0, input.Position.X, 0, input.Position.Y) + offset
-    end
-end)
-
-dropButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
--- เมื่อกดปุ่ม จะทิ้งไอเทมทั้งหมด
+-- เมื่อกดปุ่มจะทิ้งไอเทม 10 ครั้ง โดยใช้ delay หรือ task.spawn เพื่อให้ทิ้งเร็วขึ้น
 dropButton.MouseButton1Click:Connect(function()
     for i = 1, 10 do
-        task.spawn(shared.dropAllItems)
+        task.spawn(dropAllItems)  -- ใช้ task.spawn เพื่อให้ทิ้งไอเทมในเธรดใหม่
     end
 end)
