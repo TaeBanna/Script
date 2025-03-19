@@ -7,9 +7,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
+if not player then
+    return warn("❌ ไม่พบ Player ในเกม!")
+end
+
 local playerCharacter = player.Character or player.CharacterAdded:Wait()
-local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
-local runtimeItems = workspace:WaitForChild("RuntimeItems")
+local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart", 5)
+if not playerHumanoidRootPart then
+    return warn("❌ ไม่พบ HumanoidRootPart!")
+end
+
+local runtimeItems = workspace:FindFirstChild("RuntimeItems")
+if not runtimeItems then
+    return warn("❌ ไม่พบโฟลเดอร์ RuntimeItems ใน Workspace!")
+end
 
 local highlightEnabled = false
 local pickupEnabled = false
@@ -19,8 +30,15 @@ local scanning = false
 local heartbeatConnection
 
 -- ดึงข้อมูลที่จำเป็นจาก ReplicatedStorage ไว้ข้างนอก
-local remotes = ReplicatedStorage:WaitForChild("Remotes")
-local dropItemEvent = remotes:WaitForChild("DropItem")
+local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+if not remotes then
+    return warn("❌ ไม่พบ Remotes ใน ReplicatedStorage!")
+end
+
+local dropItemEvent = remotes:FindFirstChild("DropItem")
+if not dropItemEvent then
+    return warn("❌ ไม่พบ DropItem RemoteEvent!")
+end
 
 -- ฟังก์ชันทำความสะอาดไฮไลต์เก่าทั้งหมด
 local function cleanupHighlights()
@@ -116,7 +134,6 @@ end
 -- ฟังก์ชัน Drop All
 local function dropAllItems()
     -- ทิ้งทุกไอเทมที่อยู่ใน Backpack ของผู้เล่น
-    local player = game.Players.LocalPlayer
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
             dropItemEvent:FireServer(item)  -- ส่งคำสั่งทิ้งไปยังเซิร์ฟเวอร์
@@ -135,8 +152,6 @@ end
 
 
 ----------------------------
-
-
 
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
 
@@ -158,4 +173,3 @@ shared.togglePickup(false) -- ปิดใช้งาน
 AddContent("TextButton", "DropAllItem", [[
 shared.dropAll  -- แก้ให้ไม่มีวงเล็บ
 ]])
-
