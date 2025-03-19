@@ -160,6 +160,7 @@ shared.togglePickup(false) -- ปิดใช้งาน
 
 -- เพิ่มปุ่ม DropAllItem ที่เชื่อมกับฟังก์ชันที่ถูกต้อง
 AddContent("TextButton", "DropAllItem", [[
-shared.dropAll  -- แก้ให้ไม่มีวงเล็บ
+shared.dropAll()  -- เรียกฟังก์ชันด้วยวงเล็บ
 ]])
+
 
