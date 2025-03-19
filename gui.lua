@@ -22,7 +22,7 @@ local dropItemEvent = remotes:WaitForChild("DropItem")
 
 local highlightEnabled = false
 local pickupEnabled = false
-local pickupDistance = 10  -- ระยะที่สามารถเก็บของได้
+local pickupDistance = 20  -- ระยะที่สามารถเก็บของได้
 local highlights = {}
 local scanning = false
 local heartbeatConnection
