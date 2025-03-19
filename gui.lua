@@ -1,6 +1,14 @@
-loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+local success, message = pcall(function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+end)
+
+if not success then
+    warn("Failed to load GUI: " .. message)
+end
+
 
 game.CoreGui.GhostGui.MainFrame.Title.Text = "Menu"
+
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -68,7 +76,7 @@ runtimeItems.ChildRemoved:Connect(function()
     if highlightEnabled then scanRuntimeItems() end 
 end)
 
--- ฟังก์ชันเปิด/ปิดไฮไลต์ และแชร์ให้ AddContent ใช้งาน
+-- ฟังก์ชันเปิด/ปิดไฮไลต์ และแชร์ให้ `AddContent` ใช้งาน
 shared.toggleHighlight = function(state)
     highlightEnabled = state
     if highlightEnabled then
@@ -96,7 +104,7 @@ local function scanAndPickUpItems()
     scanning = false
 end
 
--- ฟังก์ชันเปิด/ปิดระบบเก็บของอัตโนมัติ และแชร์ให้ AddContent ใช้งาน
+-- ฟังก์ชันเปิด/ปิดระบบเก็บของอัตโนมัติ และแชร์ให้ `AddContent` ใช้งาน
 shared.togglePickup = function(state)
     pickupEnabled = state
     if pickupEnabled then
@@ -115,13 +123,11 @@ local function dropAllItems()
     local player = game.Players.LocalPlayer
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
-            -- ใช้ FireServer เพื่อส่งคำขอทิ้งไปยังเซิร์ฟเวอร์
-            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("DropItem"):FireServer(item)
+            dropItemEvent:FireServer(item)  -- ส่งคำสั่งทิ้งไปยังเซิร์ฟเวอร์
             task.wait(0.1)  -- ป้องกัน Spam (ลดโหลดของเซิร์ฟเวอร์)
         end
     end
 end
-
 
 -- ฟังก์ชัน Drop All 10 ครั้ง
 shared.dropAll = function()
@@ -133,6 +139,8 @@ end
 
 
 ----------------------------
+
+
 
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
 
@@ -152,5 +160,6 @@ shared.togglePickup(false) -- ปิดใช้งาน
 
 -- เพิ่มปุ่ม DropAllItem ที่เชื่อมกับฟังก์ชันที่ถูกต้อง
 AddContent("TextButton", "DropAllItem", [[
-shared.dropAll()  -- เรียกใช้งานฟังก์ชันทิ้งไอเทม
+shared.dropAll  -- แก้ให้ไม่มีวงเล็บ
 ]])
+
