@@ -1,4 +1,4 @@
-loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("DropItem"):FireServer()
 
 game.CoreGui.GhostGui.MainFrame.Title.Text = "Menu"
 
@@ -69,7 +69,7 @@ runtimeItems.ChildRemoved:Connect(function()
     if highlightEnabled then scanRuntimeItems() end 
 end)
 
--- ฟังก์ชันเปิด/ปิดไฮไลต์ และแชร์ให้ `AddContent` ใช้งาน
+-- ฟังก์ชันเปิด/ปิดไฮไลต์ และแชร์ให้ AddContent ใช้งาน
 shared.toggleHighlight = function(state)
     highlightEnabled = state
     if highlightEnabled then
@@ -97,7 +97,7 @@ local function scanAndPickUpItems()
     scanning = false
 end
 
--- ฟังก์ชันเปิด/ปิดระบบเก็บของอัตโนมัติ และแชร์ให้ `AddContent` ใช้งาน
+-- ฟังก์ชันเปิด/ปิดระบบเก็บของอัตโนมัติ และแชร์ให้ AddContent ใช้งาน
 shared.togglePickup = function(state)
     pickupEnabled = state
     if pickupEnabled then
@@ -133,8 +133,6 @@ end
 
 ----------------------------
 
-
-
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
 
 -- ระบบ Highlights
@@ -153,6 +151,5 @@ shared.togglePickup(false) -- ปิดใช้งาน
 
 -- เพิ่มปุ่ม DropAllItem ที่เชื่อมกับฟังก์ชันที่ถูกต้อง
 AddContent("TextButton", "DropAllItem", [[
-shared.dropAll  -- แก้ให้ไม่มีวงเล็บ
+shared.dropAll()  -- เรียกใช้งานฟังก์ชันทิ้งไอเทม
 ]])
-
