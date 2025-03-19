@@ -1,5 +1,4 @@
-game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("DropItem"):FireServer()
-
+loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
 game.CoreGui.GhostGui.MainFrame.Title.Text = "Menu"
 
 local RunService = game:GetService("RunService")
@@ -116,11 +115,13 @@ local function dropAllItems()
     local player = game.Players.LocalPlayer
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
-            dropItemEvent:FireServer(item)  -- ส่งคำสั่งทิ้งไปยังเซิร์ฟเวอร์
+            -- ใช้ FireServer เพื่อส่งคำขอทิ้งไปยังเซิร์ฟเวอร์
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("DropItem"):FireServer(item)
             task.wait(0.1)  -- ป้องกัน Spam (ลดโหลดของเซิร์ฟเวอร์)
         end
     end
 end
+
 
 -- ฟังก์ชัน Drop All 10 ครั้ง
 shared.dropAll = function()
