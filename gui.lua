@@ -108,9 +108,8 @@ shared.togglePickup = function(state)
     end
 end
 
--- ฟังก์ชัน Drop All
-local function dropAllItems()
-    -- ทิ้งทุกไอเทมที่อยู่ใน Backpack ของผู้เล่น
+-- ฟังก์ชัน Drop All (แชร์ไปให้ Ghost GUI ใช้ได้)
+shared.dropAllItems = function()
     local player = game.Players.LocalPlayer
     for _, item in ipairs(player.Backpack:GetChildren()) do
         if item:IsA("Tool") then
@@ -119,41 +118,28 @@ local function dropAllItems()
     end
 end
 
-dropButton.MouseButton1Click:Connect(function()
-    for i = 1, 10 do
-        task.spawn(dropAllItems)  -- ใช้ task.spawn เพื่อให้ทิ้งไอเทมในเธรดใหม่
-    end
-end)
-
 ----------------------------
-
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
-
--- ระบบ Highlights
 AddContent("Switch", "Highlights", [[
 shared.toggleHighlight(true) -- เปิดใช้งาน
 ]], [[
 shared.toggleHighlight(false) -- ปิดใช้งาน
 ]])
 
--- ระบบ Pickup
 AddContent("Switch", "Auto Pickup", [[
 shared.togglePickup(true) -- เปิดใช้งาน
 ]], [[
 shared.togglePickup(false) -- ปิดใช้งาน
 ]])
 
--- ระบบ Drop All
-AddContent("Switch", "Drop All Items", [[
-dropAllItems() -- ทิ้งไอเทมทั้งหมด
-]], [[
--- ไม่มีการปิดหรือหยุด
-]])
+AddContent("Button", "Drop All Items", [[
+for i = 1, 10 do
+    task.spawn(shared.dropAllItems)  -- ทิ้งไอเทมทั้งหมด
+end
+]], [[]])
 
--- LocalScript (เช่น ใน StarterPlayerScripts)
-
--- สร้าง ScreenGui และปุ่มบนหน้าจอ
-local player = game.Players.LocalPlayer
+----------------------------
+-- LocalScript สำหรับ GUI แยก (เช่น ใน StarterPlayerScripts) --
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- สร้าง ScreenGui
@@ -166,3 +152,31 @@ dropButton.Size = UDim2.new(0, 200, 0, 50)  -- ขนาดของปุ่ม
 dropButton.Position = UDim2.new(0.5, -100, 0.8, -25)  -- ตำแหน่งของปุ่ม (ตรงกลางด้านล่าง)
 dropButton.Text = "ทิ้งของทั้งหมด"  -- ข้อความบนปุ่ม
 dropButton.Parent = screenGui
+
+-- ทำให้ปุ่มลากได้
+local dragging, offset
+dropButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        offset = dropButton.Position - UDim2.new(0, input.Position.X, 0, input.Position.Y)
+    end
+end)
+
+dropButton.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        dropButton.Position = UDim2.new(0, input.Position.X, 0, input.Position.Y) + offset
+    end
+end)
+
+dropButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- เมื่อกดปุ่ม จะทิ้งไอเทมทั้งหมด
+dropButton.MouseButton1Click:Connect(function()
+    for i = 1, 10 do
+        task.spawn(shared.dropAllItems)
+    end
+end)
