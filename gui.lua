@@ -110,8 +110,6 @@ shared.togglePickup = function(state)
     end
 end
 
-----------------------------
-
 -- ฟังก์ชัน Drop All
 local function dropAllItems()
     -- ทิ้งทุกไอเทมที่อยู่ใน Backpack ของผู้เล่น
@@ -122,6 +120,18 @@ local function dropAllItems()
         end
     end
 end
+
+-- เมื่อกดปุ่มจะทิ้งไอเทม 10 ครั้ง โดยใช้ delay หรือ task.spawn เพื่อให้ทิ้งเร็วขึ้น
+shared.dropAllItems = function()
+    for i = 1, 10 do
+        task.spawn(dropAllItems)  -- ใช้ task.spawn เพื่อให้ทิ้งไอเทมในเธรดใหม่
+    end
+end
+
+
+----------------------------
+
+
 
 -- เพิ่มปุ่มควบคุมใน Ghost GUI --
 
@@ -139,33 +149,8 @@ shared.togglePickup(true) -- เปิดใช้งาน
 shared.togglePickup(false) -- ปิดใช้งาน
 ]])
 
--- ระบบ Drop All
-AddContent("Switch", "Drop All Items", [[
-dropAllItems() -- ทิ้งไอเทมทั้งหมด
-]], [[
--- ไม่มีการปิดหรือหยุด
+AddContent("TextButton", "DropAllItem", [[
+shared.dropAllItems
 ]])
 
--- LocalScript (เช่น ใน StarterPlayerScripts)
 
--- สร้าง ScreenGui และปุ่มบนหน้าจอ
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
--- สร้าง ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = playerGui
-
--- สร้างปุ่ม TextButton
-local dropButton = Instance.new("TextButton")
-dropButton.Size = UDim2.new(0, 200, 0, 50)  -- ขนาดของปุ่ม
-dropButton.Position = UDim2.new(0.5, -100, 0.8, -25)  -- ตำแหน่งของปุ่ม (ตรงกลางด้านล่าง)
-dropButton.Text = "ทิ้งของทั้งหมด"  -- ข้อความบนปุ่ม
-dropButton.Parent = screenGui
-
--- เมื่อกดปุ่มจะทิ้งไอเทม 10 ครั้ง โดยใช้ delay หรือ task.spawn เพื่อให้ทิ้งเร็วขึ้น
-dropButton.MouseButton1Click:Connect(function()
-    for i = 1, 10 do
-        task.spawn(dropAllItems)  -- ใช้ task.spawn เพื่อให้ทิ้งไอเทมในเธรดใหม่
-    end
-end)
