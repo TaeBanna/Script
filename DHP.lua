@@ -41,10 +41,13 @@ if character and enemiesFolder then
 
                     -- ลอยไปหามอน
                     while distance > 2 do
-                        humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(direction * 1) -- เคลื่อนที่ทีละน้อย
-                        wait(0.1)
+                        humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(direction * 3) -- ปรับความเร็วที่นี่ (0.5 คือความเร็วในการเคลื่อนที่)
+                        wait(0.1) -- หน่วงเวลาเล็กน้อย
                         distance = (enemyRootPart.Position - humanoidRootPart.Position).magnitude
                     end
+
+                    -- ไปยืนบนหัวมอน
+                    humanoidRootPart.CFrame = CFrame.new(enemyRootPart.Position + Vector3.new(0, 10, 0))
 
                     -- สร้างกำแพงใต้เท้าเพื่อป้องกันการโจมตีจากมอน
                     createBarrier()
