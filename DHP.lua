@@ -18,13 +18,17 @@ local ScreenMain = Instance.new("Frame")
 local UICorner_5 = Instance.new("UICorner")
 local GameButton = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
-local DropButton = Instance.new("TextButton")
+local DropButton = Instance.new("ImageButton")
 local UICorner_7 = Instance.new("UICorner")
+local crcl = Instance.new("Frame")
+local UICorner_8 = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local UIGradient_2 = Instance.new("UIGradient")
 local TextLabel = Instance.new("TextLabel")
 local testButton = Instance.new("TextButton")
-local UICorner_8 = Instance.new("UICorner")
-local GraButton = Instance.new("TextButton")
 local UICorner_9 = Instance.new("UICorner")
+local GraButton = Instance.new("TextButton")
+local UICorner_10 = Instance.new("UICorner")
 local TextLabel_2 = Instance.new("TextLabel")
 
 --Properties:
@@ -51,7 +55,6 @@ UICorner.Parent = miniHIDESHOW
 
 ScreenGui555.Name = "ScreenGui555"
 ScreenGui555.Parent = air
-ScreenGui555.Enabled = false
 ScreenGui555.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 Creator.Name = "Creator"
@@ -120,26 +123,41 @@ UICorner_6.Parent = GameButton
 
 DropButton.Name = "DropButton"
 DropButton.Parent = GameButton
-DropButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-DropButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-DropButton.BorderSizePixel = 0
-DropButton.Position = UDim2.new(5.78923464, 0, 0.723230481, 0)
-DropButton.Size = UDim2.new(0, 200, 0, 50)
-DropButton.Visible = false
-DropButton.Font = Enum.Font.SourceSans
-DropButton.Text = "Click"
-DropButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-DropButton.TextSize = 14.000
+DropButton.Active = false
+DropButton.BackgroundColor3 = Color3.fromRGB(113, 113, 113)
+DropButton.BorderColor3 = Color3.fromRGB(27, 42, 53)
+DropButton.Position = UDim2.new(8.7036705, -79, 2.09466505, -33)
+DropButton.Selectable = false
+DropButton.Size = UDim2.new(0, 60, 0, 25)
+DropButton.AutoButtonColor = false
 
-UICorner_7.CornerRadius = UDim.new(0, 20)
+UICorner_7.CornerRadius = UDim.new(1, 0)
 UICorner_7.Parent = DropButton
+
+crcl.Name = "crcl"
+crcl.Parent = DropButton
+crcl.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+crcl.BorderColor3 = Color3.fromRGB(27, 42, 53)
+crcl.Position = UDim2.new(0.0440002456, 0, 0.0833333358, 0)
+crcl.Size = UDim2.new(0, 20, 0, 20)
+
+UICorner_8.CornerRadius = UDim.new(0, 100)
+UICorner_8.Parent = crcl
+
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(83, 83, 83))}
+UIGradient.Rotation = 90
+UIGradient.Parent = crcl
+
+UIGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(83, 83, 83))}
+UIGradient_2.Rotation = 90
+UIGradient_2.Parent = DropButton
 
 TextLabel.Parent = DropButton
 TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.BackgroundTransparency = 1.000
 TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TextLabel.BorderSizePixel = 0
-TextLabel.Position = UDim2.new(0, 0, -0.86000061, 0)
+TextLabel.Position = UDim2.new(-2.88333344, 0, -0.540000618, 0)
 TextLabel.Size = UDim2.new(0, 200, 0, 50)
 TextLabel.Font = Enum.Font.SourceSans
 TextLabel.Text = "DropAllItem"
@@ -158,15 +176,15 @@ testButton.Text = "Test"
 testButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 testButton.TextSize = 14.000
 
-UICorner_8.CornerRadius = UDim.new(0, 20)
-UICorner_8.Parent = testButton
+UICorner_9.CornerRadius = UDim.new(0, 20)
+UICorner_9.Parent = testButton
 
 GraButton.Name = "GraButton"
 GraButton.Parent = testButton
 GraButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 GraButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 GraButton.BorderSizePixel = 0
-GraButton.Position = UDim2.new(5.78787899, 0, 2.4333334, 0)
+GraButton.Position = UDim2.new(5.78787899, 0, -0.666666687, 0)
 GraButton.Size = UDim2.new(0, 200, 0, 50)
 GraButton.Visible = false
 GraButton.Font = Enum.Font.SourceSans
@@ -174,8 +192,8 @@ GraButton.Text = "Click"
 GraButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 GraButton.TextSize = 14.000
 
-UICorner_9.CornerRadius = UDim.new(0, 20)
-UICorner_9.Parent = GraButton
+UICorner_10.CornerRadius = UDim.new(0, 20)
+UICorner_10.Parent = GraButton
 
 TextLabel_2.Parent = GraButton
 TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -191,7 +209,7 @@ TextLabel_2.TextSize = 29.000
 
 -- Scripts:
 
-local function VDBYKYK_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility 
+local function ZUYZ_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility 
 	local script = Instance.new('LocalScript', miniHIDESHOW)
 
 	local button = script.Parent
@@ -203,34 +221,8 @@ local function VDBYKYK_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility
 	
 	
 end
-coroutine.wrap(VDBYKYK_fake_script)()
-local function SEVI_fake_script() -- DropButton.Script 
-	local script = Instance.new('Script', DropButton)
-
-	local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local dropItemRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("DropItem")
-	
-	local function dropAll()
-	    for i = 1, 10 do
-	        dropItemRemote:FireServer()
-	    end
-	end
-	
-	local function toggleButtonVisibility()
-	    local button = script.Parent
-	    button.Visible = not button.Visible
-	end
-	
-	local button = script.Parent
-	button.MouseButton1Click:Connect(function()
-	    dropAll()
-	    toggleButtonVisibility()
-	end)
-	
-	
-end
-coroutine.wrap(SEVI_fake_script)()
-local function JSVY_fake_script() -- GameButton.Script 
+coroutine.wrap(ZUYZ_fake_script)()
+local function AFNSA_fake_script() -- GameButton.Script 
 	local script = Instance.new('Script', GameButton)
 
 	local function toggleButtonVisibility()
@@ -247,8 +239,78 @@ local function JSVY_fake_script() -- GameButton.Script
 		toggleButtonVisibility()
 	end)
 end
-coroutine.wrap(JSVY_fake_script)()
-local function LFWBOB_fake_script() -- testButton.Script 
+coroutine.wrap(AFNSA_fake_script)()
+local function YVYVQIK_fake_script() -- DropButton.Main 
+	local script = Instance.new('LocalScript', DropButton)
+
+	local Status = script.Parent:WaitForChild("Status")
+	local RunService = game:GetService("RunService")
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local Players = game:GetService("Players")
+	
+	local player = Players.LocalPlayer
+	local playerCharacter = player.Character or player.CharacterAdded:Wait()
+	local playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart")
+	local runtimeItems = workspace:WaitForChild("RuntimeItems")
+	local dropItemRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("DropItem")
+	
+	
+	local pickupEnabled = false
+	local pickupDistance = 20  -- ระยะที่สามารถเก็บของได้
+	local scanning = false
+	local heartbeatConnection
+	
+	local configs = {
+		DisabledPos = UDim2.new(0.044, 0, 0.06, 0),
+		EnabledPos = UDim2.new(0.585, 0, 0.104, 0),
+	
+		EnabledBGCol = Color3.fromRGB(0, 115, 255),
+		DisabledBGCol = Color3.fromRGB(113, 113, 113)
+	}
+	
+	local function enabled()
+		game:GetService("TweenService"):Create(Status.Parent.crcl, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = configs.EnabledPos}):Play()
+		game:GetService("TweenService"):Create(Status.Parent, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = configs.EnabledBGCol}):Play()    
+	end
+	
+	local function disable()
+		game:GetService("TweenService"):Create(Status.Parent.crcl, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = configs.DisabledPos}):Play()
+		game:GetService("TweenService"):Create(Status.Parent, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = configs.DisabledBGCol}):Play()    
+	end
+	
+	-- ฟังก์ชันเปิด/ปิดระบบเก็บของอัตโนมัติ
+	local function togglePickup(state)
+		pickupEnabled = state
+		if pickupEnabled then
+			heartbeatConnection = RunService.Heartbeat:Connect(scanAndPickUpItems)
+		else
+			if heartbeatConnection then
+				heartbeatConnection:Disconnect()
+				heartbeatConnection = nil
+			end
+		end
+	end
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		print("old:", Status.Value)
+		if Status.Value then 
+			Status.Value = false
+			togglePickup(false)  -- ปิดระบบเก็บของ
+			return
+		end
+		Status.Value = true
+		togglePickup(true)  -- เปิดระบบเก็บของ
+	end)
+	
+	
+	Status:GetPropertyChangedSignal("Value"):Connect(function()
+		if Status.Value then enabled() return end
+		disable()
+	end)
+	
+end
+coroutine.wrap(YVYVQIK_fake_script)()
+local function JYBH_fake_script() -- testButton.Script 
 	local script = Instance.new('Script', testButton)
 
 	local function toggleButtonVisibility()
@@ -265,4 +327,22 @@ local function LFWBOB_fake_script() -- testButton.Script
 		toggleButtonVisibility()
 	end)
 end
-coroutine.wrap(LFWBOB_fake_script)()
+coroutine.wrap(JYBH_fake_script)()
+local function ULYG_fake_script() -- GraButton.Script 
+	local script = Instance.new('Script', GraButton)
+
+	local screenGui = game.StarterGui:FindFirstChild("air"):FindFirstChild("ScreenGui555")
+	local graButton = screenGui:FindFirstChild("ScreenMain"):FindFirstChild("testButton"):FindFirstChild("GraButton")
+	
+	if graButton then
+		local isOn = false
+		graButton.MouseButton1Click:Connect(function()
+			isOn = not isOn
+			graButton.TextLabel.Text = isOn and "On" or "Off"
+		end)
+	else
+		warn("GraButton not found")
+	end
+	
+end
+coroutine.wrap(ULYG_fake_script)()
