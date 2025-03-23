@@ -209,7 +209,7 @@ TextLabel_2.TextSize = 29.000
 
 -- Scripts:
 
-local function ZUYZ_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility 
+local function BWRQZ_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility 
 	local script = Instance.new('LocalScript', miniHIDESHOW)
 
 	local button = script.Parent
@@ -221,8 +221,8 @@ local function ZUYZ_fake_script() -- miniHIDESHOW.ToggleScreenGuiVisibility
 	
 	
 end
-coroutine.wrap(ZUYZ_fake_script)()
-local function AFNSA_fake_script() -- GameButton.Script 
+coroutine.wrap(BWRQZ_fake_script)()
+local function RBPTXH_fake_script() -- GameButton.Script 
 	local script = Instance.new('Script', GameButton)
 
 	local function toggleButtonVisibility()
@@ -239,9 +239,15 @@ local function AFNSA_fake_script() -- GameButton.Script
 		toggleButtonVisibility()
 	end)
 end
-coroutine.wrap(AFNSA_fake_script)()
-local function YVYVQIK_fake_script() -- DropButton.Main 
+coroutine.wrap(RBPTXH_fake_script)()
+local function RAHS_fake_script() -- DropButton.Main 
 	local script = Instance.new('LocalScript', DropButton)
+
+	
+end
+coroutine.wrap(RAHS_fake_script)()
+local function PFNC_fake_script() -- DropButton.Script 
+	local script = Instance.new('Script', DropButton)
 
 	local Status = script.Parent:WaitForChild("Status")
 	local RunService = game:GetService("RunService")
@@ -309,8 +315,8 @@ local function YVYVQIK_fake_script() -- DropButton.Main
 	end)
 	
 end
-coroutine.wrap(YVYVQIK_fake_script)()
-local function JYBH_fake_script() -- testButton.Script 
+coroutine.wrap(PFNC_fake_script)()
+local function XXRV_fake_script() -- testButton.Script 
 	local script = Instance.new('Script', testButton)
 
 	local function toggleButtonVisibility()
@@ -327,8 +333,8 @@ local function JYBH_fake_script() -- testButton.Script
 		toggleButtonVisibility()
 	end)
 end
-coroutine.wrap(JYBH_fake_script)()
-local function ULYG_fake_script() -- GraButton.Script 
+coroutine.wrap(XXRV_fake_script)()
+local function VWHGMB_fake_script() -- GraButton.Script 
 	local script = Instance.new('Script', GraButton)
 
 	local screenGui = game.StarterGui:FindFirstChild("air"):FindFirstChild("ScreenGui555")
@@ -345,4 +351,4 @@ local function ULYG_fake_script() -- GraButton.Script
 	end
 	
 end
-coroutine.wrap(ULYG_fake_script)()
+coroutine.wrap(VWHGMB_fake_script)()
