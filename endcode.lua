@@ -1,4 +1,4 @@
-unction TP(Pos)
+function TP(Pos)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         player.Character.HumanoidRootPart.CFrame = Pos
