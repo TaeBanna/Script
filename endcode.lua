@@ -56,12 +56,12 @@ end
 
 end
 
-while wait() do
+while task.wait() do
 for i, v in pairs(workspace.Enemies:GetChildren()) do
 	if v.Name == "Bandit" then
 		local hrp = v:FindFirstChild("HumanoidRootPart") -- ตรวจสอบก่อนใช้งาน
 		if hrp then
-			TP(hrp.CFrame)
+			TP(hrp.CFrame * CFrame.new(0.10.10))
 			FastAttack()
 		end
 	end
