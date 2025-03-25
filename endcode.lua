@@ -11,9 +11,6 @@ function FastAttack()
     local character = player.Character or player.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
 
-    -- กำหนด args ก่อนใช้งาน (ต้องเปลี่ยนค่าตามที่ต้องการ)
-    local args = {}
-
     -- เรียกใช้งาน RegisterAttack
     local success, err = pcall(function()
         ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterAttack"):FireServer(unpack(args))
