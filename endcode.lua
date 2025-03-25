@@ -18,8 +18,7 @@ function FastAttack()
     if not success then return end    
     
  
-    local args = {
-        [3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"),}
+    local args = {[3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"):WaitForChild("RightLowerLeg"),}
 
     -- ตรวจสอบศัตรู
     local enemiesFolder = workspace:FindFirstChild("Enemies")
