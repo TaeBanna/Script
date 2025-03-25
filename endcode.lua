@@ -54,9 +54,7 @@ end
 while task.wait() do  -- เพิ่มการหน่วงเวลาเพื่อให้เกมไม่ทำงานหนักเกินไป
     for _, v in pairs(workspace.Enemies:GetChildren()) do
         if v.Name == "Bandit" then
-            local hrp = v:FindFirstChild("HumanoidRootPart")  -- ตรวจสอบก่อนใช้งาน
-            if hrp then
-                
+                TP(v.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0))
 		FastAttack()
             end
         end
