@@ -5,9 +5,6 @@ function TP(Pos)
 	end
 end
 
-
-
-
 function FastAttack()
     local ReplicatedStorage = game.ReplicatedStorage
     local player = game.Players.LocalPlayer  -- แก้ไขเครื่องหมาย = ให้ถูกต้อง
@@ -59,7 +56,7 @@ end
 
 end
 
-
+while wait() do
 for i, v in pairs(workspace.Enemies:GetChildren()) do
 	if v.Name == "Bandit" then
 		local hrp = v:FindFirstChild("HumanoidRootPart") -- ตรวจสอบก่อนใช้งาน
