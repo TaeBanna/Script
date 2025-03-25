@@ -52,11 +52,13 @@ end
 
 
 while task.wait() do  -- เพิ่มการหน่วงเวลาเพื่อให้เกมไม่ทำงานหนักเกินไป
+  pcall(function()
     for _, v in pairs(workspace.Enemies:GetChildren()) do
         if v.Name == "Bandit" then
                 TP(v.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0))
 		FastAttack()
-            end
-        end
-    end
+          		 	 end
+       	 		end
+    		end
+	end)
 end
