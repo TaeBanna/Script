@@ -52,3 +52,12 @@ function FastAttack()
         end
     end
 end
+
+while task.wait() do  -- เพิ่มการหน่วงเวลาเพื่อให้เกมไม่ทำงานหนักเกินไป
+    for _, v in pairs(workspace.Enemies:GetChildren()) do
+        if v.Name == "Bandit" then
+                FastAttack()
+            end
+        end
+    end
+end
