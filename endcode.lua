@@ -28,7 +28,7 @@ function FastAttack()
         if enemy:IsA("Model") and enemy:FindFirstChild("Head") then
             local head = enemy.Head
             local distance = (head.Position - rootPart.Position).Magnitude
-            if distance <= 60 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
+            if distance <= 100 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
                 pcall(function()
                     head:SetAttribute("Hidden", true)
                 end)
