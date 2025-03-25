@@ -1,65 +1,71 @@
--- SHARK X HUB NO 1 | https://www.youtube.com/channel/UCX--xBqSg1IdzLkaqmLTorA
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local venyx = library.new("Shark X Hub | No 1", 5013109572)
-
-
-local page = venyx:addPage("Test", 5012544693)
-local section1 = page:addSection("Section 1")
-local theme = venyx:addPage("Theme", 5012544693)
-local colors = theme:addSection("Colors")
-
-
-section1:addToggle("Fast Attack", _G.FastAttack, function(value)
-_G.FastAttack = value
-end)
-
-
-local themes = {
-Background = Color3.fromRGB(24, 24, 24),
-Glow = Color3.fromRGB(0, 0, 0),
-Accent = Color3.fromRGB(10, 10, 10),
-LightContrast = Color3.fromRGB(20, 20, 20),
-DarkContrast = Color3.fromRGB(14, 14, 14),  
-TextColor = Color3.fromRGB(255, 255, 255)
-}
-
-
-for theme, color in pairs(themes) do -- all in one theme changer, i know, im cool
-colors:addColorPicker(theme, color, function(color3)
-venyx:setTheme(theme, color3)
-end)
+function TP(Pos)
+	local player = game.Players.LocalPlayer
+	if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		player.Character.HumanoidRootPart.CFrame = Pos
+	end
 end
 
--- load
-venyx:SelectPage(venyx.pages[1], true)
 
 
 
+function FastAttack()
+    local ReplicatedStorage = game.ReplicatedStorage
+    local player = game.Players.LocalPlayer  -- แก้ไขเครื่องหมาย = ให้ถูกต้อง
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
 
+    -- ค่าที่จำเป็นสำหรับ args
+    local args = {0.5}  -- กำหนด args ให้ถูกต้อง
 
-spawn(function()
-   game:GetService("RunService").RenderStepped:Connect(function()
-    pcall(function()
-        if _G.FastAttack then
-            local Combat = require(game:GetService("Players").LocalPlayer.PlayerScripts.CombatFramework)
-            local Cemara = require(game:GetService("Players").LocalPlayer.PlayerScripts.CombatFramework.CameraShaker)
-            Cemara.CameraShakeInstance.CameraShakeState = {FadingIn = 3, FadingOut = 2, Sustained = 0, Inactive = 1}
-            Combat.activeController.timeToNextAttack = 0
-            Combat.activeController.hitboxMagnitude = 120
-            Combat.activeController.increment = 3
-        end
+    -- เรียกใช้งาน RegisterAttack
+    local success, err = pcall(function()
+        game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterAttack"):FireServer(unpack(args))
     end)
-end) 
-end)
+    
+    if not success then
+        print("Error in RegisterAttack:", err)
+        return
+    end
 
+    -- ตรวจสอบศัตรู
+    local enemiesFolder = workspace:FindFirstChild("Enemies")
+    if not enemiesFolder then return end
+    
+    for _, enemy in ipairs(enemiesFolder:GetChildren()) do
+        if enemy:IsA("Model") and enemy:FindFirstChild("Head") then
+            local head = enemy:FindFirstChild("Head")
+            local distance = (head.Position - rootPart.Position).Magnitude  -- แก้ไขจาก . เป็น -
+            
+            if distance <= 60 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
+                if head then
+                    pcall(function()
+                        head:SetAttribute("Hidden", true)
+                    end)
+                end
 
-spawn(function()
-   game:GetService("RunService").RenderStepped:Connect(function()
-    pcall(function()
-        if _G.FastAttack then
-            game:GetService'VirtualUser':CaptureController()
-            game:GetService'VirtualUser':Button1Down(Vector2.new(1280, 672))
+                -- เรียกใช้งาน RegisterHit
+                success, err = pcall(function()
+                    game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
+                end)
+
+                if not success then
+                    print("Error in RegisterHit:", err)
+                    return
+                end
+            end
         end
-    end)
-end) 
-end)
+    end
+end
+
+end
+
+
+for i, v in pairs(workspace.Enemies:GetChildren()) do
+	if v.Name == "Bandit" then
+		local hrp = v:FindFirstChild("HumanoidRootPart") -- ตรวจสอบก่อนใช้งาน
+		if hrp then
+			TP(hrp.CFrame)
+			FastAttack()
+		end
+	end
+end
