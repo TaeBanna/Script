@@ -34,7 +34,7 @@ function FastAttack()
                     head:SetAttribute("Hidden", true)
                 end)
 
-                -- เรียกใช้งาน RegisterHit
+                 -- เรียกใช้งาน RegisterHit
                 success, err = pcall(function()
                     ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
                 end)
@@ -48,16 +48,16 @@ function FastAttack()
     end
 end
 
-
 -- Loop ค้นหาศัตรู
 while task.wait() do
     for _, v in pairs(workspace:FindFirstChild("Enemies"):GetChildren()) do
         if v.Name == "Bandit" then
             local hrp = v:FindFirstChild("HumanoidRootPart")
             if hrp then
-                TP(hrp.CFrame * CFrame.new(0, 10, 0))
+                
                 FastAttack()
             end
         end
     end
 end
+
