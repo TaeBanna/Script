@@ -38,7 +38,7 @@ local function waitForRespawn()
     wait(1) -- Give extra time for the character to load
 end
 
--- Function to move the player behind the selected mob without delay
+-- Function to move the player behind the selected mob without delay and keep updating position
 local function moveBehindMob(mob)
     if mob and mob:FindFirstChild("HumanoidRootPart") then
         -- Calculate the position behind the mob
@@ -46,7 +46,8 @@ local function moveBehindMob(mob)
         local player = game.Players.LocalPlayer.Character
         if player and player:FindFirstChild("HumanoidRootPart") then
             -- Move the player instantly behind the mob (2 units behind)
-            player.HumanoidRootPart.CFrame = CFrame.new(mobPos - mob.HumanoidRootPart.CFrame.LookVector * 2)
+            local behindPos = mobPos - mob.HumanoidRootPart.CFrame.LookVector * 2
+            player.HumanoidRootPart.CFrame = CFrame.new(behindPos)
         end
     end
 end
@@ -87,9 +88,9 @@ mainTab.newToggle("Start Mob Farm", "Automatically farm mobs", false, function(v
                     mob:Destroy()
                     break
                 end
-                -- Move the player instantly behind the mob
+                -- Move the player instantly behind the mob, update position continuously
                 moveBehindMob(mob)
-                wait(0.5)
+                wait(0.1) -- Continuously update position to keep player behind the mob
             end
         end
     end
