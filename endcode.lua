@@ -61,6 +61,7 @@ while task.wait() do
         if v.Name == "Bandit" then
             local hrp = v:FindFirstChild("HumanoidRootPart")
             if hrp then
+		CheckQuest()
                 TP(hrp.CFrame * CFrame.new(0, 8, 0))
                 FastAttack()
             end
