@@ -1,9 +1,10 @@
 function TP(Pos)
-	local player = game.Players.LocalPlayer
-	if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-		player.Character.HumanoidRootPart.CFrame = Pos
-	end
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = Pos
+    end
 end
+
 
 function FastAttack()
     local ReplicatedStorage = game.ReplicatedStorage
@@ -32,7 +33,7 @@ function FastAttack()
         if enemy:IsA("Model") and enemy:FindFirstChild("Head") then
             local head = enemy:FindFirstChild("Head")
             local distance = (head.Position - rootPart.Position).Magnitude  -- แก้ไขจาก . เป็น -
-            
+
             if distance <= 60 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
                 if head then
                     pcall(function()
@@ -54,15 +55,14 @@ function FastAttack()
     end
 end
 
-end
 
-while task.wait() do
-for i, v in pairs(workspace.Enemies:GetChildren()) do
-	if v.Name == "Bandit" then
-		local hrp = v:FindFirstChild("HumanoidRootPart") -- ตรวจสอบก่อนใช้งาน
-		if hrp then
-			TP(hrp.CFrame * CFrame.new(0.10.10))
-			FastAttack()
-		end
-	end
+while task.wait() do  -- เพิ่มการหน่วงเวลาเพื่อให้เกมไม่ทำงานหนักเกินไป
+    for _, v in pairs(workspace.Enemies:GetChildren()) do
+        if v.Name == "Bandit" then
+            local hrp = v:FindFirstChild("HumanoidRootPart")  -- ตรวจสอบก่อนใช้งาน
+            if hrp then
+                TP(hrp.CFrame * CFrame.new(0, 10, 0))
+            end
+        end
+    end
 end
