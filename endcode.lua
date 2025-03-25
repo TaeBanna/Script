@@ -19,12 +19,7 @@ function FastAttack()
     
  
     local args = {
-        [1] = {},  -- ตัวอย่างค่า
-        [2] = {},         -- ตัวอย่างค่า
-        [3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"),  -- ตัวอย่างค่าตำแหน่ง
-        [4] = {},                 -- ข้อมูลเพิ่มเติม (อาจไม่ต้องใช้)
-        [6] = {},          -- ตัวอย่างค่า
-    }
+        [3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"),}
 
     -- ตรวจสอบศัตรู
     local enemiesFolder = workspace:FindFirstChild("Enemies")
