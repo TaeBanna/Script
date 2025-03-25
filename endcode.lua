@@ -62,6 +62,7 @@ while task.wait() do  -- เพิ่มการหน่วงเวลาเ�
             local hrp = v:FindFirstChild("HumanoidRootPart")  -- ตรวจสอบก่อนใช้งาน
             if hrp then
                 TP(hrp.CFrame * CFrame.new(0, 10, 0))
+                FastAttack()
             end
         end
     end
