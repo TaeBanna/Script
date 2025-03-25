@@ -53,7 +53,7 @@ while task.wait() do
         if v.Name == "Bandit" then
             local hrp = v:FindFirstChild("HumanoidRootPart")
             if hrp then
-                TP(hrp.CFrame * CFrame.new(0, 10, 0))
+                
                 FastAttack()
             end
         end
