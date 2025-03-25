@@ -1,4 +1,4 @@
-function TP(Pos)
+unction TP(Pos)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         player.Character.HumanoidRootPart.CFrame = Pos
@@ -15,15 +15,15 @@ function FastAttack()
     local success, err = pcall(function()
         ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterAttack"):FireServer(unpack(args))
     end)
-    if not success then return end  
+    if not success then return end    
     
-    -- กำหนด args ตามตัวอย่างที่คุณให้มา
+ 
     local args = {
         [1] = {},  -- ตัวอย่างค่า
         [2] = {},         -- ตัวอย่างค่า
         [3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"),  -- ตัวอย่างค่าตำแหน่ง
         [4] = {},                 -- ข้อมูลเพิ่มเติม (อาจไม่ต้องใช้)
-        [6] = {}"          -- ตัวอย่างค่า
+        [6] = {},          -- ตัวอย่างค่า
     }
 
     -- ตรวจสอบศัตรู
