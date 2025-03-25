@@ -13,11 +13,11 @@ function FastAttack()
 
     -- กำหนด args ตามตัวอย่างที่คุณให้มา
     local args = {
-        [1] = "ZM'Zmoa{|mz@a|",  -- ตัวอย่างค่า
-        [2] = 4293291604,         -- ตัวอย่างค่า
-        [3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"):WaitForChild("LeftLowerLeg"),  -- ตัวอย่างค่าตำแหน่ง
+        [1] = {},  -- ตัวอย่างค่า
+        [2] = {},         -- ตัวอย่างค่า
+        [3] = workspace:WaitForChild("Enemies"):WaitForChild("Bandit"),  -- ตัวอย่างค่าตำแหน่ง
         [4] = {},                 -- ข้อมูลเพิ่มเติม (อาจไม่ต้องใช้)
-        [6] = "201edc52"          -- ตัวอย่างค่า
+        [6] = {}"          -- ตัวอย่างค่า
     }
 
     -- เรียกใช้งาน RegisterAttack
