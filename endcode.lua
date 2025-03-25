@@ -5,6 +5,17 @@ function TP(Pos)
     end
 end
 
+function CheckQuest()
+	local Lv = game.Players.LocalPlayer.Data.Level.Value
+	 if Lv == 0 or Lv <= 10 then
+	 Ms = "Bandit [Lv. 5]"
+	 NM = "Bandit"
+	 LQ = 1
+	 NQ = "BanditQuest1"
+	 CQ = CFrame.new(1062.64697265625, 16.516624450683594, 1546.55224609375)
+	 end
+ end
+
 function FastAttack()
     local ReplicatedStorage = game.ReplicatedStorage
     local player = game.Players.LocalPlayer 
