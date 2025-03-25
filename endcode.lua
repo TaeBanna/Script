@@ -51,6 +51,7 @@ while task.wait() do
             local hrp = v:FindFirstChild("HumanoidRootPart")
             if hrp then
                 TP(hrp.CFrame * CFrame.new(0, 10, 0))
+                 v.HumanoidRootPart.Size = Vector3.new(60,60,60)
                 FastAttack()
             end
         end
