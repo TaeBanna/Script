@@ -1,3 +1,4 @@
+-- ฟังก์ชัน TP (Teleports to a position)
 function TP(Pos)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -5,6 +6,7 @@ function TP(Pos)
     end
 end
 
+-- ฟังก์ชัน FastAttack (โจมตีอัตโนมัติ)
 function FastAttack()
     local ReplicatedStorage = game.ReplicatedStorage
     local player = game.Players.LocalPlayer 
@@ -13,9 +15,12 @@ function FastAttack()
 
     -- เรียกใช้งาน RegisterAttack
     local success, err = pcall(function()
-        ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterAttack"):FireServer(unpack(args))
+        ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterAttack"):FireServer()
     end)
-    if not success then return end    
+    if not success then
+        print("Error in RegisterAttack:", err)
+        return
+    end    
 
     -- ตรวจสอบศัตรู
     local enemiesFolder = workspace:FindFirstChild("Enemies")
@@ -32,7 +37,7 @@ function FastAttack()
 
                 -- เรียกใช้งาน RegisterHit
                 success, err = pcall(function()
-                    ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
+                    ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net"):WaitForChild("RE/RegisterHit"):FireServer()
                 end)
 
                 if not success then
@@ -44,15 +49,28 @@ function FastAttack()
     end
 end
 
--- Loop ค้นหาศัตรู
+_G.AutoFarm = true  
+
 while task.wait() do
-    for _, v in pairs(workspace:FindFirstChild("Enemies"):GetChildren()) do
-        if v.Name == "Bandit" then
-            local hrp = v:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                TP(hrp.CFrame * CFrame.new(0, 8, 0))
-                FastAttack()
+    pcall(function() 
+        if _G.AutoFarm then
+            local enemiesFolder = workspace:FindFirstChild("Enemies")
+            if enemiesFolder then
+                for _, v in pairs(enemiesFolder:GetChildren()) do
+                    if v.Name == "Bandit" then
+                        local humanoid = v:FindFirstChild("Humanoid")
+                        if humanoid and humanoid.Health > 0 then
+                            repeat 
+                                task.wait()
+                                if v.Name == "Bandit" then
+                                    TP(v.HumanoidRootPart.CFrame * CFrame.new(0, 8, 0))  -- เทเลพอร์ตไปหาศัตรู
+                                    FastAttack()  -- โจมตีศัตรู
+                                end
+                            until not _G.AutoFarm or v.Humanoid.Health <= 0
+                        end
+                    end
+                end
             end
         end
-    end
+    end) 
 end
