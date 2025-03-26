@@ -1,32 +1,10 @@
-local TweenService = game:GetService("TweenService")
+---@diagnostic disable: undefined-global
 
+-- ฟังก์ชัน TP (Teleports to a position)
 function TP(Pos)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local humanoidRootPart = player.Character.HumanoidRootPart
-        
-        -- หาตำแหน่งเริ่มต้น (CFrame)
-        local startPos = humanoidRootPart.CFrame
-        
-        -- กำหนดข้อมูลสำหรับการเคลื่อนไหว (Tween)
-        local tweenInfo = TweenInfo.new(
-            0.5, -- ระยะเวลาการเคลื่อนไหว (0.5 วินาที)
-            Enum.EasingStyle.Linear, -- รูปแบบการเคลื่อนไหว (Linear)
-            Enum.EasingDirection.InOut, -- การเปลี่ยนทิศทางการเคลื่อนไหว (InOut)
-            0, -- จำนวนครั้งในการทำซ้ำ
-            false, -- ไม่ทำซ้ำ
-            0 -- ไม่มีการหน่วงเวลา
-        )
-
-        -- สร้าง tween (เคลื่อนไหวจากตำแหน่งเริ่มต้นไปยังตำแหน่งใหม่)
-        local tweenGoal = {CFrame = Pos}
-        local tween = TweenService:Create(humanoidRootPart, tweenInfo, tweenGoal)
-
-        -- เริ่มการเคลื่อนไหว
-        tween:Play()
-
-        -- รอจนกว่าเคลื่อนไหวเสร็จ
-        tween.Completed:Wait()
+        player.Character.HumanoidRootPart.CFrame = Pos
     end
 end
 
@@ -61,19 +39,14 @@ while task.wait() do
                         local hrp = v:FindFirstChild("HumanoidRootPart")
                         if humanoid and humanoid.Health > 0 and hrp then
                             humanoid.PlatformStand = true  -- ปิดการเคลื่อนไหวของ humanoid
-                            
-                            -- วาร์ปไปตำแหน่งของมอนสเตอร์
-                            TP(hrp.CFrame * CFrame.new(0, 0, 6))  -- วาร์ปไปที่มอนสเตอร์
-
-                            -- โจมตีจนกว่ามอนสเตอร์จะตาย
                             repeat
-                                task.wait(0.1)  -- เพิ่มเวลาระหว่างการโจมตี
+                                task.wait()
                                 if v.Name == "Soldier [Lv. 1]" then
+                                    TP(v.HumanoidRootPart.CFrame * CFrame.new(0, 8, 0))  -- วาร์ปไปที่มอนสเตอร์
                                     Attack()  -- โจมตี
                                 end
-                            until humanoid.Health <= 0  -- หยุดเมื่อมอนสเตอร์ตาย
-                            
-                            humanoid.PlatformStand = false  -- เปิดการเคลื่อนไหวกลับคืน
+                            until not _G.AutoFarm or humanoid.Health <= 0
+                            humanoid.PlatformStand = false  -- เปิดการเคลื่อนไหวกลับคืน                     
                         end
                     end
                 end
