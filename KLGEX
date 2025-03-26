@@ -49,49 +49,22 @@ _G.AutoFarm = true
 while task.wait() do
     pcall(function()
         if _G.AutoFarm then
-            local target = nil
-
-            -- วนหาเป้าหมายใหม่เรื่อย ๆ ถ้ายังไม่มี
-            repeat
+            local Monfolder = workspace.Monster:FindFirstChild("Mon")
+            if Monfolder then
                 for _, v in pairs(Monfolder:GetChildren()) do
                     if v.Name == "Soldier [Lv. 1]" then
                         local humanoid = v:FindFirstChild("Humanoid")
                         local hrp = v:FindFirstChild("HumanoidRootPart")
                         if humanoid and humanoid.Health > 0 and hrp then
-                            target = v
-                            break -- เจอมอนแล้วออกจาก loop ทันที
+                            repeat
+                                task.wait()
+                                if v.Name == "Soldier [Lv. 1]" then
+                                    TP(hrp.CFrame * CFrame.new(0, 0, 6))  -- วาร์ปไปที่มอนสเตอร์
+                                    Attack()  -- โจมตี
+                                end
+                            until not _G.AutoFarm or humanoid.Health <= 0
                         end
                     end
-                end
-                task.wait(0.1) -- รอให้มอนเกิดใหม่
-            until target or not _G.AutoFarm
-
-            -- ถ้าเจอมอนแล้ว เข้าโจมตี
-            if target then
-                local humanoid = target:FindFirstChild("Humanoid")
-                local hrp = target:FindFirstChild("HumanoidRootPart")
-
-                if humanoid and humanoid.Health > 0 and hrp then
-                    -- ล็อคมอนไม่ให้ขยับ
-                    hrp.Anchored = true
-
-                    -- ล็อคตัวผู้เล่นให้ติดกับมอน
-                    player.Character.HumanoidRootPart.Anchored = true
-
-                    -- วาร์ปไปหามอน
-                    TP(hrp.CFrame * CFrame.new(0, 0, 6))
-
-                    -- โจมตีจนกว่ามอนจะตาย
-                    repeat
-                        Attack()
-                        task.wait(0.5)
-                    until not _G.AutoFarm or humanoid.Health <= 0
-
-                    -- ปลดล็อคมอนเมื่อตาย
-                    hrp.Anchored = false
-
-                    -- ปลดล็อคตัวผู้เล่นเมื่อเสร็จ
-                    player.Character.HumanoidRootPart.Anchored = false
                 end
             end
         end
