@@ -7,11 +7,27 @@ function TP(Pos)
     end
 end
 
-local player = game.Players.LocalPlayer
-local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-
 local Monfolder = workspace.Monster:FindFirstChild("Mon")
 if not Monfolder then return end
+
+for _, mon in ipairs(Monfolder:GetChildren()) do
+    if mon:IsA("Model") and mon:FindFirstChild("Humanoid") then
+        local humanoid = mon:FindFirstChild("Humanoid")
+        local rootPart = mon:FindFirstChild("HumanoidRootPart")
+        if humanoid and rootPart then
+            local distance = (rootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+            if distance <= 60 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
+                pcall(function()
+                    humanoid:SetAttribute("Hidden", true)
+                end)
+            end
+        end
+    end
+end
+
+
+
+
 
 function Attack()
     local args = {
