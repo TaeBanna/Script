@@ -59,6 +59,9 @@ while task.wait() do
                     -- ล็อคมอนไม่ให้ขยับ
                     hrp.Anchored = true
 
+                    -- ล็อคตัวผู้เล่นให้ติดกับมอน
+                    player.Character.HumanoidRootPart.Anchored = true
+
                     -- วาร์ปไปหามอน
                     TP(hrp.CFrame * CFrame.new(0, 0, 6))
 
@@ -70,6 +73,9 @@ while task.wait() do
 
                     -- ปลดล็อคมอนเมื่อตาย
                     hrp.Anchored = false
+
+                    -- ปลดล็อคตัวผู้เล่นเมื่อเสร็จ
+                    player.Character.HumanoidRootPart.Anchored = false
                 end
             end
         end
