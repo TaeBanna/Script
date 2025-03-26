@@ -3,9 +3,6 @@
 function TP(Pos)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        -- ตั้งค่า CFrame ให้ตรงกับตำแหน่งของมอนสเตอร์
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(Pos.Position)
-        task.wait(0.05)  -- เพิ่มระยะเวลาระหว่างการวาร์ปให้มีความราบรื่น
     end
 end
 
@@ -41,7 +38,6 @@ while task.wait() do
                         if humanoid and humanoid.Health > 0 and hrp then
                             humanoid.PlatformStand = true  -- ปิดการเคลื่อนไหวของ humanoid
                             repeat
-                                task.wait(0.1)  -- เพิ่มเวลาระหว่างการวาร์ป
                                 if v.Name == "Soldier [Lv. 1]" then
                                     TP(hrp)  -- วาร์ปไปที่ตำแหน่งของมอนสเตอร์
                                     Attack()  -- โจมตี
