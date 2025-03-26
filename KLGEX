@@ -39,13 +39,11 @@ while task.wait() do
                         local hrp = v:FindFirstChild("HumanoidRootPart")
                         if humanoid and humanoid.Health > 0 and hrp then
                             humanoid.PlatformStand = true  -- ปิดการเคลื่อนไหวของ humanoid
-                            
                             -- วาร์ปไปตำแหน่งของมอนสเตอร์
                             TP(hrp.CFrame * CFrame.new(0, 0, 6))  -- วาร์ปไปที่มอนสเตอร์
-
                             -- โจมตีจนกว่ามอนสเตอร์จะตาย
                             repeat
-                                task.wait(0.1)  -- เพิ่มเวลาระหว่างการโจมตี
+                                task.wait()
                                 if v.Name == "Soldier [Lv. 1]" then
                                     Attack()  -- โจมตี
                                 end
