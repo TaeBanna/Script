@@ -8,6 +8,15 @@ end
 local Monfolder = workspace.Monster:FindFirstChild("Mon")
 if not Monfolder then return end
 
+ for _, enemy in ipairs(monfolder:GetChildren()) do
+        if enemy:IsA("Model") and enemy:FindFirstChild("Head") then
+            local head = enemy.Head
+            local distance = (head.Position - rootPart.Position).Magnitude
+            if distance <= 60 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
+                pcall(function()
+                    head:SetAttribute("Hidden", true)
+                end)
+
 function Attack()
     while _G.AutoFarm do
         local args = {
