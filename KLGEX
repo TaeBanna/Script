@@ -18,12 +18,21 @@ for _, mon in ipairs(Monfolder:GetChildren()) do
             local distance = (rootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
             if distance <= 60 then -- ตรวจสอบว่าศัตรูอยู่ในระยะ 60 หน่วย
                 pcall(function()
+                    -- ซ่อนหรือปิดการโจมตีของมอนสเตอร์
                     humanoid:SetAttribute("Hidden", true)
+
+                    -- ปิดการเคลื่อนไหวของมอนสเตอร์
+                    humanoid:MoveTo(rootPart.Position)  -- ป้องกันไม่ให้เดิน
+                    humanoid.PlatformStand = true      -- หยุดการเคลื่อนไหว
+
+                    -- หยุดการโจมตี
+                    humanoid.Health = 0
                 end)
             end
         end
     end
 end
+
 
 
 
