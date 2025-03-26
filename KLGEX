@@ -45,6 +45,7 @@ while task.wait() do
                                 if v.Name == "Soldier [Lv. 1]" then
                                     TP(hrp.CFrame * CFrame.new(0, 2, 6))  -- วาร์ปไปที่มอนสเตอร์
                                     Attack()  -- โจมตี
+                                    Checkquest()
                                 end
                             until not _G.AutoFarm or humanoid.Health <= 0
                             humanoid.PlatformStand = false  -- เปิดการเคลื่อนไหวกลับคืน                     
