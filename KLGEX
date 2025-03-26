@@ -3,9 +3,12 @@
 function TP(Pos)
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        -- ทำให้การวาร์ปไม่กระตุกโดยการค่อยๆ เปลี่ยนตำแหน่ง
         player.Character.HumanoidRootPart.CFrame = Pos
+        task.wait(0.1)  -- เพิ่มเวลาระหว่างการวาร์ป
     end
 end
+
 
 local Monfolder = workspace.Monster:FindFirstChild("Mon")
 if not Monfolder then return end
