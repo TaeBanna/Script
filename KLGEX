@@ -9,15 +9,12 @@ local Monfolder = workspace.Monster:FindFirstChild("Mon")
 if not Monfolder then return end
 
 function Attack()
-    while task.wait(0.5) do
-        if _G.AutoFarm then
-            local args = {
-                [1] = "FS_None_M1"
-            }
-            game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("SkillAction"):InvokeServer(unpack(args))
-        else
-            break
-        end
+    while _G.AutoFarm do
+        local args = {
+            [1] = "FS_None_M1"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("SkillAction"):InvokeServer(unpack(args))
+        task.wait(0.5)
     end
 end
 
@@ -32,44 +29,47 @@ end
 _G.AutoFarm = true
 
 while task.wait() do
-    pcall(function() 
+    pcall(function()
         if _G.AutoFarm then
             local target = nil
 
-            -- ค้นหามอนที่มีชีวิตอยู่
-            for _, v in pairs(Monfolder:GetChildren()) do
-                if v.Name == "Soldier [Lv. 1]" then
-                    local humanoid = v:FindFirstChild("Humanoid")
-                    local hrp = v:FindFirstChild("HumanoidRootPart")
-                    if humanoid and humanoid.Health > 0 and hrp then 
-                        target = v
-                        break  -- เจอตัวแรกก็หยุดหา แล้วไปตี
+            -- วนหาเป้าหมายใหม่เรื่อย ๆ ถ้ายังไม่มี
+            repeat
+                for _, v in pairs(Monfolder:GetChildren()) do
+                    if v.Name == "Soldier [Lv. 1]" then
+                        local humanoid = v:FindFirstChild("Humanoid")
+                        local hrp = v:FindFirstChild("HumanoidRootPart")
+                        if humanoid and humanoid.Health > 0 and hrp then
+                            target = v
+                            break -- เจอมอนแล้วออกจาก loop ทันที
+                        end
                     end
                 end
-            end
+                task.wait(0.1) -- รอให้มอนเกิดใหม่
+            until target or not _G.AutoFarm
 
-            -- ถ้ามีมอนให้ตี
+            -- ถ้าเจอมอนแล้ว เข้าโจมตี
             if target then
                 local humanoid = target:FindFirstChild("Humanoid")
                 local hrp = target:FindFirstChild("HumanoidRootPart")
 
                 if humanoid and humanoid.Health > 0 and hrp then
-                    -- ล็อคมอน ไม่ให้ขยับ
+                    -- ล็อคมอนไม่ให้ขยับ
                     hrp.Anchored = true
 
-                    -- วาร์ปไปใกล้มอน
+                    -- วาร์ปไปหามอน
                     TP(hrp.CFrame * CFrame.new(0, 0, 6))
 
                     -- โจมตีจนกว่ามอนจะตาย
-                    while _G.AutoFarm and humanoid.Health > 0 do
-                        task.wait()
+                    repeat
                         Attack()
-                    end
+                        task.wait(0.1)
+                    until not _G.AutoFarm or humanoid.Health <= 0
 
-                    -- ปลดล็อคมอน หลังจากตาย
+                    -- ปลดล็อคมอนเมื่อตาย
                     hrp.Anchored = false
                 end
             end
         end
-    end) 
+    end)
 end
