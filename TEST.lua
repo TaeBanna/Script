@@ -59,7 +59,7 @@ local function checkPlayerLevel()
         -- ถ้าไม่พบมอนสเตอร์ในพื้นที่ ระดับที่กำหนด จะให้วาร์ปไปยังตำแหน่งที่เกี่ยวข้อง
         player.Character:SetPrimaryPartCFrame(targetPosition)
         -- รอให้การวาร์ปเสร็จสิ้น
-        task.wait(1) -- เพิ่มเวลาเล็กน้อยเพื่อให้การวาร์ปเกิดขึ้น
+        task.wait(3) -- เพิ่มเวลาเล็กน้อยเพื่อให้การวาร์ปเกิดขึ้น
     end
 end
 
