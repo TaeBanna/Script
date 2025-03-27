@@ -61,11 +61,11 @@ end
 
 -- ตัวอย่างการใช้งาน
 while task.wait() do
-    pcall(function ()
+    pcall(function()
         if _G.AutoFarmLV then
             checkPlayerLevel()
         else
             unlockMonsters()
-    end
+        end
     end)
 end
