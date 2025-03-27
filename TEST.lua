@@ -9,7 +9,9 @@ local function findMonster(name)
             if v.Name == name and v:FindFirstChild("HumanoidRootPart") then
                 local humanoid = v:FindFirstChildOfClass("Humanoid")
                 if humanoid and humanoid.Health > 0 then
-                    if _G.AutoFarmLV then humanoid.RootPart.Anchored = true end
+                    if _G.AutoFarmLV then
+                        humanoid.RootPart.Anchored = true 
+                    end
                     return v.HumanoidRootPart
                 end
             end
@@ -26,6 +28,7 @@ local function checkPlayerLevel()
     local targetMonster, questName
     local targetPosition -- ใช้สำหรับเก็บตำแหน่งของมอนสเตอร์หรือจุดที่ผู้เล่นจะวาร์ปไป
 
+    -- กำหนดค่าตามระดับเลเวล
     if level <= 10 then 
         targetMonster, questName = "Soldier [Lv. 1]", "Kill 4 Soldiers"
         targetPosition = CFrame.new(-1975, 49, -4560) -- วาร์ปไปที่ตำแหน่ง Mon Lv. 1
@@ -39,7 +42,7 @@ local function checkPlayerLevel()
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
     elseif level <= 50 then
-        targetMonster, questName = "crownPaty [Lv. 50]", "Kill 1 crownPaty"
+        targetMonster, questName = "dde [Lv. 50]", "Kill 1 ddai"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
     
@@ -53,12 +56,10 @@ local function checkPlayerLevel()
     -- หาและวาร์ปไปที่มอนสเตอร์
     local monster = findMonster(targetMonster)
     if monster then
-        -- ถ้าพบมอนสเตอร์ ไม่ทำอะไร
-        print("มอนสเตอร์พบแล้ว: " .. targetMonster)
+        -- ถ้าพบมอนสเตอร์, ไม่ต้องทำอะไร
         return
     elseif targetPosition then
-        -- ถ้าไม่พบมอนสเตอร์ในพื้นที่ ระดับที่กำหนด จะให้วาร์ปไปยังตำแหน่งที่เกี่ยวข้อง
-        print("ไม่พบมอนสเตอร์, วาร์ปไปที่ตำแหน่ง: " .. tostring(targetPosition))
+        -- ถ้าไม่พบมอนสเตอร์ในพื้นที่, วาร์ปไปยังตำแหน่งที่เกี่ยวข้อง
         player.Character:SetPrimaryPartCFrame(targetPosition)
     end
 end
@@ -69,7 +70,9 @@ local function unlockMonsters()
         for _, folder in pairs(monsterFolders) do
             for _, v in pairs(folder:GetChildren()) do
                 local humanoid = v:FindFirstChildOfClass("Humanoid")
-                if humanoid then humanoid.RootPart.Anchored = false end
+                if humanoid then 
+                    humanoid.RootPart.Anchored = false 
+                end
             end
         end
     end
@@ -79,9 +82,9 @@ end
 while task.wait() do
     pcall(function ()
         if _G.AutoFarmLV then
-            checkPlayerLevel()
+            checkPlayerLevel()  -- เช็คระดับของผู้เล่น และหามอนสเตอร์
         else
-            unlockMonsters()
+            unlockMonsters()    -- ปลดล็อกมอนสเตอร์
         end
     end)
 end
