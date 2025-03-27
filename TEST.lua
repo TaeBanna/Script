@@ -42,7 +42,7 @@ local function checkPlayerLevel()
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
     elseif level <= 50 then
-        targetMonster, questName = "dde [Lv. 50]", "Kill 1 ddai"
+        targetMonster, questName = "Tashi [Lv. 40]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
     
@@ -56,7 +56,7 @@ local function checkPlayerLevel()
     -- หาและวาร์ปไปที่มอนสเตอร์
     local monster = findMonster(targetMonster)
     if monster then
-        -- ถ้าพบมอนสเตอร์, ไม่ต้องทำอะไร
+        -- ถ้าพบมอนสเตอร์, หยุดการวาร์ป
         return
     elseif targetPosition then
         -- ถ้าไม่พบมอนสเตอร์ในพื้นที่, วาร์ปไปยังตำแหน่งที่เกี่ยวข้อง
