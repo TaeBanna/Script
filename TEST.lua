@@ -40,8 +40,10 @@ local function checkPlayerLevel()
         targetMonster, questName, targetPosition = "Pusst [Lv. 50]", "Kill 1 Pusst", CFrame.new(-693, 65, -3470)
     end
     
-    -- รับเควส
-    local args = {"take", questName}
+    local args = {
+        [1] = "take",
+        [2] = questName
+    }
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
     
     -- วาร์ปไปหามอนสเตอร์หรือจุดเกิด
