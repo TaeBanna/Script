@@ -25,6 +25,18 @@ local function checkPlayerLevel()
     if level <= 100 then 
         targetMonster, questName = "Soldier [Lv. 1]", "Kill 4 Soldiers"
         targetPosition = CFrame.new(-1975, 49, -4560)
+    elseif level <= 19 then 
+        targetMonster, questName = "Clown Pirate [Lv. 10]", "Kill 5 Clown Pirates"
+        targetPosition = CFrame.new(-1792, 50, -4442)
+    elseif level <= 29 then 
+        targetMonster, questName = "Smoky [Lv. 20]", "Kill 1 Smokys"
+        targetPosition = CFrame.new(-2101, 49, -4715)
+    elseif level <= 100 then
+        targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
+        targetPosition = CFrame.new(-2321, 50, -4514)
+    elseif level <= 149 then
+        targetMonster, questName = "Pusst [Lv. 50]", "Kill 1 Pusst"
+        targetPosition = CFrame.new(-693, 65, -3470)
     
     end
     
