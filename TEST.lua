@@ -28,26 +28,27 @@ local function checkPlayerLevel()
     local targetMonster, questName, targetPosition
     
     -- กำหนดค่าตามระดับเลเวล
-    if level <= 9 then 
+    if level == 1 or level <= 9 then 
         targetMonster, questName, targetPosition = "Soldier [Lv. 1]", "Kill 4 Soldiers", CFrame.new(-1975, 49, -4560)
-    elseif level <= 19 then 
+    elseif level == 10 or level <= 19 then 
         targetMonster, questName, targetPosition = "Clown Pirate [Lv. 10]", "Kill 5 Clown Pirates", CFrame.new(-1792, 50, -4442)
-    elseif level <= 29 then 
+    elseif level == 20 or level <= 29 then 
         targetMonster, questName, targetPosition = "Smoky [Lv. 20]", "Kill 1 Smokys", CFrame.new(-2101, 49, -4715)
-    elseif level <= 39 then
+    elseif level == 30 or level <= 100 then
         targetMonster, questName, targetPosition = "Tashi [Lv. 30]", "Kill 1 Tashi", CFrame.new(-2321, 50, -4514)
-    elseif level <= 49 then
+    elseif level == 101 or level <= 200 then
         targetMonster, questName, targetPosition = "Pusst [Lv. 50]", "Kill 1 Pusst", CFrame.new(-693, 65, -3470)
     end
     
-    -- รับเควส
-    local args = {"take", questName}
+    local args = {
+        [1] = "take",
+        [2] = questName
+    }
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
     
-    -- หามอนสเตอร์ ถ้าไม่มีให้วาร์ปไปจุดเกิด
-    local monster = findMonster(targetMonster)
-    if monster then
-        topos(monster.CFrame * CFrame.new(0, 0, 6))
+    -- วาร์ปไปหามอนสเตอร์หรือจุดเกิด
+    if game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster) then
+        topos(game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster).HumanoidRootPart.CFrame * CFrame.new(0, 0, 6))
     else    
         topos(targetPosition)
     end
@@ -68,7 +69,7 @@ local function unlockMonsters()
 end
 
 -- ลูปทำงานฟาร์ม
-while task.wait() do
+while task.wait(1) do
     pcall(function ()
         if _G.AutoFarmLV then
             checkPlayerLevel()
