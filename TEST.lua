@@ -40,15 +40,14 @@ local function checkPlayerLevel()
         targetMonster, questName, targetPosition = "Pusst [Lv. 50]", "Kill 1 Pusst", CFrame.new(-693, 65, -3470)
     end
     
-    local args = {
-        [1] = "take",
-        [2] = questName
-    }
+    -- รับเควส
+    local args = {"take", questName}
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
     
-    -- วาร์ปไปหามอนสเตอร์หรือจุดเกิด
-    if game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster) then
-        topos(game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster).HumanoidRootPart.CFrame * CFrame.new(0, 0, 6))
+    -- หามอนสเตอร์ ถ้าไม่มีให้วาร์ปไปจุดเกิด
+    local monster = findMonster(targetMonster)
+    if monster then
+        topos(monster.CFrame * CFrame.new(0, 0, 6))
     else    
         topos(targetPosition)
     end
@@ -69,7 +68,7 @@ local function unlockMonsters()
 end
 
 -- ลูปทำงานฟาร์ม
-while task.wait(1) do
+while task.wait() do
     pcall(function ()
         if _G.AutoFarmLV then
             checkPlayerLevel()
