@@ -42,7 +42,7 @@ local function checkPlayerLevel()
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
     elseif level <= 50 then
-        targetMonster, questName = "ffff [Lv. 50]", "Kill 1 ffff"
+        targetMonster, questName = "Tashi [Lv. 40]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
     
@@ -53,7 +53,8 @@ local function checkPlayerLevel()
     }
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
     
-    -- หาและวาร์ปไปที่มอนสเตอร์
+   -- หาและวาร์ปไปที่มอนสเตอร์
+   function FindMonTp()
     local monster = findMonster(targetMonster)
     if monster then
         -- ถ้าพบมอนสเตอร์, หยุดการวาร์ป
@@ -63,6 +64,8 @@ local function checkPlayerLevel()
         player.Character:SetPrimaryPartCFrame(targetPosition)
     end
 end
+   end
+    
 
 -- ฟังก์ชันปลดล็อกมอนสเตอร์
 local function unlockMonsters()
@@ -78,11 +81,12 @@ local function unlockMonsters()
     end
 end
 
--- ตัวอย่างการใช้งาน
+-- ตัวอย่างการใช้งานในลูป
 while task.wait() do
     pcall(function ()
         if _G.AutoFarmLV then
             checkPlayerLevel()  -- เช็คระดับของผู้เล่น และหามอนสเตอร์
+            FindMonTp()
         else
             unlockMonsters()    -- ปลดล็อกมอนสเตอร์
         end
