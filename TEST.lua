@@ -27,7 +27,6 @@ local function checkPlayerLevel()
     -- ตรวจสอบว่า lvl มีค่าหรือไม่
     if player.PlayerStats and player.PlayerStats.lvl then
         local level = player.PlayerStats.lvl.Value
-        print("Level: " .. tostring(level)) -- พิมพ์ค่า level เพื่อตรวจสอบ
         if not level then 
             return warn("Level not valid!")
         end
