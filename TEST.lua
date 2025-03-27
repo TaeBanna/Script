@@ -39,7 +39,7 @@ local function checkPlayerLevel()
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
     elseif level <= 50 then
-        targetMonster, questName = "Ceownparty]", "Kill 1 dwd"
+        targetMonster, questName = "crownPaty [Lv. 50]", "Kill 1 crownPaty"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
     
@@ -54,12 +54,12 @@ local function checkPlayerLevel()
     local monster = findMonster(targetMonster)
     if monster then
         -- ถ้าพบมอนสเตอร์ ไม่ทำอะไร
+        print("มอนสเตอร์พบแล้ว: " .. targetMonster)
         return
     elseif targetPosition then
         -- ถ้าไม่พบมอนสเตอร์ในพื้นที่ ระดับที่กำหนด จะให้วาร์ปไปยังตำแหน่งที่เกี่ยวข้อง
+        print("ไม่พบมอนสเตอร์, วาร์ปไปที่ตำแหน่ง: " .. tostring(targetPosition))
         player.Character:SetPrimaryPartCFrame(targetPosition)
-        -- รอให้การวาร์ปเสร็จสิ้น
-        task.wait(3) -- เพิ่มเวลาเล็กน้อยเพื่อให้การวาร์ปเกิดขึ้น
     end
 end
 
