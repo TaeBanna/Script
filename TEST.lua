@@ -85,13 +85,12 @@ local function unlockMonsters()
         end
     end
 end
-
+farmMonsters()      -- เรียกฟังก์ชันฟาร์มมอนสเตอร์
 -- ตัวอย่างการใช้งานในลูป
 while task.wait(1) do
     pcall(function ()
         if _G.AutoFarmLV then
             checkPlayerLevel()  -- เช็คระดับของผู้เล่น และหามอนสเตอร์
-            farmMonsters()      -- เรียกฟังก์ชันฟาร์มมอนสเตอร์
         else
             unlockMonsters()    -- ปลดล็อกมอนสเตอร์
         end
