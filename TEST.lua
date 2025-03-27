@@ -44,12 +44,11 @@ local function checkPlayerLevel()
     local args = {"take", questName}
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
     
-    -- หาและวาร์ปไปมอนสเตอร์
-    local monsterPart = findMonster(targetMonster)
-    if monsterPart then
-        player.Character:SetPrimaryPartCFrame(monsterPart.CFrame * CFrame.new(0, 20, 0))
-    else
-        player.Character:SetPrimaryPartCFrame(targetPosition) -- ถ้าไม่เจอวาร์ปไปตำแหน่งที่กำหนดแทน
+    -- วาร์ปไปหามอนสเตอร์หรือจุดเกิด
+    if game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster) then
+        topos(game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster).HumanoidRootPart.CFrame * CFrame.new(0, 0, 6))
+    else    
+        topos(targetPosition)
     end
 end
 
