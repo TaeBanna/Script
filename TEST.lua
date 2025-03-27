@@ -45,6 +45,11 @@ local function checkPlayerLevel()
         targetMonster, questName = "Pusst [Lv. 50]", "Kill 1 Pusst"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
+
+    -- วาร์ปไปยังตำแหน่งมอนสเตอร์ก่อน
+    if targetPosition then
+        player.Character:SetPrimaryPartCFrame(targetPosition)
+    end
     
     -- รับเควส
     local args = {
@@ -52,20 +57,19 @@ local function checkPlayerLevel()
         [2] = questName
     }
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
-    
-   -- หาและวาร์ปไปที่มอนสเตอร์
-   function FindMonTp()
-    local monster = findMonster(targetMonster)
-    if monster then
-        -- ถ้าพบมอนสเตอร์, หยุดการวาร์ป
-        return
-    elseif targetPosition then
-        -- ถ้าไม่พบมอนสเตอร์ในพื้นที่, วาร์ปไปยังตำแหน่งที่เกี่ยวข้อง
-        player.Character:SetPrimaryPartCFrame(targetPosition)
+
+    -- หามอนสเตอร์หลังจากรับเควส
+    function farmMonsters()
+        local monster = findMonster(targetMonster)
+        if monster then
+            -- ฟาร์มมอนสเตอร์ที่เจอ
+            -- เพิ่มโค้ดการโจมตีหรือฟาร์มมอนสเตอร์ที่ต้องการที่นี่
+        else
+            -- ถ้าไม่เจอมอนสเตอร์ให้วาร์ปไปยังตำแหน่งที่กำหนด
+            player.Character:SetPrimaryPartCFrame(targetPosition)
+        end
     end
 end
-   end
-    
 
 -- ฟังก์ชันปลดล็อกมอนสเตอร์
 local function unlockMonsters()
@@ -82,11 +86,11 @@ local function unlockMonsters()
 end
 
 -- ตัวอย่างการใช้งานในลูป
-while task.wait() do
+while task.wait(1) do
     pcall(function ()
         if _G.AutoFarmLV then
             checkPlayerLevel()  -- เช็คระดับของผู้เล่น และหามอนสเตอร์
-            FindMonTp()
+            farmMonsters()      -- เรียกฟังก์ชันฟาร์มมอนสเตอร์
         else
             unlockMonsters()    -- ปลดล็อกมอนสเตอร์
         end
