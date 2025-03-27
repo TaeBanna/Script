@@ -31,6 +31,8 @@ local function checkPlayerLevel()
         targetMonster, questName = "Smoky [Lv. 20]", "Kill 1 Smokys"
     elseif level <= 40 then
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
+    elseif level <= 50 then
+        targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
     end
     
     -- รับเควส
