@@ -25,7 +25,7 @@ end
 -- ฟังก์ชันเช็ค Level และเลือกมอนสเตอร์
 local function checkPlayerLevel()
     -- ตรวจสอบว่า lvl มีค่าหรือไม่
-    local level = player.PlayerStats and player.PlayerStats.lvl and player.PlayerStats.lvl.Value
+    local level = LocalPlayer.PlayerStats.lvl.value
     if not level then 
         return
     end
