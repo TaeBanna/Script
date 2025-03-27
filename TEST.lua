@@ -25,22 +25,27 @@ end
 -- ฟังก์ชันเช็ค Level และเลือกมอนสเตอร์
 local function checkPlayerLevel()
     -- ตรวจสอบว่า lvl มีค่าหรือไม่
-    local level = player.PlayerStats and player.PlayerStats.lvl and player.PlayerStats.lvl.Value
-    if not level then 
-        return warn("Level not valid!")
-    end
-    
-    local targetMonster = level <= 10 and "Soldier [Lv. 1]" or 
-                          (level <= 20 and "Clown Pirate [Lv. 10]" or 
-                          (level <= 90 and "Smoky [Lv. 20]" ))
-
-    if targetMonster then
-        local monster = findMonster(targetMonster)
-        if monster then
-            player.Character:SetPrimaryPartCFrame(monster.CFrame * CFrame.new(0, 0, 5.5)) -- วาร์ปไปที่มอนสเตอร์
-        else
-            warn(targetMonster .. " not found or monster is dead!")
+    if player.PlayerStats and player.PlayerStats.lvl then
+        local level = player.PlayerStats.lvl.Value
+        print("Level: " .. tostring(level)) -- พิมพ์ค่า level เพื่อตรวจสอบ
+        if not level then 
+            return warn("Level not valid!")
         end
+        
+        local targetMonster = level <= 10 and "Soldier [Lv. 1]" or 
+                              (level <= 20 and "Clown Pirate [Lv. 10]" or 
+                              (level <= 90 and "Smoky [Lv. 20]" ))
+
+        if targetMonster then
+            local monster = findMonster(targetMonster)
+            if monster then
+                player.Character:SetPrimaryPartCFrame(monster.CFrame * CFrame.new(0, 0, 5.5)) -- วาร์ปไปที่มอนสเตอร์
+            else
+                warn(targetMonster .. " not found or monster is dead!")
+            end
+        end
+    else
+        warn("PlayerStats or lvl not found!")
     end
 end
 
