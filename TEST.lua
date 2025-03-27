@@ -25,34 +25,42 @@ local function checkPlayerLevel()
     local level = player.PlayerStats and player.PlayerStats.lvl and player.PlayerStats.lvl.Value
     if not level or level <= 0 then return end
     
-    local targetMonster, questName, targetPosition
-    
+    local targetMonster, questName
+    local targetPosition -- ใช้สำหรับเก็บตำแหน่งของมอนสเตอร์หรือจุดที่ผู้เล่นจะวาร์ปไป
+
     -- กำหนดค่าตามระดับเลเวล
     if level == 1 or level <= 9 then 
-        targetMonster, questName, targetPosition = "Soldier [Lv. 1]", "Kill 4 Soldiers", CFrame.new(-1975, 49, -4560)
+        targetMonster, questName = "Soldier [Lv. 1]", "Kill 4 Soldiers"
+        targetPosition = CFrame.new(-1975, 49, -4560) -- วาร์ปไปที่ตำแหน่ง Mon Lv. 1
     elseif level == 10 or level <= 19 then 
-        targetMonster, questName, targetPosition = "Clown Pirate [Lv. 10]", "Kill 5 Clown Pirates", CFrame.new(-1792, 50, -4442)
+        targetMonster, questName = "Clown Pirate [Lv. 10]", "Kill 5 Clown Pirates"
+        targetPosition = CFrame.new(-1792, 50, -4442) -- วาร์ปไปที่ตำแหน่ง
     elseif level == 20 or level <= 29 then 
-        targetMonster, questName, targetPosition = "Smoky [Lv. 20]", "Kill 1 Smokys", CFrame.new(-2101, 49, -4715)
-    elseif level == 30 or level <= 100 then
-        targetMonster, questName, targetPosition = "Tashi [Lv. 30]", "Kill 1 Tashi", CFrame.new(-2321, 50, -4514)
-    elseif level == 101 or level <= 200 then
-        targetMonster, questName, targetPosition = "Pusst [Lv. 50]", "Kill 1 Pusst", CFrame.new(-693, 65, -3470)
+        targetMonster, questName = "Smoky [Lv. 20]", "Kill 1 Smokys"
+        targetPosition = CFrame.new(-2101, 49, -4715) -- วาร์ปไปที่ตำแหน่ง
+    elseif level == 30 or level <= 39 then
+        targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
+        targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
+    elseif level == 40 or level <= 49 then
+        targetMonster, questName = "Pusst [Lv. 50]", "Kill 1 Pusst"
+        targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
+    end
+
+    -- วาร์ปไปยังตำแหน่งมอนสเตอร์ก่อน
+    if  then
+        
+    end
+    if targetPosition then
+        player.Character:SetPrimaryPartCFrame(targetPosition)
     end
     
+    -- รับเควส
     local args = {
         [1] = "take",
         [2] = questName
     }
     game:GetService("ReplicatedStorage"):WaitForChild("Chest"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("Quest"):InvokeServer(unpack(args))
-    
-    -- วาร์ปไปหามอนสเตอร์หรือจุดเกิด
-    if game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster) then
-        topos(game:GetService("ReplicatedStorage"):FindFirstChild(targetMonster).HumanoidRootPart.CFrame * CFrame.new(0, 0, 6))
-    else    
-        topos(targetPosition)
-    end
-end
+
 
 -- ฟังก์ชันปลดล็อกมอนสเตอร์
 local function unlockMonsters()
@@ -67,14 +75,14 @@ local function unlockMonsters()
         end
     end
 end
-
--- ลูปทำงานฟาร์ม
+farmMonsters()      -- เรียกฟังก์ชันฟาร์มมอนสเตอร์
+-- ตัวอย่างการใช้งานในลูป
 while task.wait(1) do
     pcall(function ()
         if _G.AutoFarmLV then
-            checkPlayerLevel()
+            checkPlayerLevel()  -- เช็คระดับของผู้เล่น และหามอนสเตอร์
         else
-            unlockMonsters()
+            unlockMonsters()    -- ปลดล็อกมอนสเตอร์
         end
     end)
 end
