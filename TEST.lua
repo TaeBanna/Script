@@ -38,10 +38,10 @@ local function checkPlayerLevel()
     elseif level == 20 or level <= 29 then 
         targetMonster, questName = "Smoky [Lv. 20]", "Kill 1 Smokys"
         targetPosition = CFrame.new(-2101, 49, -4715) -- วาร์ปไปที่ตำแหน่ง
-    elseif level == 30 or level <= 39 then
+    elseif level == 30 or level <= 100 then
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
-    elseif level == 40 or level <= 49 then
+    elseif level == 140 or level <= 149 then
         targetMonster, questName = "Pusst [Lv. 50]", "Kill 1 Pusst"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
