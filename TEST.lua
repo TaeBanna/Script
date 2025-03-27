@@ -30,7 +30,7 @@ local function checkPlayerLevel()
     elseif level <= 30 then 
         targetMonster, questName = "Smoky [Lv. 20]", "Kill 1 Smokys"
     elseif level <= 40 then
-        targetMonster, questName = "Pirate Captain [Lv. 30]", "Kill 7 Pirate Captains"
+        targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
     end
     
     -- รับเควส
@@ -61,11 +61,11 @@ end
 
 -- ตัวอย่างการใช้งาน
 while task.wait() do
-    pcall(function()
+    pcall(function ()
         if _G.AutoFarmLV then
             checkPlayerLevel()
         else
             unlockMonsters()
-        end
+    end
     end)
 end
