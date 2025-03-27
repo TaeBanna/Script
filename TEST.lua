@@ -60,6 +60,7 @@ local function checkPlayerLevel()
 
     -- หามอนสเตอร์หลังจากรับเควส
     function farmMonsters()
+        -- เช็คหามอนสเตอร์ตามชื่อ
         local monster = findMonster(targetMonster)
         if monster then
             -- ฟาร์มมอนสเตอร์ที่เจอ
