@@ -37,7 +37,7 @@ local function checkPlayerLevel()
     if targetMonster then
         local monster = findMonster(targetMonster)
         if monster then
-            player.Character:SetPrimaryPartCFrame(monster.CFrame * CFrame.new(0, 0, 6)) -- วาร์ปไปที่มอนสเตอร์
+            player.Character:SetPrimaryPartCFrame(monster.CFrame * CFrame.new(0, 0, 5.5)) -- วาร์ปไปที่มอนสเตอร์
         else
             warn(targetMonster .. " not found or monster is dead!")
         end
