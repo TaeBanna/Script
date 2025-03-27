@@ -1,58 +1,60 @@
 _G.AutoFarmLV = true -- เปิดใช้งาน AutoFarm
 
 local player = game.Players.LocalPlayer
-local monsterFolders = {workspace.Monster.Mon, workspace.Monster.Boss}
-local monsters = {} -- เก็บข้อมูลมอนสเตอร์ที่ล็อคไว้
+local monsterFolders = {workspace.Monster.Mon, workspace.Monster.Boss} -- รวมทั้งสอง folder
 
 -- ฟังก์ชันหามอนสเตอร์
 local function findMonster(name)
     for _, folder in pairs(monsterFolders) do
         for _, v in pairs(folder:GetChildren()) do
             if v.Name == name and v:FindFirstChild("HumanoidRootPart") then
-                return v
+                local humanoid = v:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then -- เช็คว่า Humanoid ยังมีชีวิตอยู่
+                    -- ถ้าเปิด AutoFarm จะล็อกมอนสเตอร์
+                    if _G.AutoFarmLV then
+                        humanoid.RootPart.Anchored = true -- ตั้งค่าการล็อกที่ HumanoidRootPart
+                    end
+                    return v.HumanoidRootPart
+                end
             end
         end
     end
-end
-
--- ฟังก์ชันล็อคมอนสเตอร์
-local function lockMonster(monster)
-    local humanoid = monster:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.PlatformStand = true -- ปิดการเคลื่อนไหว
-        monster:MoveTo(monster.Position) -- ป้องกันมอนสเตอร์เคลื่อนที่
-        monster:SetPrimaryPartCFrame(monster.HumanoidRootPart.CFrame)
-        monster.Anchored = true -- ตั้งค่า Anchored
-        table.insert(monsters, monster) -- เก็บข้อมูลมอนสเตอร์
-    end
-end
-
--- ฟังก์ชันปลดล็อคมอนสเตอร์
-local function unlockMonster(monster)
-    local humanoid = monster:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.PlatformStand = false -- เปิดการเคลื่อนไหว
-        monster.Anchored = false -- ปลดล็อค Anchored
-    end
+    return nil
 end
 
 -- ฟังก์ชันเช็ค Level และเลือกมอนสเตอร์
 local function checkPlayerLevel()
-    local level = player.PlayerStats.lvl.Value
-    local targetMonster = (level <= 10 and "Soldier [Lv. 1]") or
-                          (level <= 20 and "Clown Pirate [Lv. 10]") or
-                          (level <= 30 and "Smoky [Lv. 20]")
+    -- ตรวจสอบว่า lvl มีค่าหรือไม่
+    local level = player.PlayerStats and player.PlayerStats.lvl and player.PlayerStats.lvl.Value
+    if not level then 
+        return
+    end
+    
+    local targetMonster = level <= 10 and "Soldier [Lv. 1]" or 
+                          (level <= 20 and "Clown Pirate [Lv. 10]" or 
+                          (level <= 90 and "Smoky [Lv. 20]" ))
 
     if targetMonster then
         local monster = findMonster(targetMonster)
         if monster then
-            player.Character:SetPrimaryPartCFrame(monster.HumanoidRootPart.CFrame * CFrame.new(0, 0, 6))
-            lockMonster(monster) -- ล็อคมอนสเตอร์เมื่อเจอ
+            player.Character:SetPrimaryPartCFrame(monster.CFrame * CFrame.new(0, 0, 6)) -- วาร์ปไปที่มอนสเตอร์
         else
-            warn(targetMonster .. " not found!")
+            warn(targetMonster .. " not found or monster is dead!")
         end
-    else
-        warn("Level not valid!")
+    end
+end
+
+-- ฟังก์ชันที่จะคืนค่าการล็อกของมอนสเตอร์เมื่อปิด AutoFarm
+local function unlockMonsters()
+    if not _G.AutoFarmLV then
+        for _, folder in pairs(monsterFolders) do
+            for _, v in pairs(folder:GetChildren()) do
+                local humanoid = v:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.RootPart.Anchored = false -- รีเซ็ตการล็อกกลับ
+                end
+            end
+        end
     end
 end
 
@@ -61,10 +63,6 @@ while task.wait() do
     if _G.AutoFarmLV then
         pcall(checkPlayerLevel)
     else
-        -- ปลดล็อคมอนสเตอร์ทั้งหมดเมื่อปิด AutoFarm
-        for _, monster in pairs(monsters) do
-            unlockMonster(monster)
-        end
-        monsters = {} -- เคลียร์ข้อมูลมอนสเตอร์ที่ล็อค
+        unlockMonsters() -- เมื่อปิด AutoFarm จะทำการปลดล็อกมอนสเตอร์
     end
 end
