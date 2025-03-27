@@ -39,7 +39,7 @@ local function checkPlayerLevel()
         targetMonster, questName = "Tashi [Lv. 30]", "Kill 1 Tashi"
         targetPosition = CFrame.new(-2321, 50, -4514) -- วาร์ปไปที่ตำแหน่ง
     elseif level <= 50 then
-        targetMonster, questName = "Tashi [Lv. 40]", "Kill 1 Tashi"
+        targetMonster, questName = "Ceownparty]", "Kill 1 dwd"
         targetPosition = CFrame.new(-693, 65, -3470) -- วาร์ปไปที่ตำแหน่ง
     end
     
