@@ -5,15 +5,12 @@ game.CoreGui.GhostGui.MainFrame.Title.Text = "Gupro"
 
 -- สร้างฟังก์ชัน shared เพื่อเริ่มการท้าทาย
 shared.StartChallenge = function()
-    while true do
         local args = {
             [1] = 1
         }
         
         -- ส่งคำสั่ง Re_ChallengeStart
         game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Fight"):WaitForChild("Re_ChallengeStart"):FireServer(unpack(args))
-        wait(1)
-    end
 end
 
 -- สร้างฟังก์ชัน AutoFight ใน shared
