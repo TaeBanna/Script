@@ -15,7 +15,7 @@ local monsterData = {
 
 -- 🔁 ล็อกบนหัวมอน (แบบไม่ตก)
 coroutine.wrap(function()
-    while task.wait(0.2) do
+    while task.wait() do
         if _G.AutoFarmLV and monsterLock and monsterLock:IsDescendantOf(workspace) then
             local char = p.Character
             if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChildOfClass("Humanoid") then
@@ -79,7 +79,7 @@ local function releaseMonsters()
 end
 
 -- 🔁 ลูปหลัก
-while task.wait(1) do
+while task.wait() do
     pcall(function()
         if _G.AutoFarmLV then
             autoQuest()
