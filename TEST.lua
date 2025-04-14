@@ -3,6 +3,8 @@ _G.AutoFarmLV = true
 local p = game.Players.LocalPlayer
 local monsterFolders = {workspace.Monster.Mon, workspace.Monster.Boss}
 local monsterLock = nil
+
+-- ข้อมูลเควสตามระดับ
 local monsterData = {
     {maxLv = 9, name = "Soldier [Lv. 1]", quest = "Kill 4 Soldiers", pos = CFrame.new(-1975,49,-4560)},
     {maxLv = 19, name = "Clown Pirate [Lv. 10]", quest = "Kill 5 Clown Pirates", pos = CFrame.new(-1792,50,-4442)},
@@ -11,22 +13,30 @@ local monsterData = {
     {maxLv = 100, name = "Pusst [Lv. 50]", quest = "Kill 1 Pusst", pos = CFrame.new(-693,65,-3470)}
 }
 
--- ล็อกผู้เล่นให้อยู่บนหัวมอน
+-- 🔁 ล็อกบนหัวมอน (แบบไม่ตก)
 coroutine.wrap(function()
-    while task.wait(0.1) do
+    while task.wait(0.2) do
         if _G.AutoFarmLV and monsterLock and monsterLock:IsDescendantOf(workspace) then
             local char = p.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
+            if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChildOfClass("Humanoid") then
+                local hrp = char.HumanoidRootPart
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                
+                hum.PlatformStand = true
+                hum:ChangeState(Enum.HumanoidStateType.Physics)
+                
                 local pos = monsterLock.Position + Vector3.new(0, 5, 0)
-                char:SetPrimaryPartCFrame(CFrame.new(pos, monsterLock.Position))
+                hrp.CFrame = CFrame.new(pos, monsterLock.Position)
             end
-        else
-            monsterLock = nil
+        elseif p.Character and p.Character:FindFirstChildOfClass("Humanoid") then
+            -- คืนค่าปกติถ้าปิดฟาร์ม
+            local hum = p.Character:FindFirstChildOfClass("Humanoid")
+            hum.PlatformStand = false
         end
     end
 end)()
 
--- หามอนสเตอร์ที่ยังไม่ตาย
+-- 📍 หามอนสเตอร์
 local function getMonster(name)
     for _, folder in pairs(monsterFolders) do
         for _, v in pairs(folder:GetChildren()) do
@@ -39,7 +49,7 @@ local function getMonster(name)
     end
 end
 
--- รับเควสและเลือกเป้าหมายตามเลเวล
+-- 🎯 เลือกเควส + จัดการวาร์ป
 local function autoQuest()
     local lvl = p:FindFirstChild("PlayerStats") and p.PlayerStats:FindFirstChild("lvl") and p.PlayerStats.lvl.Value
     if not lvl then return end
@@ -57,7 +67,7 @@ local function autoQuest()
     end
 end
 
--- ปลดล็อกมอนสเตอร์ทั้งหมด
+-- 🔓 ปลด Anchor มอนสเตอร์ทั้งหมด
 local function releaseMonsters()
     for _, folder in pairs(monsterFolders) do
         for _, v in pairs(folder:GetChildren()) do
@@ -68,7 +78,7 @@ local function releaseMonsters()
     end
 end
 
--- ลูปหลัก
+-- 🔁 ลูปหลัก
 while task.wait(1) do
     pcall(function()
         if _G.AutoFarmLV then
