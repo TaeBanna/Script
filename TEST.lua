@@ -76,7 +76,7 @@ end
 
 -- อัปเดตตำแหน่งตัวละครไปยืนบนหัวมอนแบบล็อกค้าง
 local function stayOnTopLoop()
-    while task.wait(0.1) do
+    while task.wait() do
         if _G.AutoFarmLV and lockOnMonster and lockOnMonster:IsDescendantOf(workspace) then
             local char = player.Character
             if char and char:FindFirstChild("HumanoidRootPart") then
@@ -95,7 +95,7 @@ end
 task.spawn(stayOnTopLoop)
 
 -- ลูปหลัก
-while task.wait(1) do
+while task.wait() do
     pcall(function()
         if _G.AutoFarmLV then
             checkPlayerLevel()
