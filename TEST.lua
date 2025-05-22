@@ -1,27 +1,48 @@
--- สคริปต์ Auto Farm วาปไปค้างบนหัว Monster ชื่อ Solder [Lv.1]
+---Ghost Gui UI Library
+loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+game.CoreGui.GhostGui.MainFrame.Title.Text = "test game"
 
-local player = game.Players.LocalPlayer
-local runService = game:GetService("RunService")
-local farming = true
+AddContent("Switch", "ESP Killer", [[
+local f = workspace.Players:WaitForChild("Killers")
 
--- ฟังก์ชัน teleport ตัวละครไปยังตำแหน่งที่ต้องการ
-local function teleportToMonster(monster)
-    player.Character.HumanoidRootPart.CFrame = monster.HumanoidRootPart.CFrame * CFrame.new(0, 7, 0)
+local highlightEnabled = false
+local addedConn, removedConn
+
+local function up(o, add)
+	local hl = o:FindFirstChildOfClass("Highlight")
+	if add and not hl and (o:IsA("Model") or o:IsA("BasePart")) then
+		Instance.new("Highlight", o).FillColor = Color3.fromRGB(255,0,0)
+	elseif not add and hl then
+		hl:Destroy()
+	end
 end
 
--- ฟังก์ชัน auto farm loop
-local function autoFarm()
-    while farming do
-        for _, monster in pairs(game.Workspace.Monster.Mon:GetChildren()) do
-            if monster.Name == "Solder [Lv.1]" and monster:FindFirstChild("HumanoidRootPart") then
-                teleportToMonster(monster)
-                wait(0.5) -- รอค้างไว้บนหัวมอนสเตอร์
-            end
-        end
-
-        wait(1) -- พักการทำงานเล็กน้อยก่อนวนรอบใหม่
-    end
+local function clearHighlights()
+	for _, o in ipairs(f:GetChildren()) do
+		local hl = o:FindFirstChildOfClass("Highlight")
+		if hl then hl:Destroy() end
+	end
 end
 
--- เริ่มทำงาน auto farm
-runService.Stepped:Connect(autoFarm)
+local function enableHighlight()
+	if highlightEnabled then return end
+	highlightEnabled = true
+	for _, o in ipairs(f:GetChildren()) do up(o, true) end
+	addedConn = f.ChildAdded:Connect(function(o) up(o, true) end)
+	removedConn = f.ChildRemoved:Connect(function(o) up(o, false) end)
+end
+
+local function disableHighlight()
+	if not highlightEnabled then return end
+	highlightEnabled = false
+	if addedConn then addedConn:Disconnect() end
+	if removedConn then removedConn:Disconnect() end
+	clearHighlights()
+end
+
+enableHighlight() 
+
+
+]],[[
+disableHighlight()
+]])
