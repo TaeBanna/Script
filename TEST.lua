@@ -56,10 +56,6 @@ function disableHighlight()
 	end
 	clearHighlights()
 end
-
-
-enableHighlight()
-
 enableHighlight()  -- เริ่มต้นเปิดไฮไลต์
 ]],[[
 disableHighlight()
