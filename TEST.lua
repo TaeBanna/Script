@@ -2,20 +2,15 @@
 loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
 game.CoreGui.GhostGui.MainFrame.Title.Text = "test game"
 
-AddContent("Switch", "ESP Killer", [[
 local f = workspace.Players:WaitForChild("Killers")
 
 local highlightEnabled = false
-local addedConn, removedConn
+local conn
 
--- ค่าเริ่มต้น GHighlight() ไม่ทำอะไรเลย
-local function GHighlight()
-	-- ว่างไว้ ไม่มีการทำงาน
-end
-
-local function up(o, add)
+local function updateHighlight(o, add)
+	if not (o:IsA("Model") or o:IsA("BasePart")) then return end
 	local hl = o:FindFirstChildOfClass("Highlight")
-	if add and not hl and (o:IsA("Model") or o:IsA("BasePart")) then
+	if add and not hl then
 		Instance.new("Highlight", o).FillColor = Color3.fromRGB(255,0,0)
 	elseif not add and hl then
 		hl:Destroy()
@@ -32,24 +27,36 @@ end
 function enableHighlight()
 	if highlightEnabled then return end
 	highlightEnabled = true
-	for _, o in ipairs(f:GetChildren()) do up(o, true) end
-	addedConn = f.ChildAdded:Connect(function(o) up(o, true) end)
-	removedConn = f.ChildRemoved:Connect(function(o) up(o, false) end)
+	-- เพิ่มไฮไลต์ทั้งหมดในโฟลเดอร์
+	for _, o in ipairs(f:GetChildren()) do
+		updateHighlight(o, true)
+	end
+	-- เชื่อมต่อแค่ event เดียว ตรวจทั้งเพิ่มและลบ
+	conn = f.ChildAdded:Connect(function(o)
+		updateHighlight(o, true)
+		-- ตรวจสอบถ้าเปลี่ยนโฟลเดอร์ด้วย
+		o.AncestryChanged:Connect(function(_, parent)
+			if highlightEnabled then
+				updateHighlight(o, parent == f)
+			end
+		end)
+	end)
+	-- ตรวจสอบไอเท็มที่ถูกลบ
+	f.ChildRemoved:Connect(function(o)
+		updateHighlight(o, false)
+	end)
 end
 
 function disableHighlight()
 	if not highlightEnabled then return end
 	highlightEnabled = false
-	if addedConn then addedConn:Disconnect() end
-	if removedConn then removedConn:Disconnect() end
+	if conn then
+		conn:Disconnect()
+		conn = nil
+	end
 	clearHighlights()
 end
 
--- กำหนดให้เริ่มต้นเป็นฟังก์ชัน GHighlight ที่ไม่ทำอะไรเลย
-highlightEnabled = false
-addedConn = nil
-removedConn = nil
-local HighlightFunction = GHighlight
 
 enableHighlight()
 
