@@ -1,5 +1,12 @@
 ---Ghost Gui UI Library
-loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+local success, result = pcall(function()
+    return loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+end)
+
+if not success then
+    warn("โหลด UI Library ไม่สำเร็จ:", result)
+end
+
 game.CoreGui.GhostGui.MainFrame.Title.Text = "test game"
 
 local f = workspace.Players:WaitForChild("Killers")
