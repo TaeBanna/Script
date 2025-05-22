@@ -40,9 +40,7 @@ local function disableHighlight()
 	clearHighlights()
 end
 
-enableHighlight() 
-
-
+enableHighlight()  -- เริ่มต้นเปิดไฮไลต์
 ]],[[
 disableHighlight()
 ]])
