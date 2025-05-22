@@ -1,14 +1,9 @@
 ---Ghost Gui UI Library
-local success, result = pcall(function()
-    return loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
-end)
+loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
+game.CoreGui.GhostGui.MainFrame.Title.Text = "Title Here"
+---
 
-if not success then
-    warn("โหลด UI Library ไม่สำเร็จ:", result)
-end
-
-game.CoreGui.GhostGui.MainFrame.Title.Text = "test game"
-
+AddContent("Switch", "ESP Killer", [[
 local f = workspace.Players:WaitForChild("Killers")
 
 local highlightEnabled = false
@@ -34,21 +29,17 @@ end
 function enableHighlight()
 	if highlightEnabled then return end
 	highlightEnabled = true
-	-- เพิ่มไฮไลต์ทั้งหมดในโฟลเดอร์
 	for _, o in ipairs(f:GetChildren()) do
 		updateHighlight(o, true)
 	end
-	-- เชื่อมต่อแค่ event เดียว ตรวจทั้งเพิ่มและลบ
 	conn = f.ChildAdded:Connect(function(o)
 		updateHighlight(o, true)
-		-- ตรวจสอบถ้าเปลี่ยนโฟลเดอร์ด้วย
 		o.AncestryChanged:Connect(function(_, parent)
 			if highlightEnabled then
 				updateHighlight(o, parent == f)
 			end
 		end)
 	end)
-	-- ตรวจสอบไอเท็มที่ถูกลบ
 	f.ChildRemoved:Connect(function(o)
 		updateHighlight(o, false)
 	end)
@@ -63,7 +54,8 @@ function disableHighlight()
 	end
 	clearHighlights()
 end
-enableHighlight()  -- เริ่มต้นเปิดไฮไลต์
+
+enableHighlight()
 ]],[[
 disableHighlight()
 ]])
