@@ -20,10 +20,30 @@ AddContent("Toogle", "Text Here", [[
 ]])
 
 
-AddContent("Switch", "Text Here", [[
---script1 here need clear เปิด --
+AddContent("Switch", "AutoBubble", [[
+local rs = game:GetService("ReplicatedStorage")
+local evt = rs.Shared.Framework.Network.Remote.RemoteEvent
+local running = false
+
+local function BBenable()
+	if running then return end
+	running = true
+	task.spawn(function()
+		while running do
+			evt:FireServer("BlowBubble")
+			task.wait(0.1)
+		end
+	end)
+end
+
+local function BBdisable()
+	running = false
+end
+
+
+BBenable()
 ]],[[
---script2 here need clear ปิด --
+BBdisable()
 ]])
 
 
