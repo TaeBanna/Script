@@ -9,16 +9,6 @@ AddContent("TextButton", "Text Here", [[
 ]])
 
 
-TextBox = AddContent("TextBox","Text")
-TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-print(TextBox.Text)
-end)
-
-
-AddContent("Toogle", "Text Here", [[
---script here need clear--
-]])
-
 
 AddContent("Switch", "AutoBubble", [[
 local rs = game:GetService("ReplicatedStorage")
