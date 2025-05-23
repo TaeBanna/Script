@@ -1,6 +1,6 @@
 ---Ghost Gui UI Library
 loadstring(game:HttpGet('https://raw.githubusercontent.com/GhostPlayer352/UI-Library/refs/heads/main/Ghost%20Gui'))()
-game.CoreGui.GhostGui.MainFrame.Title.Text = "Title Here"
+game.CoreGui.GhostGui.MainFrame.Title.Text = "BBGum"
 ---
 
 
