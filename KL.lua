@@ -118,7 +118,7 @@ while _G.ENABLED do task.wait()
         if AvailableQuest then
             local Entities = Collection:GetEntities({ LatestQuest.Monster })
             if #Entities > 0 then -- Found entity
-                Collection:Teleport(Entities[1].HumanoidRootPart.CFrame * CFrame.new(0, 8, 0) * CFrame.Angles(math.rad(270), 0, 0))
+                Collection:Teleport(Entities[1].HumanoidRootPart.CFrame * CFrame.new(0, 7.5, 0) * CFrame.Angles(math.rad(270), 0, 0))
                 Collection:Attack()
             else
                 if Collection.Entity_Position[LatestQuest.Monster] ~= nil then
