@@ -1,16 +1,17 @@
--- ตั้งค่า
-_G.ENABLED = not _G.ENABLED
-print("Bot Enabled:", _G.ENABLED)
+_G.ENABLED = not _G.ENABLED 
+print("Enabled:", _G.ENABLED)
+_G.IGNORE_BOSSES = true -- ไม่สนใจบอส
+_G.WEAPON = "Combat" -- อาวุธที่ใช้
 
-_G.IGNORE_BOSSES = true
-_G.WEAPON = "Combat"
+-- สร้างตารางชื่อ Collection สำหรับเก็บฟังก์ชันและตัวแปรต่างๆ
+local Collection = {}
 
--- Services
+Collection.AttackCooldown = 0 -- เวลาคูลดาวน์ของการโจมตี
+Collection.Entity_Position = {} -- เก็บตำแหน่งของมอนสเตอร์
+
+-- เรียกใช้งานบริการที่จำเป็น
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local LocalPlayer = Players.LocalPlayer
-local Backpack = LocalPlayer:WaitForChild("Backpack")
 
 local Chest = ReplicatedStorage:WaitForChild("Chest")
 local Remotes = Chest:WaitForChild("Remotes")
@@ -19,97 +20,124 @@ local Functions = Remotes:WaitForChild("Functions")
 
 local QuestManager = require(Modules["QuestManager"])
 
--- ตัวช่วย
-local function getRoot(char) return char:FindFirstChild("HumanoidRootPart") end
-local function getHum(char) return char:FindFirstChild("Humanoid") end
+local LocalPlayer = Players.LocalPlayer -- ผู้เล่นคนปัจจุบัน
 
-local AttackCooldown = 0
-local LastPos = {}
-
--- ข้อมูลเควสแยกเป็นตาราง
-local QuestList = {
-    {min = 0, max = 9, name = "Kill 4 Soldiers"},
-    {min = 10, max = 19, name = "Kill 5 Clown Pirates"},
-    {min = 20, max = 29, name = "Kill 1 Smoky"},
-    {min = 30, max = 599, name = "SCRIPT BY ALPHES"} -- เปลี่ยนเป็นเควสจริง
-}
-
--- ฟังก์ชันหลัก
-local function getCurrentQuest()
-    local lvl = LocalPlayer.PlayerStats.lvl.Value
-    for _, q in ipairs(QuestList) do
-        if lvl >= q.min and lvl <= q.max then
-            local mob = QuestManager[q.name].Mob
-            return {
-                Quest = q.name,
-                Monster = mob,
-                IsBoss = QuestManager[q.name].Ammount == 1
-            }
-        end
-    end
+-- ฟังก์ชันเพื่อหาวัตถุ Humanoid ของตัวละคร
+function Collection:GetHum(Character)
+    return Character:FindFirstChild("Humanoid")
 end
 
-local function takeQuest(name)
-    Functions["Quest"]:InvokeServer("take", name)
+-- ฟังก์ชันเพื่อหาวัตถุ HumanoidRootPart
+function Collection:GetRoot(Character)
+    return Character:FindFirstChild("HumanoidRootPart")
 end
 
-local function attack()
-    if tick() >= AttackCooldown then
-        AttackCooldown = tick() + 0.15
-        Functions["SkillAction"]:InvokeServer("FS_None_M1")
-    end
+-- ฟังก์ชันวาร์ปผู้เล่นไปยังตำแหน่งที่กำหนด (CFrame)
+function Collection:Teleport(_Position_)
+    local RootPart = Collection:GetRoot(LocalPlayer.Character)
+    RootPart.CFrame = _Position_
 end
 
-local function teleport(pos)
-    local root = getRoot(LocalPlayer.Character)
-    if root then root.CFrame = pos end
+-- ตรวจสอบว่าผู้เล่นรับเควสอยู่หรือไม่
+function Collection:IsQuest()
+    return LocalPlayer.CurrentQuest.Value ~= ""
 end
 
-local function equipWeapon(name)
-    for _, tool in pairs(Backpack:GetChildren()) do
-        if tool:IsA("Tool") and tool.ToolTip == name then
-            getHum(LocalPlayer.Character):EquipTool(tool)
-            return
-        end
-    end
+-- ฟังก์ชันรับเควส
+function Collection:TakeQuest(Quest)
+   Functions["Quest"]:InvokeServer("take", Quest)
 end
 
-local function getEntities(monsterNames)
-    local targets = {}
-    for _, folder in pairs(workspace.Monster:GetChildren()) do
-        for _, entity in pairs(folder:GetChildren()) do
-            if entity:FindFirstChild("HumanoidRootPart") and entity:FindFirstChild("Humanoid") and entity.Humanoid.Health > 0 then
-                if table.find(monsterNames, entity.Name) then
-                    table.insert(targets, entity)
-                    LastPos[entity.Name] = entity.HumanoidRootPart.CFrame
-                end
-            end
-        end
-    end
-    return targets
+-- ฟังก์ชันสวมใส่อาวุธตามชื่อ ToolTip
+function Collection:EquipTool(ToolTip)
+    local Backpack = LocalPlayer.Backpack:GetChildren()
+    if #Backpack <= 0 then return "ไม่มีอะไรในกระเป๋าเลย" end
+
+    local Humanoid = Collection:GetHum(LocalPlayer.Character)
+
+    for _, Tool in pairs(Backpack) do
+        if Tool:IsA("Tool") and Tool.ToolTip == ToolTip then
+            Humanoid:EquipTool(Tool)
+            break
+        end
+    end
+    return "ไม่มีอาวุธที่มี ToolTip นี้"
 end
 
--- ทำงานวนลูป
-equipWeapon(_G.WEAPON)
+-- ฟังก์ชันโจมตี
+function Collection:Attack()
+    if tick() >= Collection.AttackCooldown then
+        Collection.AttackCooldown = tick() + 0.15
+        task.spawn(function()
+            Functions["SkillAction"]:InvokeServer("FS_None_M1")
+        end)
+    end
+end
 
-while _G.ENABLED do
-    task.wait()
+-- ฟังก์ชันเลือกเควสตามเลเวลของผู้เล่น
+function Collection:GetLatestQuest()
+    local Result_Data = {}
+    local CurrestQuest = ""
+    local Level = LocalPlayer.PlayerStats.lvl.Value
 
-    pcall(function()
-        local currentQuest = getCurrentQuest()
-        if not currentQuest then return end
+    if Level >= 0 and Level < 10 then
+        CurrestQuest = "Kill 4 Soldiers"
+    elseif Level >= 10 and Level < 20 then
+        CurrestQuest = "Kill 5 Clown Pirates"
+    elseif Level >= 20 and Level < 30 then
+        CurrestQuest = "Kill 1 Smoky"
+    elseif Level >= 30 and Level < 600 then
+        CurrestQuest = "SCRIPT BY ALPHES" -- ควรใส่ชื่อเควสจริงตรงนี้
+    end
 
-        if LocalPlayer.CurrentQuest.Value == "" then
-            takeQuest(currentQuest.Quest)
-            return
-        end
+    Result_Data = {
+        Quest = CurrestQuest,
+        Monster = QuestManager[CurrestQuest].Mob,
+        IsBosses = QuestManager[CurrestQuest].Ammount == 1
+    }
 
-        local mobs = getEntities({currentQuest.Monster})
-        if #mobs > 0 then
-            teleport(mobs[1].HumanoidRootPart.CFrame * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(270), 0, 0))
-            attack()
-        elseif LastPos[currentQuest.Monster] then
-            teleport(CFrame.new(LastPos[currentQuest.Monster].Position + Vector3.new(0, 60, 0)))
-        end
-    end)
+    return Result_Data
+end
+
+-- ฟังก์ชันดึงรายชื่อมอนสเตอร์ที่มีชีวิตจากพื้นที่ Monster
+function Collection:GetEntities(Entities)
+    local Included_Entities = {}
+
+    for _, EntityFolder in pairs(workspace.Monster:GetChildren()) do
+        for __, Entity in pairs(EntityFolder:GetChildren()) do
+            if not table.find(Collection.Entity_Position, Entity.Name) and Entity:FindFirstChild("HumanoidRootPart") then
+                Collection.Entity_Position[Entity.Name] = Entity.HumanoidRootPart.CFrame
+            end
+            if table.find(Entities, Entity.Name) and Entity.Humanoid.Health > 0 then
+                table.insert(Included_Entities, Entity)
+            end
+        end
+    end
+
+    return Included_Entities
+end
+
+-- ลูปหลักของระบบอัตโนมัติ
+while _G.ENABLED do task.wait()
+    pcall(function()
+        local AvailableQuest = Collection:IsQuest()
+        local LatestQuest = Collection:GetLatestQuest()
+
+        if AvailableQuest then
+            local Entities = Collection:GetEntities({ LatestQuest.Monster })
+            if #Entities > 0 then
+                -- วาร์ปไปด้านบนของมอนสเตอร์แล้วโจมตี
+                Collection:Teleport(Entities[1].HumanoidRootPart.CFrame * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(270), 0, 0))
+                Collection:Attack()
+            else
+                -- ถ้าไม่เจอมอนสเตอร์ ให้วาร์ปไปตำแหน่งที่เคยบันทึกไว้
+                if Collection.Entity_Position[LatestQuest.Monster] ~= nil then
+                    Collection:Teleport(CFrame.new(Collection.Entity_Position[LatestQuest.Monster].Position + Vector3.new(0, 60, 0)))
+                end
+            end
+        else
+            -- ถ้ายังไม่ได้รับเควส ให้รับเควสล่าสุด
+            Collection:TakeQuest(LatestQuest.Quest)
+        end
+    end)
 end
