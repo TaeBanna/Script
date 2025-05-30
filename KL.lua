@@ -1,4 +1,5 @@
-_G.ENABLED = not _G.ENABLED print("Enabled:", _G.ENABLED)
+_G.ENABLED = not _G.ENABLED 
+print("Enabled:", _G.ENABLED)
 _G.IGNORE_BOSSES = true
 _G.WEAPON = "Combat"
 
