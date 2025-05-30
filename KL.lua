@@ -12,7 +12,6 @@ Collection.Entity_Position = {} -- เก็บตำแหน่งของม
 -- เรียกใช้งานบริการที่จำเป็น
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 
 local Chest = ReplicatedStorage:WaitForChild("Chest")
 local Remotes = Chest:WaitForChild("Remotes")
@@ -20,7 +19,7 @@ local Modules = Chest:WaitForChild("Modules")
 local Functions = Remotes:WaitForChild("Functions")
 
 local QuestManager = require(Modules["QuestManager"])
-local LocalPlayer = Players.LocalPlayer -- ผู้เล่นคนปัจจุบัน
+local LocalPlayer = Players.LocalPlayer
 
 -- ฟังก์ชันเพื่อหาวัตถุ Humanoid ของตัวละคร
 function Collection:GetHum(Character)
@@ -32,33 +31,27 @@ function Collection:GetRoot(Character)
 	return Character:FindFirstChild("HumanoidRootPart")
 end
 
--- ฟังก์ชันวาร์ปผู้เล่นไปยังตำแหน่งที่กำหนด (CFrame) แบบเสถียรสุดโหด
+-- ✅ ฟังก์ชันวาร์ปผู้เล่นไปยังตำแหน่งที่กำหนด (ปรับให้เสถียรขึ้น)
 function Collection:Teleport(_CFrame_)
-	local Char = LocalPlayer.Character
-	if not Char then return end
+	if typeof(_CFrame_) ~= "CFrame" then return end
 
-	local RootPart = Collection:GetRoot(Char)
-	if not RootPart then return end
+	for i = 1, 5 do -- พยายามวาร์ป 5 ครั้งเผื่อวาร์ปไม่ติด
+		local Character = LocalPlayer.Character
+		if not Character or not Character.Parent then
+			task.wait(0.1)
+			continue
+		end
 
-	if typeof(_CFrame_) ~= "CFrame" then
-		warn("ตำแหน่งวาร์ปไม่ถูกต้อง (ไม่ใช่ CFrame)")
-		return
+		local Root = Collection:GetRoot(Character)
+		if Root then
+			Root.Velocity = Vector3.zero -- ลดโอกาสวาร์ปกระเด็น
+			Root.Anchored = false -- ป้องกันค้าง
+			Root.CFrame = _CFrame_
+			break
+		else
+			task.wait(0.1)
+		end
 	end
-
-	local distance = (RootPart.Position - _CFrame_.Position).Magnitude
-
-	-- ถ้าไกลมาก วาร์ปทันที (ป้องกันค้าง)
-	if distance > 300 then
-		RootPart.CFrame = _CFrame_
-		return
-	end
-
-	-- ถ้าใกล้ ให้วาร์ปแบบ Tween ลื่นๆ
-	local Goal = { CFrame = _CFrame_ }
-	local Info = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-	local Tween = TweenService:Create(RootPart, Info, Goal)
-	Tween:Play()
-	Tween.Completed:Wait()
 end
 
 -- ตรวจสอบว่าผู้เล่นรับเควสอยู่หรือไม่
@@ -110,7 +103,7 @@ function Collection:GetLatestQuest()
 	elseif Level >= 20 and Level < 30 then
 		CurrestQuest = "Kill 1 Smoky"
 	elseif Level >= 30 and Level < 600 then
-		CurrestQuest = "SCRIPT BY ALPHES" -- ควรใส่ชื่อเควสจริงตรงนี้
+		CurrestQuest = "SCRIPT BY ALPHES"
 	end
 
 	Result_Data = {
