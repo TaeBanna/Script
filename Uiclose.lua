@@ -20,7 +20,6 @@ return function(Library)
     local UICorner = Instance.new("UICorner")
     UICorner.Parent = Toggle
 
-    -- Dragging system
     local UserInputService = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos, moved = false, nil, nil, nil, false
 
@@ -35,7 +34,6 @@ return function(Library)
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
                     if not moved then
-                        -- กดแบบไม่ลาก
                         Library:ToggleUI()
                         Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
                     end
