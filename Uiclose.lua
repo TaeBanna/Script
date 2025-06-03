@@ -20,43 +20,52 @@ return function(Library)
     local UICorner = Instance.new("UICorner")
     UICorner.Parent = Toggle
 
-    -- ระบบลากปุ่ม (Drag)
+    -- Dragging system
     local UserInputService = game:GetService("UserInputService")
-    local dragging = false
-    local dragStart, startPos
+    local dragging, dragInput, dragStart, startPos, wasDragged = false, nil, nil, nil, false
 
     Toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = Toggle.Position
+            wasDragged = false
 
-            local connection
-            connection = input.Changed:Connect(function()
+            input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
-                    connection:Disconnect()
                 end
             end)
         end
     end)
 
     Toggle.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            if dragging then
-                local delta = input.Position - dragStart
-                Toggle.Position = UDim2.new(
-                    startPos.X.Scale,
-                    startPos.X.Offset + delta.X,
-                    startPos.Y.Scale,
-                    startPos.Y.Offset + delta.Y
-                )
-            end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
         end
     end)
 
-    -- เฉพาะเมื่อกดปุ่ม (ไม่ใช่คลิกที่อื่น)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            if delta.Magnitude > 2 then
+                wasDragged = true
+            end
+            Toggle.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
     Toggle.MouseButton1Click:Connect(function()
+        if wasDragged then
+            wasDragged = false
+            return -- อย่าทำอะไรถ้าเพิ่งลาก
+        end
+
         Library:ToggleUI()
         Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
