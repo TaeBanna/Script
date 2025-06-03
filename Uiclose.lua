@@ -8,9 +8,28 @@ return function(Library)
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
     
+    -- หา Kavo GUI โดยดูจากชื่อที่เป็นตัวเลขและ title
+    local function findKavoGui()
+        for _, child in pairs(CoreGui:GetChildren()) do
+            if child:IsA("ScreenGui") and tonumber(child.Name) then
+                local main = child:FindFirstChild("Main")
+                if main then
+                    local mainHeader = main:FindFirstChild("MainHeader")
+                    if mainHeader then
+                        local title = mainHeader:FindFirstChild("title")
+                        if title and title.Text == "BannaHub" then
+                            return child
+                        end
+                    end
+                end
+            end
+        end
+        return nil
+    end
+    
     -- ตรวจสอบเมื่อ Kavo GUI ถูกทำลาย
     local function checkKavoDestroyed()
-        local kavoGui = CoreGui:FindFirstChild("67177")
+        local kavoGui = findKavoGui()
         if not kavoGui then
             -- ถ้า Kavo GUI ถูกทำลาย ให้ทำลาย Toggle GUI ด้วย
             if ToggleGui and ToggleGui.Parent then
@@ -29,9 +48,18 @@ return function(Library)
     
     -- เช็คเมื่อมี Child ถูกลบใน CoreGui
     CoreGui.ChildRemoved:Connect(function(child)
-        if child.Name == "67177" then
-            if ToggleGui and ToggleGui.Parent then
-                ToggleGui:Destroy()
+        if child:IsA("ScreenGui") and tonumber(child.Name) then
+            local main = child:FindFirstChild("Main")
+            if main then
+                local mainHeader = main:FindFirstChild("MainHeader")
+                if mainHeader then
+                    local title = mainHeader:FindFirstChild("title")
+                    if title and title.Text == "BannaHub" then
+                        if ToggleGui and ToggleGui.Parent then
+                            ToggleGui:Destroy()
+                        end
+                    end
+                end
             end
         end
     end)
