@@ -29,16 +29,6 @@ return function(Library)
             dragStart = input.Position
             startPos = Toggle.Position
             moved = false
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                    if not moved then
-                        Library:ToggleUI()
-                        Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
-                    end
-                end
-            end)
         end
     end)
 
@@ -55,6 +45,17 @@ return function(Library)
                 moved = true
             end
             Toggle.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    -- ✅ ตรวจจับการปล่อยคลิกแบบแยก เพื่อความเสถียร
+    UserInputService.InputEnded:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            dragging = false
+            if not moved then
+                Library:ToggleUI()
+                Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+            end
         end
     end)
 end
