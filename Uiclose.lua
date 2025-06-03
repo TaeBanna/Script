@@ -22,34 +22,30 @@ return function(Library)
 
     -- Dragging system
     local UserInputService = game:GetService("UserInputService")
-    local dragging, dragInput, dragStart, startPos, wasDragged = false, nil, nil, nil, false
+    local dragging = false
+    local dragInput, dragStart, startPos
+    local moved = false
 
     Toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
             startPos = Toggle.Position
-            wasDragged = false
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
+            moved = false
         end
     end)
 
     Toggle.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
             dragInput = input
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
+        if dragging and input == dragInput then
             local delta = input.Position - dragStart
             if delta.Magnitude > 2 then
-                wasDragged = true
+                moved = true
             end
             Toggle.Position = UDim2.new(
                 startPos.X.Scale,
@@ -60,13 +56,14 @@ return function(Library)
         end
     end)
 
-    Toggle.MouseButton1Click:Connect(function()
-        if wasDragged then
-            wasDragged = false
-            return -- อย่าทำอะไรถ้าเพิ่งลาก
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and dragging then
+            dragging = false
+            if not moved then
+                -- กดแบบไม่ลาก
+                Library:ToggleUI()
+                Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+            end
         end
-
-        Library:ToggleUI()
-        Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
 end
