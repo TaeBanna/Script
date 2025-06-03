@@ -1,9 +1,40 @@
 return function(Library)
+    local CoreGui = game:GetService("CoreGui")
+    local Players = game:GetService("Players")
+    
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
     ToggleGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
+    
+    -- ตรวจสอบเมื่อ Kavo GUI ถูกทำลาย
+    local function checkKavoDestroyed()
+        local kavoGui = CoreGui:FindFirstChild("67177")
+        if not kavoGui then
+            -- ถ้า Kavo GUI ถูกทำลาย ให้ทำลาย Toggle GUI ด้วย
+            if ToggleGui and ToggleGui.Parent then
+                ToggleGui:Destroy()
+            end
+        end
+    end
+    
+    -- เช็คทุก 1 วินาที
+    spawn(function()
+        while ToggleGui and ToggleGui.Parent do
+            checkKavoDestroyed()
+            wait(1)
+        end
+    end)
+    
+    -- เช็คเมื่อมี Child ถูกลบใน CoreGui
+    CoreGui.ChildRemoved:Connect(function(child)
+        if child.Name == "67177" then
+            if ToggleGui and ToggleGui.Parent then
+                ToggleGui:Destroy()
+            end
+        end
+    end)
     
     local Toggle = Instance.new("TextButton")
     Toggle.Name = "Toggle"
