@@ -4,7 +4,7 @@ return function(Library)
     ToggleGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
-
+    
     local Toggle = Instance.new("TextButton")
     Toggle.Name = "Toggle"
     Toggle.Parent = ToggleGui
@@ -16,36 +16,23 @@ return function(Library)
     Toggle.TextColor3 = Color3.fromRGB(203, 122, 49)
     Toggle.TextSize = 19
     Toggle.AutoButtonColor = false
-
+    
     local UICorner = Instance.new("UICorner")
     UICorner.Parent = Toggle
-
+    
     -- Dragging system
     local UserInputService = game:GetService("UserInputService")
     local dragging = false
-    local dragInput, dragStart, startPos
-    local moved = false
-
-    Toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = Toggle.Position
-            moved = false
-        end
-    end)
-
-    Toggle.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragInput then
+    local dragStart = nil
+    local startPos = nil
+    local wasDragged = false
+    
+    local function updateInput(input)
+        if dragging then
             local delta = input.Position - dragStart
-            if delta.Magnitude > 2 then
-                moved = true
+            -- ถ้าเลื่อนเกิน 5 pixels ถือว่าเป็นการลาก
+            if delta.Magnitude > 5 then
+                wasDragged = true
             end
             Toggle.Position = UDim2.new(
                 startPos.X.Scale,
@@ -54,16 +41,45 @@ return function(Library)
                 startPos.Y.Offset + delta.Y
             )
         end
+    end
+    
+    Toggle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Toggle.Position
+            wasDragged = false
+        end
     end)
-
+    
+    Toggle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            updateInput(input)
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateInput(input)
+        end
+    end)
+    
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and dragging then
-            dragging = false
-            if not moved then
-                -- กดแบบไม่ลาก
-                Library:ToggleUI()
-                Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if dragging then
+                dragging = false
+                -- รอสักครู่แล้วค่อยรีเซ็ต wasDragged เพื่อป้องกันการกดปุ่มทันที
+                task.wait(0.1)
+                wasDragged = false
             end
         end
+    end)
+    
+    Toggle.MouseButton1Click:Connect(function()
+        if wasDragged then
+            return -- อย่าทำอะไรถ้าเพิ่งลาก
+        end
+        Library:ToggleUI()
+        Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
 end
