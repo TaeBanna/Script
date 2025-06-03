@@ -21,10 +21,22 @@ return function(Library)
     UICorner.Parent = Toggle
 
     local UserInputService = game:GetService("UserInputService")
-    local dragging, dragInput, dragStart, startPos, moved = false, nil, nil, nil, false
+    local dragging = false
+    local dragInput, dragStart, startPos
+    local moved = false
+    local mouseOver = false
+
+    -- ตรวจจับว่ามีเมาส์อยู่บนปุ่มไหม
+    Toggle.MouseEnter:Connect(function()
+        mouseOver = true
+    end)
+
+    Toggle.MouseLeave:Connect(function()
+        mouseOver = false
+    end)
 
     Toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
             startPos = Toggle.Position
@@ -33,7 +45,7 @@ return function(Library)
     end)
 
     Toggle.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
             dragInput = input
         end
     end)
@@ -44,17 +56,23 @@ return function(Library)
             if delta.Magnitude > 3 then
                 moved = true
             end
-            Toggle.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            Toggle.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
         end
     end)
 
-    -- ✅ ตรวจจับการปล่อยคลิกแบบแยก เพื่อความเสถียร
     UserInputService.InputEnded:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            dragging = false
-            if not moved then
-                Library:ToggleUI()
-                Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if dragging then
+                dragging = false
+                if not moved and mouseOver then
+                    Library:ToggleUI()
+                    Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+                end
             end
         end
     end)
