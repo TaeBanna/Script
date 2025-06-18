@@ -4,12 +4,13 @@ return function(Library)
     
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
-    ToggleGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    ToggleGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
-    ToggleGui.Enabled = false -- ปิดการใช้งานตั้งแต่เริ่ม
 
-    -- หา Kavo GUI โดยดูจากชื่อที่เป็นตัวเลขและ title
+    -- ✅ ซ่อน ToggleGui ทันทีหลังสร้าง
+    ToggleGui.Enabled = false
+
     local function findKavoGui()
         for _, child in pairs(CoreGui:GetChildren()) do
             if child:IsA("ScreenGui") and tonumber(child.Name) then
@@ -28,7 +29,6 @@ return function(Library)
         return nil
     end
 
-    -- ตรวจสอบเมื่อ Kavo GUI ถูกทำลาย
     local function checkKavoDestroyed()
         local kavoGui = findKavoGui()
         if not kavoGui then
@@ -38,7 +38,6 @@ return function(Library)
         end
     end
 
-    -- เช็คทุก 1 วินาที
     spawn(function()
         while ToggleGui and ToggleGui.Parent do
             checkKavoDestroyed()
@@ -46,7 +45,6 @@ return function(Library)
         end
     end)
 
-    -- เช็คเมื่อมี Child ถูกลบใน CoreGui
     CoreGui.ChildRemoved:Connect(function(child)
         if child:IsA("ScreenGui") and tonumber(child.Name) then
             local main = child:FindFirstChild("Main")
@@ -79,7 +77,6 @@ return function(Library)
     local UICorner = Instance.new("UICorner")
     UICorner.Parent = Toggle
 
-    -- Dragging system
     local UserInputService = game:GetService("UserInputService")
     local dragging = false
     local dragStart = nil
@@ -133,9 +130,7 @@ return function(Library)
     end)
 
     Toggle.MouseButton1Click:Connect(function()
-        if wasDragged then
-            return
-        end
+        if wasDragged then return end
         Library:ToggleUI()
         Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
