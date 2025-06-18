@@ -142,3 +142,5 @@ return function(Library)
         Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
 end
+game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ToggleGui").Enabled = false
+
