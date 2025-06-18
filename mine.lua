@@ -36,3 +36,12 @@ Section:NewButton("SellOres", "ButtonInfo", function()
     task.wait(0.5)
     hrp.CFrame = old
 end)
+
+local Tab = Window:NewTab("HotKey")
+local Section = Tab:NewSection("Section Name")
+Section:NewButton("Toggle ปุ่มลอย", "เปิด/ปิดปุ่มลอย (Close Gui)", function()
+    local toggleGui = game.Players.LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("ToggleGui")
+    if toggleGui then
+        toggleGui.Enabled = not toggleGui.Enabled
+    end
+end)
