@@ -62,6 +62,7 @@ return function(Library)
         end
     end)
 
+    -- ปุ่มเปิด/ปิด GUI หลัก
     local Toggle = Instance.new("TextButton")
     Toggle.Name = "Toggle"
     Toggle.Parent = ToggleGui
@@ -77,19 +78,40 @@ return function(Library)
     local UICorner = Instance.new("UICorner")
     UICorner.Parent = Toggle
 
-    local UserInputService = game:GetService("UserInputService")
+    -- ปุ่มเปิด/ปิดระบบดึงแร่ BringCoal
+    local BringToggle = Instance.new("TextButton")
+    BringToggle.Name = "BringToggle"
+    BringToggle.Parent = ToggleGui
+    BringToggle.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+    BringToggle.Position = UDim2.new(0, 0, 0.55, 0) -- ตำแหน่งขยับลงมาเล็กน้อย
+    BringToggle.Size = UDim2.new(0, 120, 0, 38)
+    BringToggle.Font = Enum.Font.SourceSans
+    BringToggle.Text = "BringOres Off"
+    BringToggle.TextColor3 = Color3.fromRGB(122, 203, 49)
+    BringToggle.TextSize = 17
+    BringToggle.AutoButtonColor = false
+
+    local UICorner2 = Instance.new("UICorner")
+    UICorner2.Parent = BringToggle
+
+    -- ตั้งค่าเริ่มต้น
+    _G.BringCoal = false
+
+    -- ตัวแปรจับการลาก (ถ้าต้องการให้ลากได้เหมือนปุ่มแรก)
     local dragging = false
     local dragStart = nil
     local startPos = nil
     local wasDragged = false
 
-    local function updateInput(input)
-        if dragging then
+    local UserInputService = game:GetService("UserInputService")
+
+    local function updateInput(input, button)
+        if dragging and button == Toggle then
             local delta = input.Position - dragStart
             if delta.Magnitude > 5 then
                 wasDragged = true
             end
-            Toggle.Position = UDim2.new(
+            button.Position = UDim2.new(
                 startPos.X.Scale,
                 startPos.X.Offset + delta.X,
                 startPos.Y.Scale,
@@ -98,6 +120,7 @@ return function(Library)
         end
     end
 
+    -- ตั้งระบบลากสำหรับปุ่ม Toggle (GUI)
     Toggle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -109,13 +132,13 @@ return function(Library)
 
     Toggle.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            updateInput(input)
+            updateInput(input, Toggle)
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updateInput(input)
+            updateInput(input, Toggle)
         end
     end)
 
@@ -133,5 +156,11 @@ return function(Library)
         if wasDragged then return end
         Library:ToggleUI()
         Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+    end)
+
+    -- กดเปิด/ปิด BringCoal
+    BringToggle.MouseButton1Click:Connect(function()
+        _G.BringCoal = not _G.BringCoal
+        BringToggle.Text = _G.BringCoal and "BringOres On" or "BringOres Off"
     end)
 end
