@@ -1,7 +1,6 @@
 return function(Library)
     local CoreGui = game:GetService("CoreGui")
     local Players = game:GetService("Players")
-    local UserInputService = game:GetService("UserInputService")
     
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
@@ -78,77 +77,61 @@ return function(Library)
     local UICorner = Instance.new("UICorner")
     UICorner.Parent = Toggle
 
-    -- ✅ ปรับปรุงระบบการลาก
-    local Dragging = false
-    local DragStart = nil
-    local StartPos = nil
-    local Connection = nil
+    local UserInputService = game:GetService("UserInputService")
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    local wasDragged = false
 
-    -- ฟังก์ชันการลาก
-    local function UpdateDrag(input)
-        local Delta = input.Position - DragStart
-        local NewPosition = UDim2.new(
-            StartPos.X.Scale,
-            StartPos.X.Offset + Delta.X,
-            StartPos.Y.Scale,
-            StartPos.Y.Offset + Delta.Y
-        )
-        Toggle.Position = NewPosition
+    local function updateInput(input)
+        if dragging then
+            local delta = input.Position - dragStart
+            if delta.Magnitude > 5 then
+                wasDragged = true
+            end
+            Toggle.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
     end
 
-    -- เริ่มการลาก
     Toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
-           input.UserInputType == Enum.UserInputType.Touch then
-            
-            Dragging = true
-            DragStart = input.Position
-            StartPos = Toggle.Position
-            
-            -- เชื่อมต่อการอัพเดทตำแหน่ง
-            Connection = UserInputService.InputChanged:Connect(function(inputChanged)
-                if Dragging and (inputChanged.UserInputType == Enum.UserInputType.MouseMovement or 
-                   inputChanged.UserInputType == Enum.UserInputType.Touch) then
-                    UpdateDrag(inputChanged)
-                end
-            end)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Toggle.Position
+            wasDragged = false
         end
     end)
 
-    -- หยุดการลาก
+    Toggle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            updateInput(input)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateInput(input)
+        end
+    end)
+
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
-           input.UserInputType == Enum.UserInputType.Touch then
-            
-            if Dragging then
-                Dragging = false
-                if Connection then
-                    Connection:Disconnect()
-                    Connection = nil
-                end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if dragging then
+                dragging = false
+                task.wait(0.1)
+                wasDragged = false
             end
         end
     end)
 
-    -- ✅ คลิกเพื่อ Toggle (ป้องกันการคลิกขณะลาก)
-    local LastClickTime = 0
     Toggle.MouseButton1Click:Connect(function()
-        local CurrentTime = tick()
-        
-        -- ตรวจสอบว่าไม่ได้กำลังลากและไม่คลิกเร็วเกินไป
-        if not Dragging and (CurrentTime - LastClickTime) > 0.1 then
-            LastClickTime = CurrentTime
-            Library:ToggleUI()
-            Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
-        end
-    end)
-
-    -- ✅ เพิ่ม Hover Effect (เสริม)
-    Toggle.MouseEnter:Connect(function()
-        Toggle.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    end)
-
-    Toggle.MouseLeave:Connect(function()
-        Toggle.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+        if wasDragged then return end
+        Library:ToggleUI()
+        Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
 end
