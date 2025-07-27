@@ -1,0 +1,24 @@
+-- โหลด Banna Hub UI จาก GitHub
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/refs/heads/main/source1.lua"))()
+
+-- ตัวอย่างการสร้าง UI, Tab, Section, Button
+local Library = Kavo.CreateLib("Banna Hub") -- สร้าง UI หลัก
+
+local Tab = Library:NewTab("Main") -- สร้างแท็บชื่อ Main
+local Section = Tab:NewSection("Menu") -- สร้าง Section ชื่อ Menu
+
+Section:NewButton("ทดสอบปุ่ม", "กดเพื่อแสดงข้อความ", function()
+    print("Hello from Banna Hub!")
+end)
+
+Section:NewToggle("เปิด/ปิด", "ทดสอบ Toggle", function(state)
+    print("Toggle State:", state)
+end)
+
+Section:NewSlider("ปรับค่า", "เลื่อนเพื่อเปลี่ยนค่า", 100, 0, function(value)
+    print("Slider Value:", value)
+end)
+
+Section:NewTextBox("กรอกข้อความ", "พิมพ์แล้ว Enter", function(text)
+    print("TextBox:", text)
+end)
