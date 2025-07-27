@@ -7,53 +7,63 @@ return function(Library)
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+    -- สร้าง GUI สำหรับปุ่ม Toggle
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
+    ToggleGui.Parent = PlayerGui
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
-    ToggleGui.Enabled = false
-    ToggleGui.Parent = PlayerGui
+    ToggleGui.Enabled = true -- เปิดไว้ให้เห็นเลย (ถ้าต้องการซ่อน ให้เปลี่ยนเป็น false)
 
-    local function createButton(name, text, position, color, textColor)
-        local btn = Instance.new("TextButton")
-        btn.Name = name
-        btn.Parent = ToggleGui
-        btn.BackgroundColor3 = color
-        btn.Position = position
-        btn.Size = UDim2.new(0, 80, 0, 38)
-        btn.Font = Enum.Font.SourceSans
-        btn.Text = text
-        btn.TextColor3 = textColor
-        btn.TextSize = 18
-        btn.AutoButtonColor = false
+    -- สร้างปุ่มเปิด-ปิด Kavo UI
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Name = "Toggle"
+    ToggleBtn.Parent = ToggleGui
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+    ToggleBtn.Position = UDim2.new(0, 0, 0.45, 0)
+    ToggleBtn.Size = UDim2.new(0, 80, 0, 38)
+    ToggleBtn.Font = Enum.Font.SourceSans
+    ToggleBtn.Text = "Close Gui"
+    ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
+    ToggleBtn.TextSize = 19
+    ToggleBtn.AutoButtonColor = false
 
-        local corner = Instance.new("UICorner")
-        corner.Parent = btn
-        return btn
-    end
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = ToggleBtn
 
-    local Toggle = createButton("Toggle", "Close Gui", UDim2.new(0, 0, 0.45, 0), Color3.fromRGB(29, 29, 29), Color3.fromRGB(203, 122, 49))
-
-    local dragging, dragStart, startPos, wasDragged = false, nil, nil, false
+    -- ระบบลากปุ่ม
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    local wasDragged = false
 
     local function updateDrag(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        if dragging then
             local delta = input.Position - dragStart
             if delta.Magnitude > 5 then wasDragged = true end
-            Toggle.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            ToggleBtn.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
         end
     end
 
-    Toggle.InputBegan:Connect(function(input)
+    ToggleBtn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
-            startPos = Toggle.Position
+            startPos = ToggleBtn.Position
             wasDragged = false
         end
     end)
 
-    UserInputService.InputChanged:Connect(updateDrag)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateDrag(input)
+        end
+    end)
 
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -63,12 +73,18 @@ return function(Library)
         end
     end)
 
-    Toggle.MouseButton1Click:Connect(function()
+    -- ฟังก์ชันเปิด-ปิด Kavo UI
+    ToggleBtn.MouseButton1Click:Connect(function()
         if wasDragged then return end
         Library:ToggleUI()
-        Toggle.Text = (Toggle.Text == "Close Gui") and "Open Gui" or "Close Gui"
+        if ToggleBtn.Text == "Close Gui" then
+            ToggleBtn.Text = "Open Gui"
+        else
+            ToggleBtn.Text = "Close Gui"
+        end
     end)
 
+    -- ตรวจจับว่าถ้า Kavo UI ถูกลบหรือปิด ให้ลบปุ่มนี้ด้วย
     local function findKavoGui()
         for _, gui in pairs(CoreGui:GetChildren()) do
             if gui:IsA("ScreenGui") and tonumber(gui.Name) then
