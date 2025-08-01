@@ -358,8 +358,12 @@ local function panAutomation()
     end
 end
 
--- Button animations
+-- Animate Button function with improved tween handling
+local animating = false
 local function animateButton(button, scale)
+    if animating then return end
+    animating = true
+
     local originalSize = button.Size
     local newSize = UDim2.new(
         originalSize.X.Scale * scale,
@@ -367,17 +371,25 @@ local function animateButton(button, scale)
         originalSize.Y.Scale * scale,
         originalSize.Y.Offset * scale
     )
-    
-    local tween = TweenService:Create(button, 
+
+    local tweenShrink = TweenService:Create(button,
         TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
         {Size = newSize}
     )
-    tween:Play()
-    tween.Completed:Connect(function()
-        TweenService:Create(button, 
-            TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-            {Size = originalSize}
-        ):Play()
+
+    local tweenExpand = TweenService:Create(button,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+        {Size = originalSize}
+    )
+
+    tweenShrink:Play()
+
+    tweenShrink.Completed:Connect(function()
+        tweenExpand:Play()
+    end)
+
+    tweenExpand.Completed:Connect(function()
+        animating = false
     end)
 end
 
@@ -412,41 +424,26 @@ autoSellToggle.MouseButton1Click:Connect(function()
         autoSellToggle.BackgroundColor3 = Color3.fromRGB(50, 150, 80)
     else
         autoSellToggle.Text = "Auto Sell: OFF"
-        autoSellToggle.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+        autoSellToggle.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     end
 end)
 
--- Minimize functionality
+-- Minimize Button Click
 minimizeBtn.MouseButton1Click:Connect(function()
     pcall(function() animateButton(minimizeBtn, 0.9) end)
     settings.minimized = not settings.minimized
     
-    local targetSize = settings.minimized and UDim2.new(0, 280, 0, 40) or UDim2.new(0, 280, 0, 380)
-    local tween = TweenService:Create(frame,
-        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-        {Size = targetSize}
-    )
-    tween:Play()
-    
-    minimizeBtn.Text = settings.minimized and "-" or "-"
-end)
-
--- Close functionality
-closeBtn.MouseButton1Click:Connect(function()
-    settings.running = false
-    screenGui:Destroy()
-end)
-
--- Keybind toggle (F2)
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.KeyCode == Enum.KeyCode.F2 then
-        screenGui.Enabled = not screenGui.Enabled
+    if settings.minimized then
+        contentFrame.Visible = false
+        frame.Size = UDim2.new(0, 280, 0, 40)
+    else
+        contentFrame.Visible = true
+        frame.Size = UDim2.new(0, 280, 0, 380)
     end
 end)
 
--- Initialize
-print("Pan Automation v2.0 loaded successfully!")
-print("Press F2 to toggle GUI visibility")
-print("Features: Auto Pan Processing, Auto Sell, Statistics, Draggable GUI")
+-- Close Button Click
+closeBtn.MouseButton1Click:Connect(function()
+    pcall(function() animateButton(closeBtn, 0.9) end)
+    screenGui:Destroy()
+end)
