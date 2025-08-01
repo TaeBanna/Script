@@ -70,7 +70,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0.7, 0, 1, 0)
 title.Position = UDim2.new(0.05, 0, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "🍳 Pan Automation v2.0"
+title.Text = "Pan Automation v2.0"
 title.Font = Enum.Font.GothamSemibold
 title.TextSize = 16
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -122,7 +122,7 @@ toggleBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleBtn.Font = Enum.Font.GothamBold
 toggleBtn.TextSize = 18
-toggleBtn.Text = "🚀 START AUTOMATION"
+toggleBtn.Text = "START AUTOMATION"
 toggleBtn.AutoButtonColor = false
 toggleBtn.Parent = contentFrame
 
@@ -149,7 +149,7 @@ statusLabel.BackgroundTransparency = 1
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextSize = 14
 statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-statusLabel.Text = "🔴 Status: OFFLINE"
+statusLabel.Text = "Status: OFFLINE"
 statusLabel.Parent = statusFrame
 
 -- Settings Frame
@@ -169,7 +169,7 @@ local settingsTitle = Instance.new("TextLabel")
 settingsTitle.Size = UDim2.new(1, 0, 0, 25)
 settingsTitle.Position = UDim2.new(0, 0, 0, 5)
 settingsTitle.BackgroundTransparency = 1
-settingsTitle.Text = "⚙️ Settings"
+settingsTitle.Text = "Settings"
 settingsTitle.Font = Enum.Font.GothamSemibold
 settingsTitle.TextSize = 14
 settingsTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -180,7 +180,7 @@ local autoSellToggle = Instance.new("TextButton")
 autoSellToggle.Size = UDim2.new(0.9, 0, 0, 25)
 autoSellToggle.Position = UDim2.new(0.05, 0, 0, 30)
 autoSellToggle.BackgroundColor3 = Color3.fromRGB(50, 150, 80)
-autoSellToggle.Text = "✅ Auto Sell: ON"
+autoSellToggle.Text = "Auto Sell: ON"
 autoSellToggle.Font = Enum.Font.Gotham
 autoSellToggle.TextSize = 12
 autoSellToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -195,7 +195,7 @@ local delayLabel = Instance.new("TextLabel")
 delayLabel.Size = UDim2.new(1, 0, 0, 20)
 delayLabel.Position = UDim2.new(0, 0, 0, 60)
 delayLabel.BackgroundTransparency = 1
-delayLabel.Text = "⏱️ Pan Delay: 0.1s"
+delayLabel.Text = "Pan Delay: 0.1s"
 delayLabel.Font = Enum.Font.Gotham
 delayLabel.TextSize = 12
 delayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -218,7 +218,7 @@ local statsTitle = Instance.new("TextLabel")
 statsTitle.Size = UDim2.new(1, 0, 0, 20)
 statsTitle.Position = UDim2.new(0, 0, 0, 5)
 statsTitle.BackgroundTransparency = 1
-statsTitle.Text = "📊 Session Statistics"
+statsTitle.Text = "Session Statistics"
 statsTitle.Font = Enum.Font.GothamSemibold
 statsTitle.TextSize = 12
 statsTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -229,7 +229,7 @@ local pansProcessedLabel = Instance.new("TextLabel")
 pansProcessedLabel.Size = UDim2.new(1, 0, 0, 15)
 pansProcessedLabel.Position = UDim2.new(0, 0, 0, 25)
 pansProcessedLabel.BackgroundTransparency = 1
-pansProcessedLabel.Text = "🍳 Pans Processed: 0"
+pansProcessedLabel.Text = "Pans Processed: 0"
 pansProcessedLabel.Font = Enum.Font.Gotham
 pansProcessedLabel.TextSize = 10
 pansProcessedLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -240,7 +240,7 @@ local sellsLabel = Instance.new("TextLabel")
 sellsLabel.Size = UDim2.new(1, 0, 0, 15)
 sellsLabel.Position = UDim2.new(0, 0, 0, 42)
 sellsLabel.BackgroundTransparency = 1
-sellsLabel.Text = "💰 Total Sells: 0"
+sellsLabel.Text = "Total Sells: 0"
 sellsLabel.Font = Enum.Font.Gotham
 sellsLabel.TextSize = 10
 sellsLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -251,7 +251,7 @@ local uptimeLabel = Instance.new("TextLabel")
 uptimeLabel.Size = UDim2.new(1, 0, 0, 15)
 uptimeLabel.Position = UDim2.new(0, 0, 0, 59)
 uptimeLabel.BackgroundTransparency = 1
-uptimeLabel.Text = "⏰ Uptime: 00:00:00"
+uptimeLabel.Text = "Uptime: 00:00:00"
 uptimeLabel.Font = Enum.Font.Gotham
 uptimeLabel.TextSize = 10
 uptimeLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -262,7 +262,7 @@ local rateLabel = Instance.new("TextLabel")
 rateLabel.Size = UDim2.new(1, 0, 0, 15)
 rateLabel.Position = UDim2.new(0, 0, 0, 76)
 rateLabel.BackgroundTransparency = 1
-rateLabel.Text = "📈 Rate: 0 pans/min"
+rateLabel.Text = "Rate: 0 pans/min"
 rateLabel.Font = Enum.Font.Gotham
 rateLabel.TextSize = 10
 rateLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -336,17 +336,17 @@ local function panAutomation()
 
             -- Update statistics
             if settings.showStats then
-                pansProcessedLabel.Text = "🍳 Pans Processed: " .. stats.totalPansProcessed
-                sellsLabel.Text = "💰 Total Sells: " .. stats.totalSells
+                pansProcessedLabel.Text = "Pans Processed: " .. stats.totalPansProcessed
+                sellsLabel.Text = "Total Sells: " .. stats.totalSells
                 
                 local uptime = tick() - stats.sessionStartTime
                 local hours = math.floor(uptime / 3600)
                 local minutes = math.floor((uptime % 3600) / 60)
                 local seconds = math.floor(uptime % 60)
-                uptimeLabel.Text = string.format("⏰ Uptime: %02d:%02d:%02d", hours, minutes, seconds)
+                uptimeLabel.Text = string.format("Uptime: %02d:%02d:%02d", hours, minutes, seconds)
                 
                 local rate = uptime > 0 and (stats.totalPansProcessed / (uptime / 60)) or 0
-                rateLabel.Text = string.format("📈 Rate: %.1f pans/min", rate)
+                rateLabel.Text = string.format("Rate: %.1f pans/min", rate)
             end
         end)
 
@@ -360,57 +360,65 @@ end
 
 -- Button animations
 local function animateButton(button, scale)
+    local originalSize = button.Size
+    local newSize = UDim2.new(
+        originalSize.X.Scale * scale,
+        originalSize.X.Offset * scale,
+        originalSize.Y.Scale * scale,
+        originalSize.Y.Offset * scale
+    )
+    
     local tween = TweenService:Create(button, 
         TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-        {Size = button.Size * scale}
+        {Size = newSize}
     )
     tween:Play()
     tween.Completed:Connect(function()
         TweenService:Create(button, 
             TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-            {Size = button.Size / scale}
+            {Size = originalSize}
         ):Play()
     end)
 end
 
 -- Toggle Button Click
 toggleBtn.MouseButton1Click:Connect(function()
-    animateButton(toggleBtn, 0.95)
+    pcall(function() animateButton(toggleBtn, 0.95) end)
     settings.running = not settings.running
     
     if settings.running then
-        toggleBtn.Text = "🛑 STOP AUTOMATION"
+        toggleBtn.Text = "STOP AUTOMATION"
         toggleBtn.BackgroundColor3 = Color3.fromRGB(180, 70, 70)
-        statusLabel.Text = "🟢 Status: ONLINE"
+        statusLabel.Text = "Status: ONLINE"
         statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
         stats.sessionStartTime = tick()
         stats.sessionsStarted = stats.sessionsStarted + 1
         spawn(panAutomation)
     else
-        toggleBtn.Text = "🚀 START AUTOMATION"
+        toggleBtn.Text = "START AUTOMATION"
         toggleBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-        statusLabel.Text = "🔴 Status: OFFLINE"
+        statusLabel.Text = "Status: OFFLINE"
         statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
     end
 end)
 
 -- Auto Sell Toggle
 autoSellToggle.MouseButton1Click:Connect(function()
-    animateButton(autoSellToggle, 0.95)
+    pcall(function() animateButton(autoSellToggle, 0.95) end)
     settings.autoSell = not settings.autoSell
     
     if settings.autoSell then
-        autoSellToggle.Text = "✅ Auto Sell: ON"
+        autoSellToggle.Text = "Auto Sell: ON"
         autoSellToggle.BackgroundColor3 = Color3.fromRGB(50, 150, 80)
     else
-        autoSellToggle.Text = "❌ Auto Sell: OFF"
+        autoSellToggle.Text = "Auto Sell: OFF"
         autoSellToggle.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
     end
 end)
 
 -- Minimize functionality
 minimizeBtn.MouseButton1Click:Connect(function()
-    animateButton(minimizeBtn, 0.9)
+    pcall(function() animateButton(minimizeBtn, 0.9) end)
     settings.minimized = not settings.minimized
     
     local targetSize = settings.minimized and UDim2.new(0, 280, 0, 40) or UDim2.new(0, 280, 0, 380)
@@ -420,7 +428,7 @@ minimizeBtn.MouseButton1Click:Connect(function()
     )
     tween:Play()
     
-    minimizeBtn.Text = settings.minimized and "□" or "−"
+    minimizeBtn.Text = settings.minimized and "-" or "-"
 end)
 
 -- Close functionality
@@ -439,6 +447,6 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 -- Initialize
-print("🍳 Pan Automation v2.0 loaded successfully!")
-print("📋 Press F2 to toggle GUI visibility")
-print("🎯 Features: Auto Pan Processing, Auto Sell, Statistics, Draggable GUI")
+print("Pan Automation v2.0 loaded successfully!")
+print("Press F2 to toggle GUI visibility")
+print("Features: Auto Pan Processing, Auto Sell, Statistics, Draggable GUI")
