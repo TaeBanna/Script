@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 
 local running = false
+local panAutomationThread = nil
 
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -110,7 +111,7 @@ local function panAutomation()
             warn("Pan automation error:", err)
         end
 
-        task.wait(0)
+        task.wait(0.1) -- เว้นช่วงสั้น ๆ เพื่อป้องกันโหลดเกมหนักเกินไป
     end
 end
 
@@ -120,7 +121,12 @@ toggleBtn.MouseButton1Click:Connect(function()
     if running then
         toggleBtn.Text = "Turn OFF"
         statusLabel.Text = "Status: ON"
-        spawn(panAutomation)
+        if not panAutomationThread then
+            panAutomationThread = task.spawn(function()
+                panAutomation()
+                panAutomationThread = nil
+            end)
+        end
     else
         toggleBtn.Text = "Turn ON"
         statusLabel.Text = "Status: OFF"
