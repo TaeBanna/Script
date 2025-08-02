@@ -22,12 +22,10 @@ frame.Active = true
 frame.Draggable = true
 frame.Parent = screenGui
 
--- Round corner
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = frame
 
--- UI Stroke (Border glow)
 local stroke = Instance.new("UIStroke")
 stroke.Thickness = 2
 stroke.Color = Color3.fromRGB(60, 60, 60)
@@ -55,7 +53,6 @@ toggleBtn.Text = "Turn ON"
 toggleBtn.AutoButtonColor = true
 toggleBtn.Parent = frame
 
--- Button corner
 local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 8)
 btnCorner.Parent = toggleBtn
@@ -71,45 +68,60 @@ statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 statusLabel.Text = "Status: OFF"
 statusLabel.Parent = frame
 
--- Core Automation Function
+-- Core Automation
+local function processPan(pan)
+    local character = player.Character
+    if not character then return end
+
+    -- Equip pan if in backpack
+    if pan.Parent == player:FindFirstChild("Backpack") then
+        pan.Parent = character
+        task.wait(0.2)
+    end
+
+    local scripts = pan:FindFirstChild("Scripts")
+    if not scripts then return end
+
+    local toggle = scripts:FindFirstChild("ToggleShovelActive")
+    local shake = scripts:FindFirstChild("Shake")
+    local collect = scripts:FindFirstChild("Collect")
+
+    if toggle and toggle:IsA("RemoteEvent") then
+        toggle:FireServer(true)
+        task.wait(0.2)
+    end
+
+    if shake and shake:IsA("RemoteEvent") then
+        shake:FireServer()
+        task.wait(0.3)
+    end
+
+    if collect and collect:IsA("RemoteFunction") then
+        collect:InvokeServer(1)
+    end
+end
+
 local function panAutomation()
     while running do
         local success, err = pcall(function()
             local character = player.Character or player.CharacterAdded:Wait()
             local backpack = player:WaitForChild("Backpack")
 
-            local function processPan(pan)
-                local scripts = pan:FindFirstChild("Scripts")
-                if not scripts then return end
-
-                local toggle = scripts:FindFirstChild("ToggleShovelActive")
-                if toggle and toggle:IsA("RemoteEvent") then
-                    toggle:FireServer(true)
-                end
-
-                local collect = scripts:FindFirstChild("Collect")
-                if collect and collect:IsA("RemoteFunction") then
-                    collect:InvokeServer(1)
-                end
-
-                local shake = scripts:FindFirstChild("Shake")
-                if shake and shake:IsA("RemoteEvent") then
-                    shake:FireServer()
-                end
-            end
-
+            -- ใช้ Pan จากตัวละครก่อน
             for _, item in pairs(character:GetChildren()) do
                 if item:IsA("Tool") and item.Name:find("Pan") then
                     processPan(item)
                 end
             end
 
+            -- แล้วค่อยเช็กในกระเป๋า
             for _, item in pairs(backpack:GetChildren()) do
                 if item:IsA("Tool") and item.Name:find("Pan") then
                     processPan(item)
                 end
             end
 
+            -- ขายของ (ถ้ามี)
             local remotes = ReplicatedStorage:FindFirstChild("Remotes")
             if remotes then
                 local shop = remotes:FindFirstChild("Shop")
@@ -126,7 +138,7 @@ local function panAutomation()
             warn("Pan automation error:", err)
         end
 
-        task.wait(0.5)
+        task.wait(0.8)
     end
 end
 
