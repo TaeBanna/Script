@@ -9,7 +9,7 @@ local targetName = "Apple"
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
-local attackDelay = 1 -- หน่วงเวลาโจมตีเริ่มต้น (วินาที)
+local attackDelay = 1 -- default
 local lastAttackTime = 0
 
 -- UI Setup
@@ -28,7 +28,7 @@ local Tab = Window:MakeTab({
 Tab:AddDropdown({
 	Name = "เลือกมอนสเตอร์",
 	Default = "Apple",
-	Options = {"Apple"}, -- เพิ่มชื่อมอนเพิ่มเติมตรงนี้ถ้ามีหลายตัว
+	Options = {"Apple"},
 	Callback = function(v) 
 		targetName = v 
 	end
@@ -64,17 +64,14 @@ Tab:AddToggle({
 	end
 })
 
--- ✅ Slider ปรับความเร็วการตี
-Tab:AddSlider({
-	Name = "ปรับความเร็วการตี (วินาที)",
-	Min = 0.1,
-	Max = 3,
-	Default = 1,
-	Increment = 0.1,
-	ValueName = "วินาที",
+-- ✅ ใช้ Dropdown แทน Slider
+Tab:AddDropdown({
+	Name = "เลือกระยะเวลาการโจมตี",
+	Default = "1",
+	Options = {"0.1", "0.5", "0.75", "1"},
 	Callback = function(v)
-		attackDelay = v
-		print("ตั้งค่าความเร็วการตีเป็น: " .. v .. " วินาที")
+		attackDelay = tonumber(v)
+		print("เปลี่ยนความเร็วการตีเป็น: " .. v .. " วินาที")
 	end
 })
 
@@ -107,7 +104,7 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 	
-	-- Update วงแสดงระยะโจมตี
+	-- อัปเดตวงแสดงระยะ
 	if showRangeEnabled and attackRangePart then
 		attackRangePart.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, 0, math.rad(90))
 	end
