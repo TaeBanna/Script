@@ -9,24 +9,37 @@ local targetName = "Apple"
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
-local attackDelay = 1 -- default attack delay in seconds
+local attackDelay = 1 -- หน่วงเวลาโจมตีเริ่มต้น (วินาที)
 local lastAttackTime = 0
 
 -- UI Setup
-local Window = OrionLib:MakeWindow({Name = "Auto Attack UI", HidePremium = true, SaveConfig = false})
-local Tab = Window:MakeTab({Name = "Main", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local Window = OrionLib:MakeWindow({
+	Name = "Auto Attack UI", 
+	HidePremium = true, 
+	SaveConfig = false
+})
+
+local Tab = Window:MakeTab({
+	Name = "Main", 
+	Icon = "rbxassetid://4483345998", 
+	PremiumOnly = false
+})
 
 Tab:AddDropdown({
 	Name = "เลือกมอนสเตอร์",
 	Default = "Apple",
-	Options = {"Apple"},
-	Callback = function(v) targetName = v end
+	Options = {"Apple"}, -- เพิ่มชื่อมอนเพิ่มเติมตรงนี้ถ้ามีหลายตัว
+	Callback = function(v) 
+		targetName = v 
+	end
 })
 
 Tab:AddToggle({
 	Name = "Auto Attack",
 	Default = false,
-	Callback = function(v) autoAttackEnabled = v end
+	Callback = function(v) 
+		autoAttackEnabled = v 
+	end
 })
 
 Tab:AddToggle({
@@ -51,6 +64,7 @@ Tab:AddToggle({
 	end
 })
 
+-- ✅ Slider ปรับความเร็วการตี
 Tab:AddSlider({
 	Name = "ปรับความเร็วการตี (วินาที)",
 	Min = 0.1,
@@ -60,20 +74,22 @@ Tab:AddSlider({
 	ValueName = "วินาที",
 	Callback = function(v)
 		attackDelay = v
+		print("ตั้งค่าความเร็วการตีเป็น: " .. v .. " วินาที")
 	end
 })
 
--- Attack Function
+-- ฟังก์ชันโจมตี
 local function attack(cframe)
 	pcall(function()
 		ReplicatedStorage.Packages.Knit.Services.MonsterService.RF.RequestAttack:InvokeServer(cframe)
 	end)
 end
 
--- Main Loop
+-- Loop หลัก
 RunService.RenderStepped:Connect(function()
 	local char = player.Character
 	if not char then return end
+
 	local root = char:FindFirstChild("HumanoidRootPart")
 	if not root then return end
 	
@@ -85,13 +101,13 @@ RunService.RenderStepped:Connect(function()
 				if targetRoot and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
 					attack(CFrame.new(targetRoot.Position))
 					lastAttackTime = tick()
-					break -- โจมตีแค่อันแรกที่เจอ
+					break
 				end
 			end
 		end
 	end
 	
-	-- Update Range Display
+	-- Update วงแสดงระยะโจมตี
 	if showRangeEnabled and attackRangePart then
 		attackRangePart.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, 0, math.rad(90))
 	end
