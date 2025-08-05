@@ -17,6 +17,8 @@ local speedMap = {
 	Slow = 1
 }
 
+local currentTarget = nil -- เก็บเป้าหมายปัจจุบัน
+
 -- UI Setup
 local Window = OrionLib:MakeWindow({
 	Name = "Auto Attack UI",
@@ -35,6 +37,9 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(v)
 		autoAttackEnabled = v
+		if not v then
+			currentTarget = nil -- ปิด auto attack ล้างเป้าหมาย
+		end
 	end
 })
 
@@ -84,20 +89,26 @@ RunService.RenderStepped:Connect(function()
 	if not root then return end
 
 	if autoAttackEnabled and tick() - lastAttackTime >= attackDelay then
-		local attacked = false
-		for _, model in ipairs(workspace:GetChildren()) do
-			local targetRoot = model:FindFirstChild("HumanoidRootPart")
-			if targetRoot then
-				-- เช็คไม่ให้โจมตีตัวเอง
-				if model ~= char and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
-					attack(CFrame.new(targetRoot.Position))
-					attacked = true
-					-- โจมตีทุกตัวที่เจอในรอบเดียว (ไม่ break)
+		-- ตรวจสอบว่าเป้าหมายปัจจุบันยังอยู่ไหม
+		if currentTarget and currentTarget.Parent and currentTarget:FindFirstChild("HumanoidRootPart") then
+			local targetRoot = currentTarget.HumanoidRootPart
+			-- เช็คระยะ ถ้าเกิน 30 stud ให้ลบเป้าหมาย เพื่อหาใหม่ในรอบหน้า
+			if (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
+				attack(CFrame.new(targetRoot.Position))
+				lastAttackTime = tick()
+			else
+				currentTarget = nil -- เป้าหมายห่างเกิน ล้างเป้าหมาย
+			end
+		else
+			-- หาเป้าหมายใหม่ในรัศมี 30 stud
+			currentTarget = nil
+			for _, model in ipairs(workspace:GetChildren()) do
+				local targetRoot = model:FindFirstChild("HumanoidRootPart")
+				if targetRoot and model ~= char and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
+					currentTarget = model
+					break
 				end
 			end
-		end
-		if attacked then
-			lastAttackTime = tick()
 		end
 	end
 
