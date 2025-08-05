@@ -21,7 +21,7 @@ local currentTarget = nil -- เก็บเป้าหมายปัจจุ
 
 -- UI Setup
 local Window = OrionLib:MakeWindow({
-	Name = "Auto Attack UI 0.2",
+	Name = "Auto Attack UI V1",
 	HidePremium = true,
 	SaveConfig = false
 })
