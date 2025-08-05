@@ -9,8 +9,15 @@ local targetName = "Apple"
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
-local attackDelay = 1 -- default
+local attackDelay = 1 -- default = slow
 local lastAttackTime = 0
+
+-- ตารางแปลงความเร็วแบบคำเป็นตัวเลข
+local speedMap = {
+	Fast = 0.1,
+	Medium = 0.5,
+	Slow = 1
+}
 
 -- UI Setup
 local Window = OrionLib:MakeWindow({
@@ -64,14 +71,14 @@ Tab:AddToggle({
 	end
 })
 
--- ✅ ใช้ Dropdown แทน Slider
+-- ✅ Dropdown ความเร็วแบบใช้คำศัพท์
 Tab:AddDropdown({
-	Name = "เลือกระยะเวลาการโจมตี",
-	Default = "1",
-	Options = {"0.1", "0.5", "0.75", "1"},
-	Callback = function(v)
-		attackDelay = tonumber(v)
-		print("เปลี่ยนความเร็วการตีเป็น: " .. v .. " วินาที")
+	Name = "เลือกระดับความเร็วการโจมตี",
+	Default = "Slow",
+	Options = {"Fast", "Medium", "Slow"},
+	Callback = function(selection)
+		attackDelay = speedMap[selection]
+		print("เลือกความเร็วการตี:", selection, "(" .. tostring(attackDelay) .. " วินาที)")
 	end
 })
 
@@ -104,7 +111,7 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 	
-	-- อัปเดตวงแสดงระยะ
+	-- วงระยะ
 	if showRangeEnabled and attackRangePart then
 		attackRangePart.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, 0, math.rad(90))
 	end
