@@ -5,11 +5,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local ATTACK_RADIUS = 30
-local ATTACK_DELAY = 0.1 -- ระยะห่างระหว่างการตี (วินาที)
 local targetName = "Apple"
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
+local attackDelay = 1 -- default attack delay in seconds
 local lastAttackTime = 0
 
 -- UI Setup
@@ -27,17 +27,6 @@ Tab:AddToggle({
 	Name = "Auto Attack",
 	Default = false,
 	Callback = function(v) autoAttackEnabled = v end
-})
-
-Tab:AddSlider({
-	Name = "ความเร็วการตี",
-	Min = 0.01,
-	Max = 2,
-	Default = 0.1,
-	Color = Color3.fromRGB(255,255,255),
-	Increment = 0.01,
-	ValueName = "วินาที",
-	Callback = function(v) ATTACK_DELAY = v end
 })
 
 Tab:AddToggle({
@@ -62,6 +51,18 @@ Tab:AddToggle({
 	end
 })
 
+Tab:AddSlider({
+	Name = "ปรับความเร็วการตี (วินาที)",
+	Min = 0.1,
+	Max = 3,
+	Default = 1,
+	Increment = 0.1,
+	ValueName = "วินาที",
+	Callback = function(v)
+		attackDelay = v
+	end
+})
+
 -- Attack Function
 local function attack(cframe)
 	pcall(function()
@@ -77,17 +78,14 @@ RunService.RenderStepped:Connect(function()
 	if not root then return end
 	
 	-- Auto Attack
-	if autoAttackEnabled then
-		local currentTime = tick()
-		if currentTime - lastAttackTime >= ATTACK_DELAY then
-			for _, model in ipairs(workspace:GetChildren()) do
-				if model.Name == targetName then
-					local targetRoot = model:FindFirstChild("HumanoidRootPart")
-					if targetRoot and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
-						attack(CFrame.new(targetRoot.Position))
-						lastAttackTime = currentTime
-						break
-					end
+	if autoAttackEnabled and tick() - lastAttackTime >= attackDelay then
+		for _, model in ipairs(workspace:GetChildren()) do
+			if model.Name == targetName then
+				local targetRoot = model:FindFirstChild("HumanoidRootPart")
+				if targetRoot and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
+					attack(CFrame.new(targetRoot.Position))
+					lastAttackTime = tick()
+					break -- โจมตีแค่อันแรกที่เจอ
 				end
 			end
 		end
