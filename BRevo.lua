@@ -12,7 +12,7 @@ local attackDelay = 0.1 -- เริ่มต้น Fast
 local lastAttackTime = 0
 
 local speedMap = {
-	Fast = 0.1,
+	Fast = 0.01,
 	Medium = 0.5,
 	Slow = 1
 }
@@ -21,7 +21,7 @@ local currentTarget = nil -- เก็บเป้าหมายปัจจุ
 
 -- UI Setup
 local Window = OrionLib:MakeWindow({
-	Name = "Auto Attack UI 0.1",
+	Name = "Auto Attack UI 0.2",
 	HidePremium = true,
 	SaveConfig = false
 })
