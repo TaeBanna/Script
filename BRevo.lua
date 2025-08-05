@@ -5,7 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local ATTACK_RADIUS = 30
-local targetName = "Apple"
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
@@ -32,17 +31,8 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
-Tab:AddDropdown({
-	Name = "เลือกมอนสเตอร์",
-	Default = "Apple",
-	Options = {"Apple"},
-	Callback = function(v) 
-		targetName = v 
-	end
-})
-
 Tab:AddToggle({
-	Name = "Auto Attack",
+	Name = "โจมตีอัตโนมัติ รอบๆตัว",
 	Default = false,
 	Callback = function(v) 
 		autoAttackEnabled = v 
@@ -71,7 +61,6 @@ Tab:AddToggle({
 	end
 })
 
--- ✅ Dropdown ความเร็วแบบใช้คำศัพท์
 Tab:AddDropdown({
 	Name = "เลือกระดับความเร็วการโจมตี",
 	Default = "Slow",
@@ -82,14 +71,12 @@ Tab:AddDropdown({
 	end
 })
 
--- ฟังก์ชันโจมตี
 local function attack(cframe)
 	pcall(function()
 		ReplicatedStorage.Packages.Knit.Services.MonsterService.RF.RequestAttack:InvokeServer(cframe)
 	end)
 end
 
--- Loop หลัก
 RunService.RenderStepped:Connect(function()
 	local char = player.Character
 	if not char then return end
@@ -97,21 +84,19 @@ RunService.RenderStepped:Connect(function()
 	local root = char:FindFirstChild("HumanoidRootPart")
 	if not root then return end
 	
-	-- Auto Attack
 	if autoAttackEnabled and tick() - lastAttackTime >= attackDelay then
 		for _, model in ipairs(workspace:GetChildren()) do
-			if model.Name == targetName then
-				local targetRoot = model:FindFirstChild("HumanoidRootPart")
-				if targetRoot and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
-					attack(CFrame.new(targetRoot.Position))
-					lastAttackTime = tick()
-					break
-				end
+			local targetRoot = model:FindFirstChild("HumanoidRootPart")
+			if targetRoot and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
+				attack(CFrame.new(targetRoot.Position))
+				lastAttackTime = tick()
+				-- ถ้าต้องการโจมตีทุกตัวในรอบเดียวให้ลบ break ออก
+				-- แต่ถ้าต้องการโจมตีทีละตัวให้มี break
+				break
 			end
 		end
 	end
 	
-	-- วงระยะ
 	if showRangeEnabled and attackRangePart then
 		attackRangePart.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, 0, math.rad(90))
 	end
