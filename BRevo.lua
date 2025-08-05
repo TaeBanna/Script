@@ -8,10 +8,9 @@ local ATTACK_RADIUS = 30
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
-local attackDelay = 1 -- default = slow
+local attackDelay = 0.1 -- เริ่มต้น Fast
 local lastAttackTime = 0
 
--- ตารางแปลงความเร็วแบบคำเป็นตัวเลข
 local speedMap = {
 	Fast = 0.1,
 	Medium = 0.5,
@@ -20,22 +19,22 @@ local speedMap = {
 
 -- UI Setup
 local Window = OrionLib:MakeWindow({
-	Name = "Auto Attack UI", 
-	HidePremium = true, 
+	Name = "Auto Attack UI",
+	HidePremium = true,
 	SaveConfig = false
 })
 
 local Tab = Window:MakeTab({
-	Name = "Main", 
-	Icon = "rbxassetid://4483345998", 
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
 })
 
 Tab:AddToggle({
-	Name = "โจมตีอัตโนมัติ รอบๆตัว",
+	Name = "Auto Attack near",
 	Default = false,
-	Callback = function(v) 
-		autoAttackEnabled = v 
+	Callback = function(v)
+		autoAttackEnabled = v
 	end
 })
 
@@ -63,7 +62,7 @@ Tab:AddToggle({
 
 Tab:AddDropdown({
 	Name = "เลือกระดับความเร็วการโจมตี",
-	Default = "Slow",
+	Default = "Fast",
 	Options = {"Fast", "Medium", "Slow"},
 	Callback = function(selection)
 		attackDelay = speedMap[selection]
@@ -83,20 +82,25 @@ RunService.RenderStepped:Connect(function()
 
 	local root = char:FindFirstChild("HumanoidRootPart")
 	if not root then return end
-	
+
 	if autoAttackEnabled and tick() - lastAttackTime >= attackDelay then
+		local attacked = false
 		for _, model in ipairs(workspace:GetChildren()) do
 			local targetRoot = model:FindFirstChild("HumanoidRootPart")
-			if targetRoot and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
-				attack(CFrame.new(targetRoot.Position))
-				lastAttackTime = tick()
-				-- ถ้าต้องการโจมตีทุกตัวในรอบเดียวให้ลบ break ออก
-				-- แต่ถ้าต้องการโจมตีทีละตัวให้มี break
-				break
+			if targetRoot then
+				-- เช็คไม่ให้โจมตีตัวเอง
+				if model ~= char and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
+					attack(CFrame.new(targetRoot.Position))
+					attacked = true
+					-- โจมตีทุกตัวที่เจอในรอบเดียว (ไม่ break)
+				end
 			end
 		end
+		if attacked then
+			lastAttackTime = tick()
+		end
 	end
-	
+
 	if showRangeEnabled and attackRangePart then
 		attackRangePart.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, 0, math.rad(90))
 	end
