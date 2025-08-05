@@ -8,7 +8,7 @@ local ATTACK_RADIUS = 30
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
-local attackDelay = 0.01 -- เริ่มต้น Fast
+local attackDelay = 0.1 -- เริ่มต้น Fast
 local lastAttackTime = 0
 
 local speedMap = {
@@ -81,6 +81,23 @@ local function attack(cframe)
 	end)
 end
 
+-- ฟังก์ชันตรวจสอบว่ามอนสเตอร์ยังมีชีวิตอยู่ไหม
+local function isTargetValid(target)
+	if not target or not target.Parent then
+		return false
+	end
+	
+	local humanoid = target:FindFirstChild("Humanoid")
+	local targetRoot = target:FindFirstChild("HumanoidRootPart")
+	
+	-- ตรวจสอบว่ามี Humanoid และ HumanoidRootPart และยังมีชีวิต
+	if not humanoid or not targetRoot or humanoid.Health <= 0 then
+		return false
+	end
+	
+	return true
+end
+
 RunService.RenderStepped:Connect(function()
 	local char = player.Character
 	if not char then return end
@@ -89,10 +106,10 @@ RunService.RenderStepped:Connect(function()
 	if not root then return end
 
 	if autoAttackEnabled and tick() - lastAttackTime >= attackDelay then
-		-- ตรวจสอบว่าเป้าหมายปัจจุบันยังอยู่ไหม
-		if currentTarget and currentTarget.Parent and currentTarget:FindFirstChild("HumanoidRootPart") then
+		-- ตรวจสอบเป้าหมายปัจจุบันก่อน
+		if currentTarget and isTargetValid(currentTarget) then
 			local targetRoot = currentTarget.HumanoidRootPart
-			-- เช็คระยะ ถ้าเกิน 30 stud ให้ลบเป้าหมาย เพื่อหาใหม่ในรอบหน้า
+			-- เช็คระยะ ถ้าเกิน ATTACK_RADIUS ให้ลบเป้าหมาย
 			if (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
 				attack(CFrame.new(targetRoot.Position))
 				lastAttackTime = tick()
@@ -100,13 +117,18 @@ RunService.RenderStepped:Connect(function()
 				currentTarget = nil -- เป้าหมายห่างเกิน ล้างเป้าหมาย
 			end
 		else
-			-- หาเป้าหมายใหม่ในรัศมี 30 stud
+			-- เป้าหมายตายหรือไม่มี ให้หาใหม่ทันที
 			currentTarget = nil
 			for _, model in ipairs(workspace:GetChildren()) do
-				local targetRoot = model:FindFirstChild("HumanoidRootPart")
-				if targetRoot and model ~= char and (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
-					currentTarget = model
-					break
+				if model ~= char and isTargetValid(model) then
+					local targetRoot = model.HumanoidRootPart
+					if (targetRoot.Position - root.Position).Magnitude <= ATTACK_RADIUS then
+						currentTarget = model
+						-- โจมตีทันทีที่เจอเป้าหมายใหม่
+						attack(CFrame.new(targetRoot.Position))
+						lastAttackTime = tick()
+						break
+					end
 				end
 			end
 		end
