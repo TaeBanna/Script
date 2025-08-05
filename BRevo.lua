@@ -8,7 +8,7 @@ local ATTACK_RADIUS = 30
 local autoAttackEnabled = false
 local showRangeEnabled = false
 local attackRangePart
-local attackDelay = 0.1 -- เริ่มต้น Fast
+local attackDelay = 0.01 -- เริ่มต้น Fast
 local lastAttackTime = 0
 
 local speedMap = {
