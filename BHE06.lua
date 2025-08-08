@@ -198,25 +198,25 @@ function BannaHub:CreateWindow(config)
     end
 
     -- ฟังก์ชันสำหรับสร้าง Dropdown (Multiple Options)
-    function BannaHub:CreateDropdown(cfg)
-        local dropdownFrame = Instance.new("Frame")
-        dropdownFrame.Parent = cfg.Parent
-        dropdownFrame.Size = UDim2.new(0, 200, 0, 40)
-        dropdownFrame.BackgroundColor3 = Theme.Background
-        dropdownFrame.BorderSizePixel = 1
-        dropdownFrame.BorderColor3 = Theme.Primary
+    function BannaHub:CreateDropdown(DropdownSettings)
+        local Dropdown = Instance.new("Frame")
+        Dropdown.Parent = DropdownSettings.Parent
+        Dropdown.Size = UDim2.new(1, 0, 0, 40)
+        Dropdown.BackgroundColor3 = Theme.Background
+        Dropdown.BorderSizePixel = 1
+        Dropdown.BorderColor3 = Theme.Primary
 
         local dropdownButton = Instance.new("TextButton")
-        dropdownButton.Parent = dropdownFrame
+        dropdownButton.Parent = Dropdown
         dropdownButton.Size = UDim2.new(1, 0, 0, 30)
         dropdownButton.BackgroundColor3 = Theme.Primary
         dropdownButton.TextColor3 = Theme.Text
         dropdownButton.Font = Enum.Font.Gotham
         dropdownButton.TextSize = 14
-        dropdownButton.Text = cfg.Name or "Dropdown"
+        dropdownButton.Text = DropdownSettings.Name
 
         local listFrame = Instance.new("Frame")
-        listFrame.Parent = dropdownFrame
+        listFrame.Parent = Dropdown
         listFrame.Size = UDim2.new(1, 0, 0, 0)
         listFrame.Position = UDim2.new(0, 0, 1, 0)
         listFrame.BackgroundColor3 = Theme.Sidebar
@@ -227,10 +227,10 @@ function BannaHub:CreateWindow(config)
         listLayout.SortOrder = Enum.SortOrder.LayoutOrder
         listLayout.Padding = UDim.new(0, 5)
 
-        local selectedOptions = cfg.CurrentOption or {}
+        local selectedOptions = DropdownSettings.CurrentOption or {}
 
-        -- สร้างตัวเลือกใน Dropdown
-        for _, option in ipairs(cfg.Options or {}) do
+        -- ตั้งค่าตัวเลือกใน Dropdown
+        for _, option in ipairs(DropdownSettings.Options or {}) do
             local button = Instance.new("TextButton")
             button.Parent = listFrame
             button.Size = UDim2.new(1, -10, 0, 30)
@@ -241,39 +241,30 @@ function BannaHub:CreateWindow(config)
             button.Text = option
 
             button.MouseButton1Click:Connect(function()
-                -- ถ้าเป็น MultipleOptions ให้เก็บค่าหลายตัวเลือก
-                if cfg.MultipleOptions then
+                if not DropdownSettings.MultipleOptions then
+                    selectedOptions = {option}
+                else
                     if table.find(selectedOptions, option) then
                         table.remove(selectedOptions, table.find(selectedOptions, option))
                     else
                         table.insert(selectedOptions, option)
                     end
-                else
-                    selectedOptions = {option} -- กรณีเลือกแค่ตัวเดียว
                 end
 
-                -- เรียก callback
-                if cfg.Callback then
-                    cfg.Callback(selectedOptions)
+                if DropdownSettings.Callback then
+                    DropdownSettings.Callback(selectedOptions)
                 end
-                dropdownButton.Text = table.concat(selectedOptions, ", ") -- แสดงตัวเลือกที่เลือก
+                dropdownButton.Text = table.concat(selectedOptions, ", ")
                 listFrame.Visible = false
             end)
         end
 
-        -- เมื่อคลิกปุ่มจะเปิด/ปิดตัวเลือก
+        -- การเปิด/ปิด Dropdown
         dropdownButton.MouseButton1Click:Connect(function()
             listFrame.Visible = not listFrame.Visible
         end)
 
-        -- ซ่อนเมื่อคลิกนอก dropdown
-        game:GetService("UserInputService").InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                if not dropdownFrame:IsAncestorOf(input.Target) then
-                    listFrame.Visible = false
-                end
-            end
-        end)
+        return DropdownSettings
     end
 
     -- ปุ่ม Open/Close GUI
