@@ -1,8 +1,6 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
 local BannaHub = {}
@@ -111,7 +109,7 @@ function BannaHub:SetTheme(themeName)
     end
 end
 
--- Toggle UI function
+-- Toggle UI
 function BannaHub:ToggleUI()
     self.MainFrame.Visible = not self.MainFrame.Visible
 end
@@ -241,17 +239,11 @@ function BannaHub:CreateWindow(config)
         return TabAPI
     end
 
-    -- สร้างปุ่ม Toggle UI
-    local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = "ToggleGui"
-    ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-    ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ToggleGui.ResetOnSpawn = false
-
+    -- ปุ่ม Toggle UI ติดกับ UI หลัก
     local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Parent = ToggleGui
-    ToggleBtn.Size = UDim2.new(0, 80, 0, 38)
-    ToggleBtn.Position = UDim2.new(0, 0, 0.45, 0)
+    ToggleBtn.Parent = MainFrame
+    ToggleBtn.Size = UDim2.new(0, 80, 0, 30)
+    ToggleBtn.Position = UDim2.new(1, -90, 0, 0)
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
     ToggleBtn.Text = "Close Gui"
     ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
@@ -260,41 +252,7 @@ function BannaHub:CreateWindow(config)
     ToggleBtn.AutoButtonColor = false
     Instance.new("UICorner").Parent = ToggleBtn
 
-    -- ระบบลากปุ่ม Toggle
-    local dragging, dragStartPos, dragStartInput, wasDragged
-    local function updatePosition(input)
-        if not dragging then return end
-        local delta = input.Position - dragStartInput.Position
-        if delta.Magnitude > 5 then wasDragged = true end
-        ToggleBtn.Position = UDim2.new(dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X, dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y)
-    end
-
-    ToggleBtn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStartPos = ToggleBtn.Position
-            dragStartInput = input
-            wasDragged = false
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    ToggleBtn.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            updatePosition(input)
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragStartInput then
-            updatePosition(input)
-        end
-    end)
-
     ToggleBtn.MouseButton1Click:Connect(function()
-        if wasDragged then return end
         self:ToggleUI()
         ToggleBtn.Text = (ToggleBtn.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
