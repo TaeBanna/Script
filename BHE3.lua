@@ -36,7 +36,6 @@ local Themes = {
 
 local Theme = Themes.Dark
 
--- ทำให้ลากได้
 local function MakeDraggable(frame, dragHandle)
     local dragging, dragStart, startPos
     dragHandle.InputBegan:Connect(function(input)
@@ -60,7 +59,6 @@ local function MakeDraggable(frame, dragHandle)
     end)
 end
 
--- Gradient ให้ปุ่ม
 local function ApplyGradient(button, color1, color2)
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new(color1, color2)
@@ -68,7 +66,6 @@ local function ApplyGradient(button, color1, color2)
     gradient.Parent = button
 end
 
--- Hover Effect
 local function AddHoverEffect(button)
     button.MouseEnter:Connect(function()
         TweenService:Create(button, TweenInfo.new(0.15), {BackgroundTransparency = 0.05}):Play()
@@ -78,7 +75,6 @@ local function AddHoverEffect(button)
     end)
 end
 
--- Notification
 function BannaHub:Notify(text, time)
     local notif = Instance.new("TextLabel")
     notif.Text = text
@@ -102,19 +98,12 @@ function BannaHub:Notify(text, time)
     end)
 end
 
--- เปลี่ยนธีม
 function BannaHub:SetTheme(themeName)
     if Themes[themeName] then
         Theme = Themes[themeName]
     end
 end
 
--- Toggle UI
-function BannaHub:ToggleUI()
-    self.MainFrame.Visible = not self.MainFrame.Visible
-end
-
--- สร้าง Window
 function BannaHub:CreateWindow(config)
     config = config or {}
     local title = config.Name or "BannaHub"
@@ -131,7 +120,6 @@ function BannaHub:CreateWindow(config)
     MainFrame.BackgroundColor3 = Theme.Background
     MainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
     MainFrame.Size = UDim2.new(0, 500, 0, 300)
-    self.MainFrame = MainFrame
 
     local UICorner = Instance.new("UICorner")
     UICorner.CornerRadius = UDim.new(0, 8)
@@ -239,22 +227,60 @@ function BannaHub:CreateWindow(config)
         return TabAPI
     end
 
-    -- ปุ่ม Toggle UI ติดกับ UI หลัก
+    -- เพิ่มปุ่ม Toggle UI กลางบนจอ
+    local ToggleGui = Instance.new("ScreenGui")
+    ToggleGui.Name = "ToggleGui"
+    ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ToggleGui.ResetOnSpawn = false
+
     local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Parent = MainFrame
-    ToggleBtn.Size = UDim2.new(0, 80, 0, 30)
-    ToggleBtn.Position = UDim2.new(1, -90, 0, 0)
+    ToggleBtn.Parent = ToggleGui
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+    ToggleBtn.Position = UDim2.new(0.5, -40, 0, 10)
+    ToggleBtn.Size = UDim2.new(0, 80, 0, 38)
+    ToggleBtn.Font = Enum.Font.SourceSans
     ToggleBtn.Text = "Close Gui"
     ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
-    ToggleBtn.Font = Enum.Font.SourceSans
     ToggleBtn.TextSize = 19
-    ToggleBtn.AutoButtonColor = false
-    Instance.new("UICorner").Parent = ToggleBtn
+
+    local dragStartPos, dragStartInput, dragging, wasDragged
+    local function updatePos(input)
+        if not dragging then return end
+        local delta = input.Position - dragStartInput.Position
+        if delta.Magnitude > 5 then wasDragged = true end
+        ToggleBtn.Position = UDim2.new(
+            dragStartPos.X.Scale,
+            dragStartPos.X.Offset + delta.X,
+            dragStartPos.Y.Scale,
+            dragStartPos.Y.Offset + delta.Y
+        )
+    end
+
+    ToggleBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStartPos = ToggleBtn.Position
+            dragStartInput = input
+            wasDragged = false
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updatePos(input)
+        end
+    end)
 
     ToggleBtn.MouseButton1Click:Connect(function()
-        self:ToggleUI()
-        ToggleBtn.Text = (ToggleBtn.Text == "Close Gui") and "Open Gui" or "Close Gui"
+        if wasDragged then return end
+        MainFrame.Visible = not MainFrame.Visible
+        ToggleBtn.Text = MainFrame.Visible and "Close Gui" or "Open Gui"
     end)
 
     return self
