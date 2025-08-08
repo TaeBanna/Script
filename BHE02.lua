@@ -197,6 +197,69 @@ function BannaHub:CreateWindow(config)
         return TabAPI
     end
 
+    -- ฟังก์ชันสำหรับสร้าง Dropdown
+    function BannaHub:CreateDropdown(cfg)
+        local dropdownFrame = Instance.new("Frame")
+        dropdownFrame.Parent = cfg.Parent
+        dropdownFrame.Size = UDim2.new(0, 200, 0, 40)
+        dropdownFrame.BackgroundColor3 = Theme.Background
+        dropdownFrame.BorderSizePixel = 1
+        dropdownFrame.BorderColor3 = Theme.Primary
+
+        local dropdownButton = Instance.new("TextButton")
+        dropdownButton.Parent = dropdownFrame
+        dropdownButton.Size = UDim2.new(1, 0, 0, 30)
+        dropdownButton.BackgroundColor3 = Theme.Primary
+        dropdownButton.TextColor3 = Theme.Text
+        dropdownButton.Font = Enum.Font.Gotham
+        dropdownButton.TextSize = 14
+        dropdownButton.Text = cfg.Name or "Dropdown"
+
+        local listFrame = Instance.new("Frame")
+        listFrame.Parent = dropdownFrame
+        listFrame.Size = UDim2.new(1, 0, 0, 0)
+        listFrame.Position = UDim2.new(0, 0, 1, 0)
+        listFrame.BackgroundColor3 = Theme.Sidebar
+        listFrame.Visible = false
+
+        local listLayout = Instance.new("UIListLayout")
+        listLayout.Parent = listFrame
+        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        listLayout.Padding = UDim.new(0, 5)
+
+        for _, option in ipairs(cfg.Options or {}) do
+            local button = Instance.new("TextButton")
+            button.Parent = listFrame
+            button.Size = UDim2.new(1, -10, 0, 30)
+            button.BackgroundColor3 = Theme.Sidebar
+            button.TextColor3 = Theme.Text
+            button.Font = Enum.Font.Gotham
+            button.TextSize = 14
+            button.Text = option.Name
+
+            button.MouseButton1Click:Connect(function()
+                if option.Callback then
+                    option.Callback(option.Name)
+                end
+                listFrame.Visible = false
+                dropdownButton.Text = option.Name
+            end)
+        end
+
+        dropdownButton.MouseButton1Click:Connect(function()
+            listFrame.Visible = not listFrame.Visible
+        end)
+
+        -- Close dropdown when clicking outside
+        game:GetService("UserInputService").InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                if not dropdownFrame:IsAncestorOf(input.Target) then
+                    listFrame.Visible = false
+                end
+            end
+        end)
+    end
+
     -- ปุ่ม Open/Close GUI
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
