@@ -15,71 +15,43 @@ local Themes = {
         Text = Color3.fromRGB(255, 255, 255),
         TextSecondary = Color3.fromRGB(180, 180, 190),
         Accent = Color3.fromRGB(255, 170, 0)
-    },
-    Light = {
-        Background = Color3.fromRGB(245, 245, 250),
-        Sidebar = Color3.fromRGB(230, 230, 240),
-        Primary = Color3.fromRGB(0, 120, 215),
-        Text = Color3.fromRGB(20, 20, 25),
-        TextSecondary = Color3.fromRGB(80, 80, 90),
-        Accent = Color3.fromRGB(0, 170, 140)
-    },
-    Ocean = {
-        Background = Color3.fromRGB(15, 25, 35),
-        Sidebar = Color3.fromRGB(20, 40, 60),
-        Primary = Color3.fromRGB(0, 180, 255),
-        Text = Color3.fromRGB(220, 240, 255),
-        TextSecondary = Color3.fromRGB(160, 190, 210),
-        Accent = Color3.fromRGB(0, 220, 180)
     }
 }
-
 local Theme = Themes.Dark
 
--- ทำให้ลากได้
-local function MakeDraggable(frame, dragHandle)
+-- ทำให้ลากได้ + ตรวจว่าลากหรือคลิก
+local function MakeDraggableWithCheck(frame, dragHandle)
     local dragging, dragStart, startPos
+    local wasDragged = false
+
     dragHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
+            wasDragged = false
             dragStart = input.Position
             startPos = frame.Position
+
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
                 end
             end)
-            -- ป้องกันบัคกดแล้วเดิน
-            if input.UserInputType == Enum.UserInputType.Touch then
-                input.UserInputState = Enum.UserInputState.Begin
-            end
         end
     end)
 
     dragHandle.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
+            if delta.Magnitude > 5 then
+                wasDragged = true
+            end
             frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-end
 
--- Gradient ให้ปุ่ม
-local function ApplyGradient(button, color1, color2)
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new(color1, color2)
-    gradient.Rotation = 90
-    gradient.Parent = button
-end
-
--- Hover Effect
-local function AddHoverEffect(button)
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.15), {BackgroundTransparency = 0.05}):Play()
-    end)
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
-    end)
+    return function()
+        return wasDragged
+    end
 end
 
 -- Notification
@@ -106,44 +78,6 @@ function BannaHub:Notify(text, time)
     end)
 end
 
--- เปลี่ยนธีม
-function BannaHub:SetTheme(themeName)
-    if Themes[themeName] then
-        Theme = Themes[themeName]
-    end
-end
-
--- สร้างปุ่ม Open/Close GUI
-local function CreateToggleButton(library)
-    local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = "ToggleGui"
-    ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-    ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ToggleGui.ResetOnSpawn = false
-
-    local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Name = "Toggle"
-    ToggleBtn.Parent = ToggleGui
-    ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
-    ToggleBtn.Position = UDim2.new(0.5, -40, 0, 10)
-    ToggleBtn.Size = UDim2.new(0, 80, 0, 38)
-    ToggleBtn.Font = Enum.Font.SourceSans
-    ToggleBtn.Text = "Close Gui"
-    ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
-    ToggleBtn.TextSize = 19
-    ToggleBtn.AutoButtonColor = false
-
-    local UICorner = Instance.new("UICorner")
-    UICorner.Parent = ToggleBtn
-
-    MakeDraggable(ToggleBtn, ToggleBtn)
-
-    ToggleBtn.MouseButton1Click:Connect(function()
-        library.ScreenGui.Enabled = not library.ScreenGui.Enabled
-        ToggleBtn.Text = library.ScreenGui.Enabled and "Close Gui" or "Open Gui"
-    end)
-end
-
 -- สร้าง Window
 function BannaHub:CreateWindow(config)
     config = config or {}
@@ -155,8 +89,6 @@ function BannaHub:CreateWindow(config)
     ScreenGui.IgnoreGuiInset = true
     ScreenGui.ResetOnSpawn = false
     self.ScreenGui = ScreenGui
-
-    CreateToggleButton(self)
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
@@ -177,14 +109,14 @@ function BannaHub:CreateWindow(config)
     Header.Font = Enum.Font.GothamBold
     Header.TextSize = 16
 
-    MakeDraggable(MainFrame, Header)
-
+    -- Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Parent = MainFrame
     Sidebar.BackgroundColor3 = Theme.Sidebar
     Sidebar.Size = UDim2.new(0, 120, 1, -30)
     Sidebar.Position = UDim2.new(0, 0, 0, 30)
 
+    -- Content
     local ContentFrame = Instance.new("Frame")
     ContentFrame.Parent = MainFrame
     ContentFrame.BackgroundTransparency = 1
@@ -219,7 +151,6 @@ function BannaHub:CreateWindow(config)
         ElementList.SortOrder = Enum.SortOrder.LayoutOrder
 
         TabButton.MouseButton1Click:Connect(function()
-            if TabContent.Visible then return end
             for _, t in pairs(Tabs) do
                 t.Content.Visible = false
                 t.Button.TextColor3 = Theme.TextSecondary
@@ -241,8 +172,6 @@ function BannaHub:CreateWindow(config)
             btn.TextSize = 14
             btn.TextColor3 = Theme.Text
             btn.BackgroundColor3 = Theme.Primary
-            ApplyGradient(btn, Theme.Primary, Theme.Accent)
-            AddHoverEffect(btn)
             btn.MouseButton1Click:Connect(function()
                 if cfg.Callback then cfg.Callback() end
             end)
@@ -258,8 +187,6 @@ function BannaHub:CreateWindow(config)
             btn.TextSize = 14
             btn.TextColor3 = Theme.Text
             btn.BackgroundColor3 = Theme.Accent
-            ApplyGradient(btn, Theme.Accent, Theme.Primary)
-            AddHoverEffect(btn)
             btn.MouseButton1Click:Connect(function()
                 state = not state
                 btn.Text = cfg.Name .. ": " .. tostring(state)
@@ -269,6 +196,29 @@ function BannaHub:CreateWindow(config)
 
         return TabAPI
     end
+
+    -- ปุ่ม Open/Close GUI
+    local ToggleGui = Instance.new("ScreenGui")
+    ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ToggleGui.ResetOnSpawn = false
+
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Parent = ToggleGui
+    ToggleBtn.Size = UDim2.new(0, 100, 0, 35)
+    ToggleBtn.Position = UDim2.new(0.5, -50, 0, 10)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+    ToggleBtn.Text = "Close Gui"
+    ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.Font = Enum.Font.Gotham
+    ToggleBtn.TextSize = 14
+
+    local checkDragged = MakeDraggableWithCheck(ToggleBtn, ToggleBtn)
+
+    ToggleBtn.MouseButton1Click:Connect(function()
+        if checkDragged() then return end -- ถ้าลาก ให้ข้ามการกด
+        ScreenGui.Enabled = not ScreenGui.Enabled
+        ToggleBtn.Text = ScreenGui.Enabled and "Close Gui" or "Open Gui"
+    end)
 
     return self
 end
