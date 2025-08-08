@@ -15,22 +15,6 @@ local Themes = {
         Text = Color3.fromRGB(255, 255, 255),
         TextSecondary = Color3.fromRGB(180, 180, 190),
         Accent = Color3.fromRGB(255, 170, 0)
-    },
-    Light = {
-        Background = Color3.fromRGB(240, 240, 240),
-        Sidebar = Color3.fromRGB(200, 200, 200),
-        Primary = Color3.fromRGB(88, 101, 242),
-        Text = Color3.fromRGB(0, 0, 0),
-        TextSecondary = Color3.fromRGB(180, 180, 190),
-        Accent = Color3.fromRGB(255, 170, 0)
-    },
-    Ocean = {
-        Background = Color3.fromRGB(10, 50, 80),
-        Sidebar = Color3.fromRGB(0, 30, 60),
-        Primary = Color3.fromRGB(0, 255, 255),
-        Text = Color3.fromRGB(255, 255, 255),
-        TextSecondary = Color3.fromRGB(180, 180, 190),
-        Accent = Color3.fromRGB(0, 255, 200)
     }
 }
 local Theme = Themes.Dark
@@ -213,7 +197,7 @@ function BannaHub:CreateWindow(config)
         return TabAPI
     end
 
-    -- ฟังก์ชันสำหรับสร้าง Dropdown
+    -- ฟังก์ชันสำหรับสร้าง Dropdown (Multiple Options)
     function BannaHub:CreateDropdown(cfg)
         local dropdownFrame = Instance.new("Frame")
         dropdownFrame.Parent = cfg.Parent
@@ -243,6 +227,8 @@ function BannaHub:CreateWindow(config)
         listLayout.SortOrder = Enum.SortOrder.LayoutOrder
         listLayout.Padding = UDim.new(0, 5)
 
+        local selectedOptions = cfg.CurrentOption or {}
+
         -- สร้างตัวเลือกใน Dropdown
         for _, option in ipairs(cfg.Options or {}) do
             local button = Instance.new("TextButton")
@@ -252,14 +238,26 @@ function BannaHub:CreateWindow(config)
             button.TextColor3 = Theme.Text
             button.Font = Enum.Font.Gotham
             button.TextSize = 14
-            button.Text = option.Name
+            button.Text = option
 
             button.MouseButton1Click:Connect(function()
-                if option.Callback then
-                    option.Callback(option.Name)
+                -- ถ้าเป็น MultipleOptions ให้เก็บค่าหลายตัวเลือก
+                if cfg.MultipleOptions then
+                    if table.find(selectedOptions, option) then
+                        table.remove(selectedOptions, table.find(selectedOptions, option))
+                    else
+                        table.insert(selectedOptions, option)
+                    end
+                else
+                    selectedOptions = {option} -- กรณีเลือกแค่ตัวเดียว
                 end
+
+                -- เรียก callback
+                if cfg.Callback then
+                    cfg.Callback(selectedOptions)
+                end
+                dropdownButton.Text = table.concat(selectedOptions, ", ") -- แสดงตัวเลือกที่เลือก
                 listFrame.Visible = false
-                dropdownButton.Text = option.Name
             end)
         end
 
