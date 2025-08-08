@@ -1,155 +1,177 @@
+-- BannaHub UI Library (BHub) - Version 1.0
+-- Inspired by Rayfield, built from scratch with unique layout
+-- Developer: TaeBanna
+
+local BannaHub = {}
+
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local player = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local running = false
-local automationThread = nil
+-- Theme
+local Theme = {
+	Background = Color3.fromRGB(20, 20, 30),
+	Header = Color3.fromRGB(30, 30, 45),
+	Primary = Color3.fromRGB(88, 101, 242),
+	Text = Color3.fromRGB(255, 255, 255),
+	Section = Color3.fromRGB(40, 40, 60),
+	Button = Color3.fromRGB(60, 60, 90),
+	ToggleOn = Color3.fromRGB(67, 181, 129),
+	ToggleOff = Color3.fromRGB(100, 100, 120),
+}
 
--- UI Initialization
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "PanAutoGui"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
-
--- Main Frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 260, 0, 140)
-frame.Position = UDim2.new(0.5, -130, 0.5, -70)
-frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-frame.BorderSizePixel = 0
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.Active = true
-frame.Draggable = true
-frame.Parent = screenGui
-
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
-corner.Parent = frame
-
-local stroke = Instance.new("UIStroke")
-stroke.Thickness = 2
-stroke.Color = Color3.fromRGB(60, 60, 60)
-stroke.Parent = frame
-
--- Title Label
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.BackgroundTransparency = 1
-title.Text = "🥄 Pan Automation"
-title.Font = Enum.Font.GothamSemibold
-title.TextSize = 20
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Parent = frame
-
--- Toggle Button
-local toggleBtn = Instance.new("TextButton")
-toggleBtn.Size = UDim2.new(0.6, 0, 0, 40)
-toggleBtn.Position = UDim2.new(0.2, 0, 0.55, 0)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 18
-toggleBtn.Text = "Turn ON"
-toggleBtn.AutoButtonColor = true
-toggleBtn.Parent = frame
-
-local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(0, 8)
-btnCorner.Parent = toggleBtn
-
--- Status Label
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, 0, 0, 25)
-statusLabel.Position = UDim2.new(0, 0, 0.85, 0)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Font = Enum.Font.Gotham
-statusLabel.TextSize = 16
-statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-statusLabel.Text = "Status: OFF"
-statusLabel.Parent = frame
-
--- Core Automation
-local function processPan(pan)
-    local character = player.Character
-    if not character then return end
-
-    -- Equip pan if in backpack
-    if pan.Parent == player:FindFirstChild("Backpack") then
-        pan.Parent = character
-        task.wait(0.2)
-    end
-
-    local scripts = pan:FindFirstChild("Scripts")
-    if not scripts then return end
-
-    local toggle = scripts:FindFirstChild("ToggleShovelActive")
-    local shake = scripts:FindFirstChild("Shake")
-    local collect = scripts:FindFirstChild("Collect")
-
-    if toggle and toggle:IsA("RemoteEvent") then
-        toggle:FireServer(true)
-        task.wait(0.2)
-    end
-
-    if shake and shake:IsA("RemoteEvent") then
-        shake:FireServer()
-        task.wait(0.3)
-    end
-
-    if collect and collect:IsA("RemoteFunction") then
-        collect:InvokeServer(1)
-    end
+-- Utility Functions
+local function create(instanceType, properties)
+	local obj = Instance.new(instanceType)
+	for k, v in pairs(properties) do
+		obj[k] = v
+	end
+	return obj
 end
 
-local function panAutomation()
-    while running do
-        local success, err = pcall(function()
-            local character = player.Character or player.CharacterAdded:Wait()
-            local backpack = player:WaitForChild("Backpack")
+-- Main UI Constructor
+function BannaHub:CreateWindow(title, theme)
+	theme = Theme -- (future: custom themes)
 
-            -- ใช้ Pan จากตัวละครก่อน
-            for _, item in pairs(character:GetChildren()) do
-                if item:IsA("Tool") and item.Name:find("Pan") then
-                    processPan(item)
-                end
-            end
+	local screenGui = create("ScreenGui", {
+		Name = "BannaHubGUI",
+		Parent = PlayerGui,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		ResetOnSpawn = false,
+	})
 
-            -- แล้วค่อยเช็กในกระเป๋า
-            for _, item in pairs(backpack:GetChildren()) do
-                if item:IsA("Tool") and item.Name:find("Pan") then
-                    processPan(item)
-                end
-            end
+	local mainFrame = create("Frame", {
+		Name = "Main",
+		Parent = screenGui,
+		BackgroundColor3 = theme.Background,
+		Size = UDim2.new(0, 500, 0, 350),
+		Position = UDim2.new(0.5, -250, 0.5, -175),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BorderSizePixel = 0,
+	})
+	create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = mainFrame})
 
-            -- ขายของ (ถ้ามี)
-            local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-            if remotes then
-                local shop = remotes:FindFirstChild("Shop")
-                if shop then
-                    local sell = shop:FindFirstChild("SellAll")
-                    if sell and sell:IsA("RemoteFunction") then
-                        sell:InvokeServer()
-                    end
-                end
-            end
-        end)
+	local header = create("TextLabel", {
+		Parent = mainFrame,
+		BackgroundColor3 = theme.Header,
+		Size = UDim2.new(1, 0, 0, 40),
+		Text = title or "BannaHub",
+		TextColor3 = theme.Text,
+		Font = Enum.Font.GothamBold,
+		TextSize = 20,
+		BorderSizePixel = 0,
+	})
+	create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = header})
 
-        if not success then
-            warn("Pan automation error:", err)
-        end
+	local tabHolder = create("Frame", {
+		Parent = mainFrame,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, -20, 1, -60),
+		Position = UDim2.new(0, 10, 0, 50),
+	})
 
-        task.wait(0.8)
-    end
+	local layout = create("UIListLayout", {
+		Parent = tabHolder,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 10),
+	})
+
+	-- Tab System
+	local tabFunctions = {}
+
+	function tabFunctions:NewTab(name)
+		local tabFrame = create("Frame", {
+			Name = name,
+			Parent = tabHolder,
+			BackgroundColor3 = theme.Section,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BorderSizePixel = 0,
+		})
+		create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = tabFrame})
+
+		local tabLayout = create("UIListLayout", {
+			Parent = tabFrame,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 5),
+		})
+
+		local sectionFunctions = {}
+
+		function sectionFunctions:NewSection(title)
+			local section = create("Frame", {
+				Parent = tabFrame,
+				BackgroundColor3 = theme.Background,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BorderSizePixel = 0,
+			})
+			create("UICorner", {Parent = section})
+
+			create("TextLabel", {
+				Parent = section,
+				Text = title,
+				TextColor3 = theme.Text,
+				Font = Enum.Font.GothamSemibold,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -10, 0, 25),
+				Position = UDim2.new(0, 5, 0, 0),
+				TextXAlignment = Enum.TextXAlignment.Left,
+			})
+
+			local contentLayout = create("UIListLayout", {
+				Parent = section,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 5),
+			})
+
+			-- Button
+			function section:NewButton(text, callback)
+				local button = create("TextButton", {
+					Parent = section,
+					Text = text,
+					BackgroundColor3 = theme.Button,
+					TextColor3 = theme.Text,
+					Font = Enum.Font.Gotham,
+					Size = UDim2.new(1, -10, 0, 30),
+					Position = UDim2.new(0, 5, 0, 0),
+					BorderSizePixel = 0,
+				})
+				create("UICorner", {Parent = button})
+				button.MouseButton1Click:Connect(function()
+					pcall(callback)
+				end)
+			end
+
+			-- Toggle
+			function section:NewToggle(text, default, callback)
+				local state = default
+				local toggle = create("TextButton", {
+					Parent = section,
+					Text = text,
+					BackgroundColor3 = state and theme.ToggleOn or theme.ToggleOff,
+					TextColor3 = theme.Text,
+					Font = Enum.Font.Gotham,
+					Size = UDim2.new(1, -10, 0, 30),
+					Position = UDim2.new(0, 5, 0, 0),
+					BorderSizePixel = 0,
+				})
+				create("UICorner", {Parent = toggle})
+				toggle.MouseButton1Click:Connect(function()
+					state = not state
+					toggle.BackgroundColor3 = state and theme.ToggleOn or theme.ToggleOff
+					pcall(callback, state)
+				end)
+			end
+
+			return section
+		end
+
+		return sectionFunctions
+	end
+
+	return tabFunctions
 end
 
--- Toggle Button Click
-toggleBtn.MouseButton1Click:Connect(function()
-    running = not running
-    toggleBtn.Text = running and "Turn OFF" or "Turn ON"
-    statusLabel.Text = running and "Status: ON" or "Status: OFF"
-
-    if running then
-        automationThread = coroutine.create(panAutomation)
-        coroutine.resume(automationThread)
-    end
-end)
+return BannaHub
