@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 local BannaHub = {}
 BannaHub.__index = BannaHub
 
--- 🎨 Theme Styles
+-- Themes
 local Themes = {
     Dark = {
         Background = Color3.fromRGB(20, 20, 25),
@@ -15,50 +15,21 @@ local Themes = {
         Text = Color3.fromRGB(255, 255, 255),
         TextSecondary = Color3.fromRGB(180, 180, 190),
         Accent = Color3.fromRGB(255, 170, 0)
-    },
-    Light = {
-        Background = Color3.fromRGB(245, 245, 250),
-        Sidebar = Color3.fromRGB(230, 230, 240),
-        Primary = Color3.fromRGB(0, 120, 215),
-        Text = Color3.fromRGB(20, 20, 25),
-        TextSecondary = Color3.fromRGB(80, 80, 90),
-        Accent = Color3.fromRGB(0, 170, 140)
-    },
-    Ocean = {
-        Background = Color3.fromRGB(15, 25, 35),
-        Sidebar = Color3.fromRGB(20, 40, 60),
-        Primary = Color3.fromRGB(0, 180, 255),
-        Text = Color3.fromRGB(220, 240, 255),
-        TextSecondary = Color3.fromRGB(160, 190, 210),
-        Accent = Color3.fromRGB(0, 220, 180)
     }
 }
 local Theme = Themes.Dark
 
--- 🖱 MakeDraggable function
-local function MakeDraggable(frame, options)
-    options = options or {}
-    local threshold = options.threshold or 5
-    local dragging = false
-    local dragStartPos, dragStartInput
+-- ทำให้ลากได้ + ตรวจว่าลากหรือคลิก
+local function MakeDraggableWithCheck(frame, dragHandle)
+    local dragging, dragStart, startPos
     local wasDragged = false
 
-    local function update(input)
-        if not dragging then return end
-        local delta = input.Position - dragStartInput.Position
-        if delta.Magnitude > threshold then wasDragged = true end
-        frame.Position = UDim2.new(
-            dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X,
-            dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y
-        )
-    end
-
-    frame.InputBegan:Connect(function(input)
+    dragHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            dragStartPos = frame.Position
-            dragStartInput = input
             wasDragged = false
+            dragStart = input.Position
+            startPos = frame.Position
 
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -68,15 +39,13 @@ local function MakeDraggable(frame, options)
         end
     end)
 
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            update(input)
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragStartInput then
-            update(input)
+    dragHandle.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            if delta.Magnitude > 5 then
+                wasDragged = true
+            end
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 
@@ -85,15 +54,7 @@ local function MakeDraggable(frame, options)
     end
 end
 
--- 🌈 Gradient for buttons
-local function ApplyGradient(button, color1, color2)
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new(color1, color2)
-    gradient.Rotation = 90
-    gradient.Parent = button
-end
-
--- 🔔 Notification
+-- Notification
 function BannaHub:Notify(text, time)
     local notif = Instance.new("TextLabel")
     notif.Text = text
@@ -103,28 +64,21 @@ function BannaHub:Notify(text, time)
     notif.Font = Enum.Font.Gotham
     notif.TextSize = 14
     notif.Parent = self.ScreenGui
-    notif.Position = UDim2.new(1, 220, 0, 20)
+    notif.Position = UDim2.new(1, 220, 1, -60)
 
     TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back), {
-        Position = UDim2.new(1, -240, 0, 20)
+        Position = UDim2.new(1, -240, 1, -60)
     }):Play()
 
     task.delay(time or 2, function()
         TweenService:Create(notif, TweenInfo.new(0.3), {
-            Position = UDim2.new(1, 220, 0, 20)
+            Position = UDim2.new(1, 220, 1, -60)
         }):Play()
         task.delay(0.3, function() notif:Destroy() end)
     end)
 end
 
--- 🎨 Change Theme
-function BannaHub:SetTheme(themeName)
-    if Themes[themeName] then
-        Theme = Themes[themeName]
-    end
-end
-
--- 📂 Create Window
+-- สร้าง Window
 function BannaHub:CreateWindow(config)
     config = config or {}
     local title = config.Name or "BannaHub"
@@ -142,6 +96,10 @@ function BannaHub:CreateWindow(config)
     MainFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
     MainFrame.Size = UDim2.new(0, 500, 0, 300)
 
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 8)
+    UICorner.Parent = MainFrame
+
     local Header = Instance.new("TextLabel")
     Header.Parent = MainFrame
     Header.BackgroundTransparency = 1
@@ -151,14 +109,14 @@ function BannaHub:CreateWindow(config)
     Header.Font = Enum.Font.GothamBold
     Header.TextSize = 16
 
-    MakeDraggable(MainFrame)
-
+    -- Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Parent = MainFrame
     Sidebar.BackgroundColor3 = Theme.Sidebar
     Sidebar.Size = UDim2.new(0, 120, 1, -30)
     Sidebar.Position = UDim2.new(0, 0, 0, 30)
 
+    -- Content
     local ContentFrame = Instance.new("Frame")
     ContentFrame.Parent = MainFrame
     ContentFrame.BackgroundTransparency = 1
@@ -214,7 +172,6 @@ function BannaHub:CreateWindow(config)
             btn.TextSize = 14
             btn.TextColor3 = Theme.Text
             btn.BackgroundColor3 = Theme.Primary
-            ApplyGradient(btn, Theme.Primary, Theme.Accent)
             btn.MouseButton1Click:Connect(function()
                 if cfg.Callback then cfg.Callback() end
             end)
@@ -230,7 +187,6 @@ function BannaHub:CreateWindow(config)
             btn.TextSize = 14
             btn.TextColor3 = Theme.Text
             btn.BackgroundColor3 = Theme.Accent
-            ApplyGradient(btn, Theme.Accent, Theme.Primary)
             btn.MouseButton1Click:Connect(function()
                 state = not state
                 btn.Text = cfg.Name .. ": " .. tostring(state)
@@ -238,59 +194,31 @@ function BannaHub:CreateWindow(config)
             end)
         end
 
-        -- 📂 DropDown
-        function TabAPI:CreateDropdown(cfg)
-            local current = cfg.CurrentOption or cfg.Options[1]
-            local holder = Instance.new("Frame")
-            holder.Parent = TabContent
-            holder.Size = UDim2.new(1, -10, 0, 30)
-            holder.BackgroundColor3 = Theme.Sidebar
-
-            local label = Instance.new("TextButton")
-            label.Parent = holder
-            label.Size = UDim2.new(1, 0, 1, 0)
-            label.Text = cfg.Name .. ": " .. current
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.TextColor3 = Theme.Text
-
-            local open = false
-            label.MouseButton1Click:Connect(function()
-                open = not open
-                for _, child in ipairs(holder:GetChildren()) do
-                    if child:IsA("TextButton") and child ~= label then
-                        child.Visible = open
-                    end
-                end
-            end)
-
-            for _, option in ipairs(cfg.Options) do
-                local optBtn = Instance.new("TextButton")
-                optBtn.Parent = holder
-                optBtn.Size = UDim2.new(1, 0, 0, 30)
-                optBtn.Position = UDim2.new(0, 0, 1, (#holder:GetChildren()-2) * 30)
-                optBtn.Text = option
-                optBtn.Font = Enum.Font.Gotham
-                optBtn.TextSize = 14
-                optBtn.TextColor3 = Theme.Text
-                optBtn.Visible = false
-
-                optBtn.MouseButton1Click:Connect(function()
-                    current = option
-                    label.Text = cfg.Name .. ": " .. current
-                    open = false
-                    for _, child in ipairs(holder:GetChildren()) do
-                        if child:IsA("TextButton") and child ~= label then
-                            child.Visible = false
-                        end
-                    end
-                    if cfg.Callback then cfg.Callback(current) end
-                end)
-            end
-        end
-
         return TabAPI
     end
+
+    -- ปุ่ม Open/Close GUI
+    local ToggleGui = Instance.new("ScreenGui")
+    ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ToggleGui.ResetOnSpawn = false
+
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Parent = ToggleGui
+    ToggleBtn.Size = UDim2.new(0, 100, 0, 35)
+    ToggleBtn.Position = UDim2.new(0.5, -50, 0, 10)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+    ToggleBtn.Text = "Close Gui"
+    ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.Font = Enum.Font.Gotham
+    ToggleBtn.TextSize = 14
+
+    local checkDragged = MakeDraggableWithCheck(ToggleBtn, ToggleBtn)
+
+    ToggleBtn.MouseButton1Click:Connect(function()
+        if checkDragged() then return end -- ถ้าลาก ให้ข้ามการกด
+        ScreenGui.Enabled = not ScreenGui.Enabled
+        ToggleBtn.Text = ScreenGui.Enabled and "Close Gui" or "Open Gui"
+    end)
 
     return self
 end
