@@ -15,6 +15,22 @@ local Themes = {
         Text = Color3.fromRGB(255, 255, 255),
         TextSecondary = Color3.fromRGB(180, 180, 190),
         Accent = Color3.fromRGB(255, 170, 0)
+    },
+    Light = {
+        Background = Color3.fromRGB(240, 240, 240),
+        Sidebar = Color3.fromRGB(200, 200, 200),
+        Primary = Color3.fromRGB(88, 101, 242),
+        Text = Color3.fromRGB(0, 0, 0),
+        TextSecondary = Color3.fromRGB(180, 180, 190),
+        Accent = Color3.fromRGB(255, 170, 0)
+    },
+    Ocean = {
+        Background = Color3.fromRGB(10, 50, 80),
+        Sidebar = Color3.fromRGB(0, 30, 60),
+        Primary = Color3.fromRGB(0, 255, 255),
+        Text = Color3.fromRGB(255, 255, 255),
+        TextSecondary = Color3.fromRGB(180, 180, 190),
+        Accent = Color3.fromRGB(0, 255, 200)
     }
 }
 local Theme = Themes.Dark
@@ -227,6 +243,7 @@ function BannaHub:CreateWindow(config)
         listLayout.SortOrder = Enum.SortOrder.LayoutOrder
         listLayout.Padding = UDim.new(0, 5)
 
+        -- สร้างตัวเลือกใน Dropdown
         for _, option in ipairs(cfg.Options or {}) do
             local button = Instance.new("TextButton")
             button.Parent = listFrame
@@ -246,11 +263,12 @@ function BannaHub:CreateWindow(config)
             end)
         end
 
+        -- เมื่อคลิกปุ่มจะเปิด/ปิดตัวเลือก
         dropdownButton.MouseButton1Click:Connect(function()
             listFrame.Visible = not listFrame.Visible
         end)
 
-        -- Close dropdown when clicking outside
+        -- ซ่อนเมื่อคลิกนอก dropdown
         game:GetService("UserInputService").InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 if not dropdownFrame:IsAncestorOf(input.Target) then
