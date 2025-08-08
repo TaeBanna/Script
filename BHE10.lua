@@ -163,6 +163,7 @@ function BannaHub:CreateWindow(config)
 
         local TabAPI = {}
 
+        -- 📌 ปุ่ม
         function TabAPI:CreateButton(cfg)
             local btn = Instance.new("TextButton")
             btn.Parent = TabContent
@@ -177,6 +178,7 @@ function BannaHub:CreateWindow(config)
             end)
         end
 
+        -- 📌 Toggle
         function TabAPI:CreateToggle(cfg)
             local state = cfg.CurrentValue or false
             local btn = Instance.new("TextButton")
@@ -194,77 +196,58 @@ function BannaHub:CreateWindow(config)
             end)
         end
 
-        return TabAPI
-    end
+        -- 📌 Dropdown ใหม่
+        function TabAPI:CreateDropdown(cfg)
+            local current = cfg.CurrentOption or cfg.Options[1]
+            local holder = Instance.new("Frame")
+            holder.Parent = TabContent
+            holder.Size = UDim2.new(1, -10, 0, 30)
+            holder.BackgroundColor3 = Theme.Sidebar
 
-    -- ฟังก์ชันสำหรับสร้าง Dropdown (Multiple Options)
-    function BannaHub:CreateDropdown(DropdownSettings)
-        local Dropdown = Instance.new("Frame")
-        Dropdown.Parent = DropdownSettings.Parent
-        Dropdown.Size = UDim2.new(1, 0, 0, 40)
-        Dropdown.BackgroundColor3 = Theme.Background
-        Dropdown.BorderSizePixel = 1
-        Dropdown.BorderColor3 = Theme.Primary
+            local label = Instance.new("TextButton")
+            label.Parent = holder
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.Text = cfg.Name .. ": " .. current
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 14
+            label.TextColor3 = Theme.Text
 
-        local dropdownButton = Instance.new("TextButton")
-        dropdownButton.Parent = Dropdown
-        dropdownButton.Size = UDim2.new(1, 0, 0, 30)
-        dropdownButton.BackgroundColor3 = Theme.Primary
-        dropdownButton.TextColor3 = Theme.Text
-        dropdownButton.Font = Enum.Font.Gotham
-        dropdownButton.TextSize = 14
-        dropdownButton.Text = DropdownSettings.Name
-
-        local listFrame = Instance.new("Frame")
-        listFrame.Parent = Dropdown
-        listFrame.Size = UDim2.new(1, 0, 0, 0)
-        listFrame.Position = UDim2.new(0, 0, 1, 0)
-        listFrame.BackgroundColor3 = Theme.Sidebar
-        listFrame.Visible = false
-
-        local listLayout = Instance.new("UIListLayout")
-        listLayout.Parent = listFrame
-        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        listLayout.Padding = UDim.new(0, 5)
-
-        local selectedOptions = DropdownSettings.CurrentOption or {}
-
-        -- ตั้งค่าตัวเลือกใน Dropdown
-        for _, option in ipairs(DropdownSettings.Options or {}) do
-            local button = Instance.new("TextButton")
-            button.Parent = listFrame
-            button.Size = UDim2.new(1, -10, 0, 30)
-            button.BackgroundColor3 = Theme.Sidebar
-            button.TextColor3 = Theme.Text
-            button.Font = Enum.Font.Gotham
-            button.TextSize = 14
-            button.Text = option
-
-            button.MouseButton1Click:Connect(function()
-                if not DropdownSettings.MultipleOptions then
-                    selectedOptions = {option}
-                else
-                    if table.find(selectedOptions, option) then
-                        table.remove(selectedOptions, table.find(selectedOptions, option))
-                    else
-                        table.insert(selectedOptions, option)
+            local open = false
+            label.MouseButton1Click:Connect(function()
+                open = not open
+                for _, child in ipairs(holder:GetChildren()) do
+                    if child:IsA("TextButton") and child ~= label then
+                        child.Visible = open
                     end
                 end
-
-                if DropdownSettings.Callback then
-                    DropdownSettings.Callback(selectedOptions)
-                end
-                dropdownButton.Text = table.concat(selectedOptions, ", ")
-                listFrame.Visible = false
             end)
+
+            for _, option in ipairs(cfg.Options) do
+                local optBtn = Instance.new("TextButton")
+                optBtn.Parent = holder
+                optBtn.Size = UDim2.new(1, 0, 0, 30)
+                optBtn.Position = UDim2.new(0, 0, 1, (#holder:GetChildren()-2) * 30)
+                optBtn.Text = option
+                optBtn.Font = Enum.Font.Gotham
+                optBtn.TextSize = 14
+                optBtn.TextColor3 = Theme.Text
+                optBtn.Visible = false
+
+                optBtn.MouseButton1Click:Connect(function()
+                    current = option
+                    label.Text = cfg.Name .. ": " .. current
+                    open = false
+                    for _, child in ipairs(holder:GetChildren()) do
+                        if child:IsA("TextButton") and child ~= label then
+                            child.Visible = false
+                        end
+                    end
+                    if cfg.Callback then cfg.Callback(current) end
+                end)
+            end
         end
 
-        -- การเปิด/ปิด Dropdown
-        dropdownButton.MouseButton1Click:Connect(function()
-            listFrame.Visible = not listFrame.Visible
-        end)
-
-        return DropdownSettings
+        return TabAPI
     end
 
     -- ปุ่ม Open/Close GUI
@@ -285,7 +268,7 @@ function BannaHub:CreateWindow(config)
     local checkDragged = MakeDraggableWithCheck(ToggleBtn, ToggleBtn)
 
     ToggleBtn.MouseButton1Click:Connect(function()
-        if checkDragged() then return end -- ถ้าลาก ให้ข้ามการกด
+        if checkDragged() then return end
         ScreenGui.Enabled = not ScreenGui.Enabled
         ToggleBtn.Text = ScreenGui.Enabled and "Close Gui" or "Open Gui"
     end)
