@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 local BannaHub = {}
 BannaHub.__index = BannaHub
 
--- Themes
+-- 🎨 Themes
 local Themes = {
     Dark = {
         Background = Color3.fromRGB(20, 20, 25),
@@ -19,7 +19,7 @@ local Themes = {
 }
 local Theme = Themes.Dark
 
--- ทำให้ลากได้ + ตรวจว่าลากหรือคลิก
+-- 🖱 Make Draggable + Check if Click or Drag
 local function MakeDraggableWithCheck(frame, dragHandle)
     local dragging, dragStart, startPos
     local wasDragged = false
@@ -30,7 +30,6 @@ local function MakeDraggableWithCheck(frame, dragHandle)
             wasDragged = false
             dragStart = input.Position
             startPos = frame.Position
-
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -54,7 +53,7 @@ local function MakeDraggableWithCheck(frame, dragHandle)
     end
 end
 
--- Notification
+-- 🔔 Notification
 function BannaHub:Notify(text, time)
     local notif = Instance.new("TextLabel")
     notif.Text = text
@@ -78,7 +77,7 @@ function BannaHub:Notify(text, time)
     end)
 end
 
--- สร้าง Window
+-- 🪟 Create Window
 function BannaHub:CreateWindow(config)
     config = config or {}
     local title = config.Name or "BannaHub"
@@ -122,6 +121,7 @@ function BannaHub:CreateWindow(config)
     ContentFrame.BackgroundTransparency = 1
     ContentFrame.Size = UDim2.new(1, -120, 1, -30)
     ContentFrame.Position = UDim2.new(0, 120, 0, 30)
+    ContentFrame.ClipsDescendants = false
 
     local TabList = Instance.new("UIListLayout")
     TabList.Parent = Sidebar
@@ -162,8 +162,9 @@ function BannaHub:CreateWindow(config)
         table.insert(Tabs, {Button = TabButton, Content = TabContent})
 
         local TabAPI = {}
+        local _tabDropdowns = {}
 
-        -- 📌 ปุ่ม
+        -- Button
         function TabAPI:CreateButton(cfg)
             local btn = Instance.new("TextButton")
             btn.Parent = TabContent
@@ -178,7 +179,7 @@ function BannaHub:CreateWindow(config)
             end)
         end
 
-        -- 📌 Toggle
+        -- Toggle
         function TabAPI:CreateToggle(cfg)
             local state = cfg.CurrentValue or false
             local btn = Instance.new("TextButton")
@@ -196,61 +197,91 @@ function BannaHub:CreateWindow(config)
             end)
         end
 
-        -- 📌 Dropdown ใหม่
+        -- Dropdown (Fixed)
         function TabAPI:CreateDropdown(cfg)
-            local current = cfg.CurrentOption or cfg.Options[1]
+            local name = cfg.Name or "Dropdown"
+            local options = cfg.Options or {}
+            local current = cfg.CurrentOption or options[1] or ""
+            local callback = cfg.Callback
+
+            local BASE_H = 30
+            local ITEM_H = 30
+            local LIST_H = math.max(#options * ITEM_H, 0)
+
             local holder = Instance.new("Frame")
             holder.Parent = TabContent
-            holder.Size = UDim2.new(1, -10, 0, 30)
+            holder.Size = UDim2.new(1, -10, 0, BASE_H)
             holder.BackgroundColor3 = Theme.Sidebar
+            holder.BorderSizePixel = 0
+            holder.ClipsDescendants = true
 
             local label = Instance.new("TextButton")
             label.Parent = holder
-            label.Size = UDim2.new(1, 0, 1, 0)
-            label.Text = cfg.Name .. ": " .. current
+            label.Size = UDim2.new(1, 0, 0, BASE_H)
+            label.Text = string.format("%s: %s", name, tostring(current))
             label.Font = Enum.Font.Gotham
             label.TextSize = 14
             label.TextColor3 = Theme.Text
+            label.BackgroundTransparency = 0.1
 
-            local open = false
-            label.MouseButton1Click:Connect(function()
-                open = not open
-                for _, child in ipairs(holder:GetChildren()) do
-                    if child:IsA("TextButton") and child ~= label then
-                        child.Visible = open
-                    end
-                end
-            end)
+            local pane = Instance.new("Frame")
+            pane.Parent = holder
+            pane.Position = UDim2.new(0, 0, 0, BASE_H)
+            pane.Size = UDim2.new(1, 0, 0, LIST_H)
+            pane.BackgroundColor3 = Theme.Sidebar
+            pane.BorderSizePixel = 1
+            pane.Visible = false
 
-            for _, option in ipairs(cfg.Options) do
+            local uiList = Instance.new("UIListLayout")
+            uiList.Parent = pane
+            uiList.SortOrder = Enum.SortOrder.LayoutOrder
+            uiList.Padding = UDim.new(0, 2)
+
+            for _, option in ipairs(options) do
                 local optBtn = Instance.new("TextButton")
-                optBtn.Parent = holder
-                optBtn.Size = UDim2.new(1, 0, 0, 30)
-                optBtn.Position = UDim2.new(0, 0, 1, (#holder:GetChildren()-2) * 30)
+                optBtn.Parent = pane
+                optBtn.Size = UDim2.new(1, 0, 0, ITEM_H)
                 optBtn.Text = option
                 optBtn.Font = Enum.Font.Gotham
                 optBtn.TextSize = 14
                 optBtn.TextColor3 = Theme.Text
-                optBtn.Visible = false
-
+                optBtn.BackgroundColor3 = Theme.Sidebar
                 optBtn.MouseButton1Click:Connect(function()
                     current = option
-                    label.Text = cfg.Name .. ": " .. current
-                    open = false
-                    for _, child in ipairs(holder:GetChildren()) do
-                        if child:IsA("TextButton") and child ~= label then
-                            child.Visible = false
-                        end
-                    end
-                    if cfg.Callback then cfg.Callback(current) end
+                    label.Text = string.format("%s: %s", name, tostring(current))
+                    closeDropdown()
+                    if callback then callback(current) end
                 end)
             end
+
+            local isOpen = false
+            local function openDropdown()
+                for _, d in ipairs(_tabDropdowns) do
+                    if d._close then d._close() end
+                end
+                isOpen = true
+                pane.Visible = true
+                holder.Size = UDim2.new(1, -10, 0, BASE_H + LIST_H)
+            end
+
+            function closeDropdown()
+                isOpen = false
+                holder.Size = UDim2.new(1, -10, 0, BASE_H)
+                pane.Visible = false
+            end
+
+            label.MouseButton1Click:Connect(function()
+                if isOpen then closeDropdown() else openDropdown() end
+            end)
+
+            holder._close = closeDropdown
+            table.insert(_tabDropdowns, holder)
         end
 
         return TabAPI
     end
 
-    -- ปุ่ม Open/Close GUI
+    -- Toggle GUI Button
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     ToggleGui.ResetOnSpawn = false
@@ -266,7 +297,6 @@ function BannaHub:CreateWindow(config)
     ToggleBtn.TextSize = 14
 
     local checkDragged = MakeDraggableWithCheck(ToggleBtn, ToggleBtn)
-
     ToggleBtn.MouseButton1Click:Connect(function()
         if checkDragged() then return end
         ScreenGui.Enabled = not ScreenGui.Enabled
