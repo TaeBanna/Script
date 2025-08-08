@@ -1,6 +1,8 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
 local BannaHub = {}
@@ -23,58 +25,80 @@ local Themes = {
         Text = Color3.fromRGB(20, 20, 25),
         TextSecondary = Color3.fromRGB(80, 80, 90),
         Accent = Color3.fromRGB(0, 170, 140)
-    },
-    Ocean = {
-        Background = Color3.fromRGB(15, 25, 35),
-        Sidebar = Color3.fromRGB(20, 40, 60),
-        Primary = Color3.fromRGB(0, 180, 255),
-        Text = Color3.fromRGB(220, 240, 255),
-        TextSecondary = Color3.fromRGB(160, 190, 210),
-        Accent = Color3.fromRGB(0, 220, 180)
     }
 }
 
 local Theme = Themes.Dark
 
-local function MakeDraggable(frame, dragHandle)
-    local dragging, dragStart, startPos
-    dragHandle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
+-- MakeDraggable
+local function MakeDraggable(frame, options)
+	options = options or {}
+	local threshold = options.threshold or 5
+	local clampToScreen = (options.clampToScreen ~= false)
 
-    dragHandle.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
+	local dragging = false
+	local dragStartPos, dragStartInput
+	local connections = {}
+	local state = { wasDragged = false }
+
+	local function clampUDim2(pos)
+		if not clampToScreen then return pos end
+		local vp = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1920,1080)
+		local x = math.clamp(pos.X.Offset, 0, vp.X - frame.AbsoluteSize.X)
+		local y = math.clamp(pos.Y.Offset, 0, vp.Y - frame.AbsoluteSize.Y)
+		return UDim2.new(0, x, 0, y)
+	end
+
+	local function update(input)
+		if not dragging or not dragStartPos or not dragStartInput then return end
+		local delta = input.Position - dragStartInput.Position
+		if delta.Magnitude > threshold then state.wasDragged = true end
+		local newPos = UDim2.new(
+			dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X,
+			dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y
+		)
+		frame.Position = clampUDim2(newPos)
+	end
+
+	table.insert(connections, frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStartPos = frame.Position
+			dragStartInput = input
+			state.wasDragged = false
+
+			table.insert(connections, input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end))
+		end
+	end))
+
+	table.insert(connections, frame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch then
+			update(input)
+		end
+	end))
+
+	table.insert(connections, UserInputService.InputChanged:Connect(function(input)
+		if dragging and input == dragStartInput then
+			update(input)
+		end
+	end))
+
+	function state:Disconnect()
+		for _, c in ipairs(connections) do
+			if c.Connected then c:Disconnect() end
+		end
+	end
+
+	return state
 end
 
-local function ApplyGradient(button, color1, color2)
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new(color1, color2)
-    gradient.Rotation = 90
-    gradient.Parent = button
-end
-
-local function AddHoverEffect(button)
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.15), {BackgroundTransparency = 0.05}):Play()
-    end)
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
-    end)
-end
-
+-- Notification
 function BannaHub:Notify(text, time)
     local notif = Instance.new("TextLabel")
     notif.Text = text
@@ -98,12 +122,14 @@ function BannaHub:Notify(text, time)
     end)
 end
 
+-- Set Theme
 function BannaHub:SetTheme(themeName)
     if Themes[themeName] then
         Theme = Themes[themeName]
     end
 end
 
+-- Create Window
 function BannaHub:CreateWindow(config)
     config = config or {}
     local title = config.Name or "BannaHub"
@@ -133,8 +159,6 @@ function BannaHub:CreateWindow(config)
     Header.TextColor3 = Theme.Text
     Header.Font = Enum.Font.GothamBold
     Header.TextSize = 16
-
-    MakeDraggable(MainFrame, Header)
 
     local Sidebar = Instance.new("Frame")
     Sidebar.Parent = MainFrame
@@ -198,8 +222,6 @@ function BannaHub:CreateWindow(config)
             btn.TextSize = 14
             btn.TextColor3 = Theme.Text
             btn.BackgroundColor3 = Theme.Primary
-            ApplyGradient(btn, Theme.Primary, Theme.Accent)
-            AddHoverEffect(btn)
             btn.MouseButton1Click:Connect(function()
                 if cfg.Callback then cfg.Callback() end
             end)
@@ -215,8 +237,6 @@ function BannaHub:CreateWindow(config)
             btn.TextSize = 14
             btn.TextColor3 = Theme.Text
             btn.BackgroundColor3 = Theme.Accent
-            ApplyGradient(btn, Theme.Accent, Theme.Primary)
-            AddHoverEffect(btn)
             btn.MouseButton1Click:Connect(function()
                 state = not state
                 btn.Text = cfg.Name .. ": " .. tostring(state)
@@ -227,14 +247,15 @@ function BannaHub:CreateWindow(config)
         return TabAPI
     end
 
-    -- เพิ่มปุ่ม Toggle UI กลางบนจอ
+    -- Toggle UI Button (top center, draggable)
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
-    ToggleGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ToggleGui.Parent = LocalPlayer.PlayerGui
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
 
     local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Name = "Toggle"
     ToggleBtn.Parent = ToggleGui
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
     ToggleBtn.Position = UDim2.new(0.5, -40, 0, 10)
@@ -243,44 +264,21 @@ function BannaHub:CreateWindow(config)
     ToggleBtn.Text = "Close Gui"
     ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
     ToggleBtn.TextSize = 19
+    ToggleBtn.AutoButtonColor = false
 
-    local dragStartPos, dragStartInput, dragging, wasDragged
-    local function updatePos(input)
-        if not dragging then return end
-        local delta = input.Position - dragStartInput.Position
-        if delta.Magnitude > 5 then wasDragged = true end
-        ToggleBtn.Position = UDim2.new(
-            dragStartPos.X.Scale,
-            dragStartPos.X.Offset + delta.X,
-            dragStartPos.Y.Scale,
-            dragStartPos.Y.Offset + delta.Y
-        )
+    local UICorner2 = Instance.new("UICorner")
+    UICorner2.Parent = ToggleBtn
+
+    local dragState = MakeDraggable(ToggleBtn, { threshold = 5, clampToScreen = true })
+
+    function self:ToggleUI()
+        MainFrame.Visible = not MainFrame.Visible
     end
 
-    ToggleBtn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStartPos = ToggleBtn.Position
-            dragStartInput = input
-            wasDragged = false
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updatePos(input)
-        end
-    end)
-
     ToggleBtn.MouseButton1Click:Connect(function()
-        if wasDragged then return end
-        MainFrame.Visible = not MainFrame.Visible
-        ToggleBtn.Text = MainFrame.Visible and "Close Gui" or "Open Gui"
+        if dragState.wasDragged then return end
+        self:ToggleUI()
+        ToggleBtn.Text = (ToggleBtn.Text == "Close Gui") and "Open Gui" or "Close Gui"
     end)
 
     return self
