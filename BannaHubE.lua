@@ -78,25 +78,6 @@ local function AddHoverEffect(button)
     end)
 end
 
--- อนิเมชันแท็บ
-local function AnimateTab(tabFrame, open)
-    if open then
-        tabFrame.Visible = true
-        tabFrame.BackgroundTransparency = 1
-        tabFrame.Position = UDim2.new(0, 20, 0, 0)
-        TweenService:Create(tabFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 0,
-            Position = UDim2.new(0, 0, 0, 0)
-        }):Play()
-    else
-        TweenService:Create(tabFrame, TweenInfo.new(0.2), {
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 20, 0, 0)
-        }):Play()
-        task.delay(0.2, function() tabFrame.Visible = false end)
-    end
-end
-
 -- Notification
 function BannaHub:Notify(text, time)
     local notif = Instance.new("TextLabel")
@@ -205,10 +186,10 @@ function BannaHub:CreateWindow(config)
                 return -- ถ้าแท็บนี้เปิดอยู่แล้ว ไม่ต้องทำอะไร
             end
             for _, t in pairs(Tabs) do
-                AnimateTab(t.Content, false)
+                t.Content.Visible = false
                 t.Button.TextColor3 = Theme.TextSecondary
             end
-            AnimateTab(TabContent, true)
+            TabContent.Visible = true
             TabButton.TextColor3 = Theme.Primary
         end)
 
