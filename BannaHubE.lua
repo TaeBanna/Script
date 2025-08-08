@@ -36,6 +36,7 @@ local Themes = {
 
 local Theme = Themes.Dark
 
+-- ทำให้ลากได้
 local function MakeDraggable(frame, dragHandle)
     local dragging, dragStart, startPos
     dragHandle.InputBegan:Connect(function(input)
@@ -59,6 +60,7 @@ local function MakeDraggable(frame, dragHandle)
     end)
 end
 
+-- Gradient ให้ปุ่ม
 local function ApplyGradient(button, color1, color2)
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new(color1, color2)
@@ -66,6 +68,7 @@ local function ApplyGradient(button, color1, color2)
     gradient.Parent = button
 end
 
+-- Hover Effect
 local function AddHoverEffect(button)
     button.MouseEnter:Connect(function()
         TweenService:Create(button, TweenInfo.new(0.15), {BackgroundTransparency = 0.05}):Play()
@@ -75,6 +78,7 @@ local function AddHoverEffect(button)
     end)
 end
 
+-- อนิเมชันแท็บ
 local function AnimateTab(tabFrame, open)
     if open then
         tabFrame.Visible = true
@@ -93,6 +97,7 @@ local function AnimateTab(tabFrame, open)
     end
 end
 
+-- Notification
 function BannaHub:Notify(text, time)
     local notif = Instance.new("TextLabel")
     notif.Text = text
@@ -116,12 +121,14 @@ function BannaHub:Notify(text, time)
     end)
 end
 
+-- เปลี่ยนธีม
 function BannaHub:SetTheme(themeName)
     if Themes[themeName] then
         Theme = Themes[themeName]
     end
 end
 
+-- สร้าง Window
 function BannaHub:CreateWindow(config)
     config = config or {}
     local title = config.Name or "BannaHub"
@@ -194,6 +201,9 @@ function BannaHub:CreateWindow(config)
         ElementList.SortOrder = Enum.SortOrder.LayoutOrder
 
         TabButton.MouseButton1Click:Connect(function()
+            if TabContent.Visible then
+                return -- ถ้าแท็บนี้เปิดอยู่แล้ว ไม่ต้องทำอะไร
+            end
             for _, t in pairs(Tabs) do
                 AnimateTab(t.Content, false)
                 t.Button.TextColor3 = Theme.TextSecondary
