@@ -1,5 +1,4 @@
--- FloatingToggle.lua
--- ปุ่มลอย ลากได้ กดแล้วจำลองการกดปุ่มคีย์บอร์ด (เช่น LeftAlt)
+-- Toggle11.lua (แก้ให้ลากได้)
 return function(options)
     local Players = game:GetService("Players")
     local UserInputService = game:GetService("UserInputService")
@@ -9,19 +8,18 @@ return function(options)
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
-    local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt -- คีย์ที่จะจำลองการกด
+    local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt
     local position    = options.position or UDim2.new(0, 0, 0.45, 0)
     local size        = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
 
-    -- ScreenGui
+    -- สร้าง GUI
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = options.name or "FloatingToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
     ToggleGui.Parent = PlayerGui
 
-    -- Button
     local ToggleBtn = Instance.new("TextButton")
     ToggleBtn.Name = "ToggleButton"
     ToggleBtn.Parent = ToggleGui
@@ -38,7 +36,7 @@ return function(options)
     UICorner.CornerRadius = cornerRadius
     UICorner.Parent = ToggleBtn
 
-    -- Dragging
+    -- ระบบลากปุ่ม
     local dragging = false
     local dragStartPos, dragStartInput
     local wasDragged = false
@@ -56,8 +54,7 @@ return function(options)
     end
 
     ToggleBtn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStartPos = ToggleBtn.Position
             dragStartInput = input
@@ -72,8 +69,7 @@ return function(options)
     end)
 
     ToggleBtn.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             updatePosition(input)
         end
     end)
@@ -84,10 +80,9 @@ return function(options)
         end
     end)
 
-    -- Click => จำลองการกดคีย์บอร์ด
+    -- คลิก -> จำลองการกดคีย์บอร์ด
     ToggleBtn.MouseButton1Click:Connect(function()
         if wasDragged then return end
-        -- ส่งสัญญาณว่ามีการกดปุ่มคีย์บอร์ด
         VirtualInputManager:SendKeyEvent(true, keyToPress, false, game)
         task.wait()
         VirtualInputManager:SendKeyEvent(false, keyToPress, false, game)
