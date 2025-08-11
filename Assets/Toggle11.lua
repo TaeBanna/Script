@@ -1,39 +1,47 @@
-return function(toggleCallback)
+-- FloatingToggle.lua
+-- ปุ่มลอย ลากได้ กดแล้วจำลองการกดปุ่มคีย์บอร์ด (เช่น LeftAlt)
+return function(options)
     local Players = game:GetService("Players")
     local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
 
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-    -- ลบของเดิมถ้ามี
-    local old = PlayerGui:FindFirstChild("ToggleGui")
-    if old then old:Destroy() end
+    options = options or {}
+    local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt -- คีย์ที่จะจำลองการกด
+    local position    = options.position or UDim2.new(0, 0, 0.45, 0)
+    local size        = options.size or UDim2.new(0, 80, 0, 38)
+    local cornerRadius = options.cornerRadius or UDim.new(0, 8)
 
-    -- สร้าง ScreenGui
+    -- ScreenGui
     local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = "ToggleGui"
-    ToggleGui.Parent = PlayerGui
+    ToggleGui.Name = options.name or "FloatingToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
+    ToggleGui.Parent = PlayerGui
 
-    -- ปุ่ม Toggle
+    -- Button
     local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Name = "Toggle"
+    ToggleBtn.Name = "ToggleButton"
     ToggleBtn.Parent = ToggleGui
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
-    ToggleBtn.Position = UDim2.new(0, 0, 0.45, 0)
-    ToggleBtn.Size = UDim2.new(0, 80, 0, 38)
+    ToggleBtn.Position = position
+    ToggleBtn.Size = size
     ToggleBtn.Font = Enum.Font.SourceSans
-    ToggleBtn.Text = "Close Gui"
     ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
     ToggleBtn.TextSize = 19
     ToggleBtn.AutoButtonColor = false
+    ToggleBtn.Text = "Toggle"
 
     local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = cornerRadius
     UICorner.Parent = ToggleBtn
 
-    -- ระบบลาก
-    local dragging, dragStartPos, dragStartInput, wasDragged = false, nil, nil, false
+    -- Dragging
+    local dragging = false
+    local dragStartPos, dragStartInput
+    local wasDragged = false
 
     local function updatePosition(input)
         if not dragging or not dragStartPos or not dragStartInput then return end
@@ -48,7 +56,8 @@ return function(toggleCallback)
     end
 
     ToggleBtn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStartPos = ToggleBtn.Position
             dragStartInput = input
@@ -63,7 +72,8 @@ return function(toggleCallback)
     end)
 
     ToggleBtn.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
             updatePosition(input)
         end
     end)
@@ -74,18 +84,20 @@ return function(toggleCallback)
         end
     end)
 
-    -- คลิกเปิด/ปิด
-    local isOpen = true
-    local function setButtonText()
-        ToggleBtn.Text = isOpen and "Close Gui" or "Open Gui"
-    end
-
+    -- Click => จำลองการกดคีย์บอร์ด
     ToggleBtn.MouseButton1Click:Connect(function()
         if wasDragged then return end
-        isOpen = not isOpen
-        setButtonText()
-        if toggleCallback then
-            toggleCallback(isOpen)
-        end
+        -- ส่งสัญญาณว่ามีการกดปุ่มคีย์บอร์ด
+        VirtualInputManager:SendKeyEvent(true, keyToPress, false, game)
+        task.wait()
+        VirtualInputManager:SendKeyEvent(false, keyToPress, false, game)
     end)
+
+    return {
+        Gui = ToggleGui,
+        Button = ToggleBtn,
+        Destroy = function()
+            ToggleGui:Destroy()
+        end
+    }
 end
