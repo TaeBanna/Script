@@ -13,6 +13,9 @@ local Window = Library:CreateWindow({
 	MinimizeKeybind = Enum.KeyCode.LeftAlt,
 })
 
+local ToggleFunc = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle.lua"))()
+ToggleFunc(Window)
+
 local Themes = {
 	Light = {
 		--// Frames:
