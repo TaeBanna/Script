@@ -1,25 +1,10 @@
-return function(Library)
+return function(Window)
     local Players = game:GetService("Players")
     local UserInputService = game:GetService("UserInputService")
-    local CoreGui = game:GetService("CoreGui")
-    local RunService = game:GetService("RunService")
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-    -- หา UI หลักจาก CoreGui (Library ของคุณใช้ชื่อ "Main")
-    local function findMainUI()
-        for _, gui in pairs(CoreGui:GetChildren()) do
-            local main = gui:FindFirstChild("Main")
-            if main and main:IsA("CanvasGroup") then
-                return main
-            end
-        end
-        return nil
-    end
-
-    local MainUI = findMainUI()
-
-    -- สร้าง ScreenGui สำหรับปุ่ม
+    -- GUI สำหรับปุ่ม Toggle
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
     ToggleGui.Parent = PlayerGui
@@ -38,15 +23,14 @@ return function(Library)
     ToggleBtn.TextSize = 19
     ToggleBtn.AutoButtonColor = false
 
-    local UICorner = Instance.new("UICorner")
-    UICorner.Parent = ToggleBtn
+    Instance.new("UICorner").Parent = ToggleBtn
 
-    -- ระบบลากปุ่ม
+    -- ตัวแปรลาก
     local dragging = false
-    local dragStartPos, dragStartInput, wasDragged = nil, nil, false
+    local dragStartPos, dragStartInput
+    local wasDragged = false
 
     local function updatePosition(input)
-        if not dragging then return end
         local delta = input.Position - dragStartInput.Position
         if delta.Magnitude > 5 then wasDragged = true end
         ToggleBtn.Position = UDim2.new(
@@ -63,36 +47,35 @@ return function(Library)
             dragStartPos = ToggleBtn.Position
             dragStartInput = input
             wasDragged = false
-        end
-    end)
 
-    ToggleBtn.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragStartInput and dragging then
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             updatePosition(input)
         end
     end)
 
-    -- ปุ่มกดเปิด/ปิด UI
+    -- คลิกปุ่ม Toggle
     ToggleBtn.MouseButton1Click:Connect(function()
-        if wasDragged then return end
-        MainUI = MainUI or findMainUI()
-        if MainUI then
-            local isVisible = MainUI.Visible
-            MainUI.Visible = not isVisible
-            ToggleBtn.Text = isVisible and "Open Gui" or "Close Gui"
+        if wasDragged then
+            wasDragged = false
+            return
         end
-    end)
 
-    -- ถ้า UI หลักหายไป ปุ่มก็หายตาม
-    RunService.RenderStepped:Connect(function()
-        if not findMainUI() then
-            ToggleGui:Destroy()
+        if Window and typeof(Window.ToggleUI) == "function" then
+            Window:ToggleUI()
+            ToggleBtn.Text = Window.Visible and "Close Gui" or "Open Gui"
+        else
+            -- fallback ถ้าไม่มีฟังก์ชัน ToggleUI
+            Window.Visible = not Window.Visible
+            ToggleBtn.Text = Window.Visible and "Close Gui" or "Open Gui"
         end
     end)
 end
