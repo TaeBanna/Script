@@ -4,6 +4,9 @@ return function(Window)
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+    -- อ่านค่าปุ่ม MinimizeKeybind จาก Window (ถ้าไม่เจอให้ใช้ LeftAlt)
+    local minimizeKey = Window.MinimizeKeybind or Enum.KeyCode.LeftAlt
+
     -- GUI สำหรับปุ่ม Toggle
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
@@ -18,11 +21,10 @@ return function(Window)
     ToggleBtn.Position = UDim2.new(0, 0, 0.45, 0)
     ToggleBtn.Size = UDim2.new(0, 80, 0, 38)
     ToggleBtn.Font = Enum.Font.SourceSans
-    ToggleBtn.Text = "Close Gui"
+    ToggleBtn.Text = "Minimize"
     ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
     ToggleBtn.TextSize = 19
     ToggleBtn.AutoButtonColor = false
-
     Instance.new("UICorner").Parent = ToggleBtn
 
     -- ตัวแปรลาก
@@ -62,20 +64,28 @@ return function(Window)
         end
     end)
 
-    -- คลิกปุ่ม Toggle
+    -- ฟังก์ชันสำหรับสลับ UI
+    local function toggleUI()
+        if Window and typeof(Window.ToggleUI) == "function" then
+            Window:ToggleUI()
+        else
+            Window.Visible = not Window.Visible
+        end
+    end
+
+    -- คลิกปุ่ม = ทำเหมือนกดปุ่ม MinimizeKeybind
     ToggleBtn.MouseButton1Click:Connect(function()
         if wasDragged then
             wasDragged = false
             return
         end
+        toggleUI()
+    end)
 
-        if Window and typeof(Window.ToggleUI) == "function" then
-            Window:ToggleUI()
-            ToggleBtn.Text = Window.Visible and "Close Gui" or "Open Gui"
-        else
-            -- fallback ถ้าไม่มีฟังก์ชัน ToggleUI
-            Window.Visible = not Window.Visible
-            ToggleBtn.Text = Window.Visible and "Close Gui" or "Open Gui"
+    -- กดปุ่มคีย์บอร์ดตาม MinimizeKeybind
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == minimizeKey then
+            toggleUI()
         end
     end)
 end
