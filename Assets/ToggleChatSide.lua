@@ -1,71 +1,112 @@
--- ToggleChatSide.lua
--- ปุ่มข้างช่องแชท Roblox กดแล้วจำลองการกดปุ่มคีย์บอร์ด (เช่น LeftAlt)
-
 return function(options)
-    local CoreGui = game:GetService("CoreGui")
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
     local VirtualInputManager = game:GetService("VirtualInputManager")
-    local RunService = game:GetService("RunService")
+
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
     local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt
-    local offsetX     = options.offsetX or 100 -- ระยะห่างจากขอบซ้ายของช่องแชท
-    local offsetY     = options.offsetY or -40 -- ระยะเลื่อนขึ้น/ลงจากขอบบนของช่องแชท
+    local position    = options.position or UDim2.new(0, 0, 0.45, 0)
     local size        = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
 
     -- ScreenGui
     local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = options.name or "ChatSideToggle"
+    ToggleGui.Name = options.name or "FloatingToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ToggleGui.IgnoreGuiInset = true
-    ToggleGui.Parent = CoreGui
+    ToggleGui.ResetOnSpawn = false
+    ToggleGui.Parent = PlayerGui
 
     -- ปุ่ม
-    local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Name = "ToggleButton"
-    ToggleBtn.Parent = ToggleGui
-    ToggleBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
-    ToggleBtn.Size = size
-    ToggleBtn.Font = Enum.Font.SourceSans
-    ToggleBtn.TextColor3 = Color3.fromRGB(203, 122, 49)
-    ToggleBtn.TextSize = 19
-    ToggleBtn.AutoButtonColor = false
-    ToggleBtn.Text = "Toggle"
+    local Toggle = Instance.new("TextButton")
+    Toggle.Name = "Toggle"
+    Toggle.Parent = ToggleGui
+    Toggle.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+    Toggle.Position = position
+    Toggle.Size = size
+    Toggle.Font = Enum.Font.SourceSans
+    Toggle.Text = options.startText or "Toggle"
+    Toggle.TextColor3 = Color3.fromRGB(203, 122, 49)
+    Toggle.TextSize = 19
+    Toggle.AutoButtonColor = false
 
     local UICorner = Instance.new("UICorner")
     UICorner.CornerRadius = cornerRadius
-    UICorner.Parent = ToggleBtn
+    UICorner.Parent = Toggle
 
-    -- ฟังก์ชันจัดตำแหน่งข้างช่องแชท
-    local function updatePosition()
-        local chat = CoreGui:FindFirstChild("Chat")
-        if chat and chat:FindFirstChild("Frame") then
-            local chatFrame = chat.Frame
-            ToggleBtn.Position = UDim2.new(
-                0, chatFrame.AbsolutePosition.X + offsetX,
-                0, chatFrame.AbsolutePosition.Y + offsetY
+    -- ระบบลาก
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    local wasDragged = false
+
+    local function updateInput(input)
+        if dragging then
+            local delta = input.Position - dragStart
+            if delta.Magnitude > 5 then
+                wasDragged = true
+            end
+            Toggle.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
             )
-        else
-            -- ถ้าหาไม่เจอ วางตำแหน่ง fallback
-            ToggleBtn.Position = UDim2.new(0, 200, 0, 400)
         end
     end
 
-    -- อัปเดตตำแหน่งเรื่อย ๆ เผื่อผู้เล่นย้าย UI หรือขนาดจอเปลี่ยน
-    RunService.RenderStepped:Connect(updatePosition)
-
-    -- คลิก -> จำลองการกดคีย์บอร์ด
-    ToggleBtn.MouseButton1Click:Connect(function()
-        VirtualInputManager:SendKeyEvent(true, keyToPress, false, game)
-        task.wait()
-        VirtualInputManager:SendKeyEvent(false, keyToPress, false, game)
+    Toggle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Toggle.Position
+            wasDragged = false
+        end
     end)
 
-    -- คืนค่าฟังก์ชันควบคุม
+    Toggle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            updateInput(input)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
+        or input.UserInputType == Enum.UserInputType.Touch) then
+            updateInput(input)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            if dragging then
+                dragging = false
+                task.wait(0.1)
+                wasDragged = false
+            end
+        end
+    end)
+
+    -- คลิกเพื่อจำลองการกดคีย์
+    Toggle.MouseButton1Click:Connect(function()
+        if wasDragged then return end
+        if options.useLibrary and options.Library then
+            options.Library:ToggleUI()
+        else
+            VirtualInputManager:SendKeyEvent(true, keyToPress, false, game)
+            task.wait()
+            VirtualInputManager:SendKeyEvent(false, keyToPress, false, game)
+        end
+    end)
+
     return {
         Gui = ToggleGui,
-        Button = ToggleBtn,
-        UpdatePos = updatePosition,
+        Button = Toggle,
         Destroy = function()
             ToggleGui:Destroy()
         end
