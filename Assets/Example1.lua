@@ -12,14 +12,6 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
-loadstring(game:HttpGet("https://your_toggle_script_url.lua"))()(function(open)
-    if open then
-        Window:ShowUI()
-    else
-        Window:HideUI()
-    end
-end)
-
 local Themes = {
 	Light = {
 		--// Frames:
