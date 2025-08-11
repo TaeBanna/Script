@@ -994,7 +994,7 @@ function Library:CreateWindow(Settings: { Title: string, Size: UDim2, Transparen
 		end
 	end
 
-	SetProperty(Window, { Size = Settings.Size, Visible = true, Parent = Screen });
+	SetProperty(Window, { Size = UDim2.fromScale(0.8, 0.6), Visible = true, Parent = Screen });
 	Animations:Open(Window, Settings.Transparency or 0)
 
 	return Options
