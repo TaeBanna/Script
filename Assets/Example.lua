@@ -11,11 +11,6 @@ local Window = Library:CreateWindow({
     Blurring = true,
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
-
--- โหลดปุ่ม Toggle
-loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle1.lua"))()(Window)
-
-
 local Themes = {
 	Light = {
 		--// Frames:
