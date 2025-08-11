@@ -4,7 +4,7 @@ local UserInputService = game:GetService("UserInputService");
 --// Library
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Main.lua"))()
 local Window = Library:CreateWindow({
-    Title = "BannaHub",
+    Title = "BannaHub1",
     Theme = "Dark",
     Size = UDim2.fromOffset(570, 370),
     Transparency = 0.2,
