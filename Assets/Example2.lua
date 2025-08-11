@@ -12,11 +12,12 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
-local createFloatingToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle11.lua"))()
-createFloatingToggle({
-    keyToPress = Enum.KeyCode.LeftAlt -- ให้ปุ่มจำลองการกด LeftAlt
+local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide.lua"))()
+createChatSideToggle({
+    keyToPress = Enum.KeyCode.LeftAlt,
+    offsetX = 100, -- ระยะห่างจากช่องแชท
+    offsetY = -40  -- ขึ้น/ลงจากช่องแชท
 })
-
 
 local Themes = {
 	Light = {
