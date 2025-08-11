@@ -2,19 +2,19 @@
 local UserInputService = game:GetService("UserInputService");
 
 --// Library
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Main.lua"))()
-local Window = Library:CreateWindow({
-	Title = "???",
-	Theme = "Dark",
-	
-	Size = UDim2.fromOffset(570, 370),
-	Transparency = 0.2,
-	Blurring = true,
-	MinimizeKeybind = Enum.KeyCode.LeftAlt,
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/UILibrary.lua"))()
+Library:CreateWindow({
+    Title = "BannaHub",
+    Theme = "Dark",
+    Size = UDim2.fromScale(0.8, 0.6),
+    Transparency = 0.2,
+    Blurring = true,
+    MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
-local ToggleFunc = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle.lua"))()
-ToggleFunc(Window)
+-- โหลดปุ่ม Toggle ใหม่
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle.lua"))()(Library)
+
 
 local Themes = {
 	Light = {
