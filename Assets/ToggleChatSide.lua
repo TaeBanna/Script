@@ -1,6 +1,10 @@
+-- ToggleChatSide.lua
+-- ปุ่มข้างช่องแชท Roblox กดแล้วจำลองการกดปุ่มคีย์บอร์ด (เช่น LeftAlt)
+
 return function(options)
     local CoreGui = game:GetService("CoreGui")
     local VirtualInputManager = game:GetService("VirtualInputManager")
+    local RunService = game:GetService("RunService")
 
     options = options or {}
     local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt
@@ -11,7 +15,7 @@ return function(options)
 
     -- ScreenGui
     local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = options.name or "FloatingToggle"
+    ToggleGui.Name = options.name or "ChatSideToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.IgnoreGuiInset = true
     ToggleGui.Parent = CoreGui
@@ -32,26 +36,32 @@ return function(options)
     UICorner.CornerRadius = cornerRadius
     UICorner.Parent = ToggleBtn
 
-    -- จัดตำแหน่งข้างช่องแชท Roblox
+    -- ฟังก์ชันจัดตำแหน่งข้างช่องแชท
     local function updatePosition()
         local chat = CoreGui:FindFirstChild("Chat")
         if chat and chat:FindFirstChild("Frame") then
             local chatFrame = chat.Frame
-            ToggleBtn.Position = UDim2.new(0, chatFrame.AbsolutePosition.X + offsetX, 0, chatFrame.AbsolutePosition.Y + offsetY)
+            ToggleBtn.Position = UDim2.new(
+                0, chatFrame.AbsolutePosition.X + offsetX,
+                0, chatFrame.AbsolutePosition.Y + offsetY
+            )
         else
-            ToggleBtn.Position = UDim2.new(0, 200, 0, 400) -- fallback
+            -- ถ้าหาไม่เจอ วางตำแหน่ง fallback
+            ToggleBtn.Position = UDim2.new(0, 200, 0, 400)
         end
     end
 
-    updatePosition()
+    -- อัปเดตตำแหน่งเรื่อย ๆ เผื่อผู้เล่นย้าย UI หรือขนาดจอเปลี่ยน
+    RunService.RenderStepped:Connect(updatePosition)
 
-    -- กดปุ่ม -> จำลองคีย์บอร์ด
+    -- คลิก -> จำลองการกดคีย์บอร์ด
     ToggleBtn.MouseButton1Click:Connect(function()
         VirtualInputManager:SendKeyEvent(true, keyToPress, false, game)
         task.wait()
         VirtualInputManager:SendKeyEvent(false, keyToPress, false, game)
     end)
 
+    -- คืนค่าฟังก์ชันควบคุม
     return {
         Gui = ToggleGui,
         Button = ToggleBtn,
