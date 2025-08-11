@@ -1,23 +1,22 @@
-return function(Library)
+return function(toggleCallback)
     local Players = game:GetService("Players")
     local UserInputService = game:GetService("UserInputService")
-    local CoreGui = game:GetService("CoreGui")
-    local RunService = game:GetService("RunService")
 
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-    -- กันซ้ำ: ถ้ามีอยู่แล้วให้ลบทิ้งก่อน
+    -- ลบของเดิมถ้ามี
     local old = PlayerGui:FindFirstChild("ToggleGui")
     if old then old:Destroy() end
 
-    -- สร้าง ScreenGui สำหรับปุ่ม
+    -- สร้าง ScreenGui
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "ToggleGui"
     ToggleGui.Parent = PlayerGui
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
 
+    -- ปุ่ม Toggle
     local ToggleBtn = Instance.new("TextButton")
     ToggleBtn.Name = "Toggle"
     ToggleBtn.Parent = ToggleGui
@@ -75,88 +74,18 @@ return function(Library)
         end
     end)
 
-    -- หา GUI หลัก (fallback ใช้ตรวจจับและซ่อน/แสดงเองได้)
-    local function findMainWindow()
-        for _, gui in pairs(CoreGui:GetChildren()) do
-            -- library ของคุณสุ่มชื่อเป็นตัวเลขไว้ (tonumber(gui.Name))
-            if gui:IsA("ScreenGui") and tonumber(gui.Name) then
-                local main = gui:FindFirstChild("Main") -- CanvasGroup
-                local header = main and main:FindFirstChild("MainHeader")
-                local title = header and header:FindFirstChild("title")
-                if title and title.Text == "BannaHub" then
-                    return gui, main
-                end
-            end
-        end
-        return nil, nil
-    end
-
-    local isOpen = true -- สถานะปัจจุบัน (สำหรับสลับข้อความปุ่ม)
-
+    -- คลิกเปิด/ปิด
+    local isOpen = true
     local function setButtonText()
         ToggleBtn.Text = isOpen and "Close Gui" or "Open Gui"
     end
 
-    local function toggleUI()
-        -- ถ้า Library มีเมธอด Toggle/Show/Hide ใช้อันนี้ก่อน
-        if typeof(Library) == "table" and Library.ToggleUI then
-            Library:ToggleUI()
-            isOpen = not isOpen
-            setButtonText()
-            return
-        end
-
-        -- Fallback: ถ้า Library ยังไม่มี ToggleUI ให้ซ่อน/แสดงด้วยตัวเอง
-        local gui, main = findMainWindow()
-        if main and main:IsA("CanvasGroup") then
-            if main.Visible then
-                -- ปิด
-                main.Visible = false
-                isOpen = false
-            else
-                -- เปิด
-                main.Visible = true
-                main.GroupTransparency = 0
-                isOpen = true
-            end
-            setButtonText()
-        end
-    end
-
     ToggleBtn.MouseButton1Click:Connect(function()
         if wasDragged then return end
-        toggleUI()
-    end)
-
-    -- เพิ่มคีย์ลัด (เช่น LeftAlt) สำหรับเปิด/ปิด
-    local Keybind = Enum.KeyCode.LeftAlt
-    UserInputService.InputBegan:Connect(function(input, gp)
-        if not gp and input.KeyCode == Keybind then
-            toggleUI()
-        end
-    end)
-
-    -- ลบปุ่มถ้า UI หลักหายไป
-    local renderConn
-    renderConn = RunService.RenderStepped:Connect(function()
-        if not ToggleGui or not ToggleGui.Parent then
-            if renderConn then renderConn:Disconnect() end
-            return
-        end
-        local gui = findMainWindow()
-        if not gui then
-            ToggleGui:Destroy()
-            if renderConn then renderConn:Disconnect() end
-        end
-    end)
-
-    CoreGui.ChildRemoved:Connect(function(child)
-        local main = child:FindFirstChild("Main")
-        local header = main and main:FindFirstChild("MainHeader")
-        local title = header and header:FindFirstChild("title")
-        if title and title.Text == "BannaHub" and ToggleGui and ToggleGui.Parent then
-            ToggleGui:Destroy()
-            if renderConn then renderConn:Disconnect() end
+        isOpen = not isOpen
+        setButtonText()
+        if toggleCallback then
+            toggleCallback(isOpen)
         end
     end)
 end
