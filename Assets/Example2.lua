@@ -12,7 +12,7 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
-local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide.lua"))()
+local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle11.lua"))()
 createChatSideToggle({
     keyToPress = Enum.KeyCode.LeftAlt,
     offsetX = 100, -- ระยะห่างจากช่องแชท
