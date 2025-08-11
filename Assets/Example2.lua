@@ -6,7 +6,7 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBa
 local Window = Library:CreateWindow({
     Title = "BannaHub1",
     Theme = "Dark",
-    Size = UDim2.fromOffset(400, 260),
+    Size = UDim2.fromOffset(470, 260),
     Transparency = 0.2,
     Blurring = true,
     MinimizeKeybind = Enum.KeyCode.LeftAlt
@@ -16,7 +16,7 @@ local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercont
 createChatSideToggle({
     keyToPress = Enum.KeyCode.LeftAlt,
     offsetX = 100, -- ระยะห่างจากช่องแชท
-    offsetY = -40  -- ขึ้น/ลงจากช่องแชท
+    offsetY = 40  -- ขึ้น/ลงจากช่องแชท
 })
 
 local Themes = {
