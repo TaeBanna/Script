@@ -11,7 +11,14 @@ local Window = Library:CreateWindow({
     Blurring = true,
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
-loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle1.lua"))()(Window)
+
+loadstring(game:HttpGet("https://your_toggle_script_url.lua"))()(function(open)
+    if open then
+        Window:ShowUI()
+    else
+        Window:HideUI()
+    end
+end)
 
 local Themes = {
 	Light = {
