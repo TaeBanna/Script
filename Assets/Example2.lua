@@ -15,6 +15,7 @@ local Window = Library:CreateWindow({
 local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide.lua"))()
 createChatSideToggle({
     keyToPress = Enum.KeyCode.LeftAlt,
+	position = UDim2.new(0, 55, 0.449999988, -132)
 })
 
 local Themes = {
