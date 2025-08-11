@@ -110,7 +110,7 @@ Window:AddParagraph({
 Window:AddSection({ Name = "Interactable", Tab = Main }) 
 
 Window:AddButton({
-	Title = "Button",
+	Title = "GayBUTTON",
 	Description = "I wonder what this does",
 	Tab = Main,
 	Callback = function() 
