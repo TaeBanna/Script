@@ -12,6 +12,12 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
+local createFloatingToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Toggle11.lua"))()
+createFloatingToggle({
+    keyToPress = Enum.KeyCode.LeftAlt -- ให้ปุ่มจำลองการกด LeftAlt
+})
+
+
 local Themes = {
 	Light = {
 		--// Frames:
