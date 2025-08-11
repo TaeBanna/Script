@@ -8,7 +8,7 @@ return function(options)
 
     options = options or {}
     local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt
-    local position    = options.position or UDim2.new(0, 0, 0.45, 0)
+    local position    = options.position or UDim2.new(0, 143, 0.449999988, -125) -- ตำแหน่งเริ่มต้น
     local size        = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
 
