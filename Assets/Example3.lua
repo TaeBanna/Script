@@ -157,25 +157,6 @@ local Settings = Window:AddTab({
     Icon = "rbxassetid://11293977610",
 })
 
--- เพิ่มในหน้า Settings ให้ผู้ใช้เปิด/ปิดการลาก
-Window:AddDropdown({
-    Title = "Floating Button Drag",
-    Description = "ตั้งค่าการย้ายปุ่มลอย",
-    Tab = Settings,
-    Options = {
-        ["Locked (ห้ามย้าย)"] = false,
-        ["Draggable (ย้ายได้)"] = true,
-    },
-    Callback = function(isDraggable)
-        toggleApi.SetDraggable(isDraggable)
-        Window:Notify({
-            Title = "Floating Button",
-            Description = isDraggable and "เปิดให้ย้ายได้แล้ว" or "ล็อกไม่ให้ย้าย",
-            Duration = 3
-        })
-    end,
-})
-
 Window:AddKeybind({
     Title = "Minimize Keybind",
     Description = "Set the keybind for Minimizing",
