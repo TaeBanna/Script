@@ -30,9 +30,12 @@ local createChatSideToggle = loadstring(game:HttpGet(
 ))()
 
 createChatSideToggle({
-    CloseFunction = Close, -- ส่งฟังก์ชันเข้าไปตรงๆ
+    CloseFunction = function()
+        Window:ToggleUI()
+    end,
     position = UDim2.new(0, 55, 0.449999988, -132)
 })
+
 
 
 
