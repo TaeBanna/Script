@@ -12,11 +12,12 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
-local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide.lua"))()
+local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"))()
 createChatSideToggle({
-    keyToPress = Enum.KeyCode.LeftAlt,
+    CloseFunction = Close, -- ส่งฟังก์ชัน Close() ของคุณเข้ามา
     position = UDim2.new(0, 55, 0.449999988, -132)
 })
+
 
 local Themes = {
     Light = {
