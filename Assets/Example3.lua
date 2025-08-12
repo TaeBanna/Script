@@ -151,6 +151,7 @@ local TweenTab = Window:AddTab({
     Section = "Teleport",
     Icon = "rbxassetid://11963373994"
 })
+
 local SelectedTarget = nil
 
 Window:AddDropdown({
@@ -158,17 +159,14 @@ Window:AddDropdown({
     Description = "เลือกเป้าหมายที่จะ Tween ไปหา",
     Tab = TweenTab,
     Options = {
-        ["Sam (Seed NPC)"] = workspace:FindFirstChild("NPCS") 
+        ["Sam (NPC)"] = workspace:FindFirstChild("NPCS") 
             and workspace.NPCS:FindFirstChild("Sam") 
-            and workspace.NPCS.Sam:FindFirstChild("seednpc") 
             or nil,
-        ["Steven (Sell NPC)"] = workspace:FindFirstChild("NPCS") 
+        ["Steven (NPC)"] = workspace:FindFirstChild("NPCS") 
             and workspace.NPCS:FindFirstChild("Steven") 
-            and workspace.NPCS.Steven:FindFirstChild("sellnpc") 
             or nil,
         ["Ingredients Board"] = workspace:FindFirstChild("CookingEventModel") 
             and workspace.CookingEventModel:FindFirstChild("IngredientsBoard") 
-            and workspace.CookingEventModel.IngredientsBoard:FindFirstChild("event") 
             or nil
     },
     Callback = function(Target)
@@ -210,7 +208,6 @@ Window:AddButton({
         end
     end,
 })
-
 -- Tab Settings
 local Keybind = nil
 local Settings = Window:AddTab({
