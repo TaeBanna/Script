@@ -377,6 +377,24 @@ function Library:CreateWindow(Settings: { Title: string, Size: UDim2, Transparen
 		end
 	end)
 
+    --=== Public UI controls (export toggle) ===
+    function Options:ToggleUI()
+        Close()
+    end
+
+    function Options:OpenUI()
+        if not Opened then Close() end
+    end
+
+    function Options:CloseUI()
+        if Opened then Close() end
+    end
+
+    function Options:IsOpen()
+        return Opened
+    end
+
+	
 	--// Tab Functions
 
 	function Options:SetTab(Name: string)
