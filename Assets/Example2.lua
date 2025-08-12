@@ -155,7 +155,6 @@ Window:AddInput({
 	end,
 }) 
 
-
 Window:AddDropdown({
 	Title = "Dropdown",
 	Description = "Selecting",
@@ -170,14 +169,58 @@ Window:AddDropdown({
 	end,
 }) 
 
-Window:AddKeybind({
-	Title = "Keybind",
-	Description = "Binding",
-	Tab = Main,
-	Callback = function(Key) 
-		warn("Key Set")
-	end,
-}) 
+--// Tab [TWEEN]
+-- โหลดฟังก์ชัน TweenTP จาก GitHub
+local TweenTP = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/Tween.lua"))()
+
+-- เก็บเป้าหมายที่เลือกจาก Dropdown
+local SelectedTarget = nil
+
+-- Dropdown เลือกเป้าหมาย
+Window:AddDropdown({
+    Title = "Teleport Target",
+    Description = "เลือกเป้าหมายที่จะ Tween ไปหา",
+    Tab = Main,
+    Options = {
+        ["Sam (Seed NPC)"] = workspace.NPCS.Sam.seednpc,
+        ["Steven (Sell NPC)"] = workspace.NPCS.Steven.sellnpc,
+        ["Ingredients Board"] = workspace.CookingEventModel.IngredientsBoard.event
+    },
+    Callback = function(Target)
+        SelectedTarget = Target
+        Window:Notify({
+            Title = "Target Selected",
+            Description = "เลือกเป้าหมายเรียบร้อย",
+            Duration = 3
+        })
+    end,
+})
+
+-- ปุ่มเริ่ม Tween
+Window:AddButton({
+    Title = "Go Tween",
+    Description = "เริ่ม Tween ไปยังเป้าหมายที่เลือก",
+    Tab = Main,
+    Callback = function()
+        if SelectedTarget then
+            TweenTP(SelectedTarget)
+            Window:Notify({
+                Title = "Tween Started",
+                Description = "กำลังวิ่งไปหาเป้าหมายที่เลือก",
+                Duration = 4
+            })
+        else
+            Window:Notify({
+                Title = "Error",
+                Description = "กรุณาเลือกเป้าหมายก่อน",
+                Duration = 4
+            })
+        end
+    end,
+})
+
+
+
 
 --// Tab [SETTINGS]
 local Keybind = nil
@@ -186,15 +229,6 @@ local Settings = Window:AddTab({
 	Section = "Settings",
 	Icon = "rbxassetid://11293977610",
 })
-
-Window:AddKeybind({
-	Title = "Minimize Keybind",
-	Description = "Set the keybind for Minimizing",
-	Tab = Settings,
-	Callback = function(Key) 
-		Window:SetSetting("Keybind", Key)
-	end,
-}) 
 
 Window:AddDropdown({
 	Title = "Set Theme",
@@ -210,37 +244,9 @@ Window:AddDropdown({
 	end,
 }) 
 
-Window:AddToggle({
-	Title = "UI Blur",
-	Description = "If enabled, must have your Roblox graphics set to 8+ for it to work",
-	Default = true,
-	Tab = Settings,
-	Callback = function(Boolean) 
-		Window:SetSetting("Blur", Boolean)
-	end,
-}) 
-
-
-Window:AddSlider({
-	Title = "UI Transparency",
-	Description = "Set the transparency of the UI",
-	Tab = Settings,
-	AllowDecimals = true,
-	MaxValue = 1,
-	Callback = function(Amount) 
-		Window:SetSetting("Transparency", Amount)
-	end,
-}) 
 
 Window:Notify({
 	Title = "Hello World!",
 	Description = "Press Left Alt to Minimize and Open the tab!", 
 	Duration = 10
 })
-
---// Keybind Example
-UserInputService.InputBegan:Connect(function(Key) 
-	if Key == Keybind then
-		warn("You have pressed the minimize keybind!");
-	end
-end)
