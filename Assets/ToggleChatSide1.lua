@@ -6,7 +6,7 @@ return function(options)
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
-    local position     = options.position or UDim2.new(0, 55, 0.45, -132)
+    local position     = options.position or UDim2.new(0, 55, 0.449999988, -132)
     local size         = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
     local closeFunc    = options.CloseFunction -- ฟังก์ชันที่ส่งมา
