@@ -6,18 +6,18 @@ return function(options)
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
-    local position    = options.position or UDim2.new(0, 55, 0.449999988, -132) -- ตำแหน่งเริ่มต้น
+    local position    = options.position or UDim2.new(0, 55, 0.45, -132)
     local size        = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
+    local closeFunc   = options.CloseFunction -- ดึงฟังก์ชันที่ส่งมา
 
-    -- ScreenGui
+    -- สร้าง GUI
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = options.name or "FloatingToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
     ToggleGui.Parent = PlayerGui
 
-    -- ปุ่ม
     local Toggle = Instance.new("TextButton")
     Toggle.Name = "Toggle"
     Toggle.Parent = ToggleGui
@@ -90,13 +90,13 @@ return function(options)
         end
     end)
 
-    -- คลิกเพื่อรัน Close()
+    -- คลิกเพื่อรันฟังก์ชันที่ส่งมา
     Toggle.MouseButton1Click:Connect(function()
         if wasDragged then return end
-        if typeof(Close) == "function" then
-            Close() -- เรียกฟังก์ชัน Close() โดยตรง
+        if typeof(closeFunc) == "function" then
+            closeFunc()
         else
-            warn("Close function not found!")
+            warn("CloseFunction not found!")
         end
     end)
 
