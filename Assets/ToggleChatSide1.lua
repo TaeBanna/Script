@@ -2,20 +2,28 @@ return function(options)
     local Players = game:GetService("Players")
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+    local CoreGui = game:GetService("CoreGui")
 
     options = options or {}
     local position     = options.position or UDim2.new(0, 55, 0.45, -132)
     local size         = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
-    local closeFunc    = options.CloseFunction      -- ส่งฟังก์ชันเองก็ได้
-    local window       = options.Window             -- หรือส่ง Window แล้วใช้ Window:ToggleUI()
+    local closeFunc    = options.CloseFunction
+    local window       = options.Window
 
     -- GUI
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = options.name or "FloatingToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ToggleGui.ResetOnSpawn = false
-    ToggleGui.Parent = PlayerGui
+
+    -- ★ เปลี่ยน parent เป็น CoreGui (พร้อม fallback)
+    local ok = pcall(function()
+        ToggleGui.Parent = (gethui and gethui()) or CoreGui
+    end)
+    if not ok then
+        ToggleGui.Parent = PlayerGui
+    end
 
     local Toggle = Instance.new("TextButton")
     Toggle.Name = "Toggle"
