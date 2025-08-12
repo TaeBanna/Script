@@ -14,7 +14,7 @@ local Window = Library:CreateWindow({
 
 local Opened = true -- สถานะเริ่มต้นเปิด
 
-function Close() -- global function
+local function Close()
     if Opened then
         Window.Visible = false
         Opened = false
@@ -24,11 +24,16 @@ function Close() -- global function
     end
 end
 
--- สร้างปุ่มหลังจากมี Close แล้ว
-local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"))()
+-- โหลดปุ่มแล้วส่งฟังก์ชัน Close เข้าไป
+local createChatSideToggle = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"
+))()
+
 createChatSideToggle({
+    CloseFunction = Close, -- ส่งฟังก์ชันเข้าไปตรงๆ
     position = UDim2.new(0, 55, 0.449999988, -132)
 })
+
 
 
 
