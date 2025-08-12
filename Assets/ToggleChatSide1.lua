@@ -93,14 +93,12 @@ return function(options)
     -- คลิกเพื่อรัน Close()
     Toggle.MouseButton1Click:Connect(function()
         if wasDragged then return end
-       Toggle.MouseButton1Click:Connect(function()
-    if wasDragged then return end
-    if typeof(Close) == "function" then
-        Close() -- เรียกฟังก์ชัน Close() โดยตรง
-    else
-        warn("Close function not found!")
-    end
-end)
+        if typeof(Close) == "function" then
+            Close() -- เรียกฟังก์ชัน Close() โดยตรง
+        else
+            warn("Close function not found!")
+        end
+    end)
 
     return {
         Gui = ToggleGui,
