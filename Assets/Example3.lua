@@ -14,7 +14,8 @@ local Window = Library:CreateWindow({
 
 local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"))()
 createChatSideToggle({
-    CloseFunction = Close -- ส่งฟังก์ชัน Close() ของคุณเข้ามา
+    CloseFunction = Close, -- ส่งฟังก์ชัน Close() ของคุณเข้ามา
+    position = UDim2.new(0, 55, 0.449999988, -132)
 })
 
 
