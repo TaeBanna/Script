@@ -12,14 +12,21 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
-local function Close()
-    -- โค้ดเปิด/ปิด GUI
+local Opened = true -- สถานะเริ่มต้นเปิด
+
+function Close() -- global function
+    if Opened then
+        Window.Visible = false
+        Opened = false
+    else
+        Window.Visible = true
+        Opened = true
+    end
 end
 
 -- สร้างปุ่มหลังจากมี Close แล้ว
 local createChatSideToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"))()
 createChatSideToggle({
-    CloseFunction = Close,
     position = UDim2.new(0, 55, 0.449999988, -132)
 })
 
