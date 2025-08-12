@@ -6,10 +6,11 @@ return function(options)
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
-    local position    = options.position or UDim2.new(0, 55, 0.45, -132)
-    local size        = options.size or UDim2.new(0, 80, 0, 38)
+    local position     = options.position or UDim2.new(0, 55, 0.45, -132)
+    local size         = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
-    local closeFunc   = options.CloseFunction -- ดึงฟังก์ชันที่ส่งมา
+    local closeFunc    = options.CloseFunction -- ฟังก์ชันที่ส่งมา
+    local window       = options.Window -- ตัวเลือกเสริม ส่ง Window มาแทน CloseFunction
 
     -- สร้าง GUI
     local ToggleGui = Instance.new("ScreenGui")
@@ -90,13 +91,15 @@ return function(options)
         end
     end)
 
-    -- คลิกเพื่อรันฟังก์ชันที่ส่งมา
+    -- คลิกเพื่อรันฟังก์ชันปิด/เปิด
     Toggle.MouseButton1Click:Connect(function()
         if wasDragged then return end
         if typeof(closeFunc) == "function" then
             closeFunc()
+        elseif window and typeof(window.ToggleUI) == "function" then
+            window:ToggleUI()
         else
-            warn("CloseFunction not found!")
+            warn("CloseFunction or Window.ToggleUI not found!")
         end
     end)
 
