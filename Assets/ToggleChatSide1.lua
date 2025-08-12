@@ -6,11 +6,13 @@ return function(options)
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
-    local position     = options.position or UDim2.new(0, 55, 0.449999988, -132)
+    local position     = options.position or UDim2.new(0, 55, 0.45, -132)
     local size         = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
     local closeFunc    = options.CloseFunction -- ฟังก์ชันที่ส่งมา
-    local window       = options.Window -- ตัวเลือกเสริม ส่ง Window มาแทน CloseFunction
+    local window       = options.Window       -- ส่ง Window มาแทน CloseFunction ก็ได้
+    local draggable    = (options.draggable == nil) and false or not not options.draggable
+    -- ^ ค่าเริ่มต้น "ล็อก" ไม่ให้ลาก (false). ถ้าอยากให้ลากได้ตั้งแต่เริ่ม ส่ง draggable = true
 
     -- สร้าง GUI
     local ToggleGui = Instance.new("ScreenGui")
@@ -35,7 +37,7 @@ return function(options)
     UICorner.CornerRadius = cornerRadius
     UICorner.Parent = Toggle
 
-    -- ระบบลาก
+    -- ระบบลาก (รองรับเปิด/ปิด)
     local dragging = false
     local dragStart = nil
     local startPos = nil
@@ -57,7 +59,8 @@ return function(options)
     end
 
     Toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        if not draggable then return end -- ล็อก: ไม่ให้เริ่มลาก
+        if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
@@ -67,21 +70,24 @@ return function(options)
     end)
 
     Toggle.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement 
+        if not draggable then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement
         or input.UserInputType == Enum.UserInputType.Touch then
             updateInput(input)
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
+        if not draggable then return end
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
         or input.UserInputType == Enum.UserInputType.Touch) then
             updateInput(input)
         end
     end)
 
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        if not draggable then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
             if dragging then
                 dragging = false
@@ -103,11 +109,25 @@ return function(options)
         end
     end)
 
-    return {
+    -- API สำหรับเปิด/ปิดการลากภายหลัง
+    local api = {
         Gui = ToggleGui,
         Button = Toggle,
+        SetDraggable = function(state: boolean)
+            draggable = not not state
+            -- ถ้าปิดระหว่างกำลังลากอยู่ ให้หยุดลากทันที
+            if not draggable and dragging then
+                dragging = false
+                wasDragged = false
+            end
+        end,
+        IsDraggable = function()
+            return draggable
+        end,
         Destroy = function()
             ToggleGui:Destroy()
         end
     }
+
+    return api
 end
