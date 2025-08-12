@@ -12,16 +12,15 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
--- ปุ่มลอย Toggle UI
+-- ปุ่มลอย Toggle UI (ไม่ต้องประกาศ Close ใด ๆ)
 local createChatSideToggle = loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"
 ))()
 
--- เก็บ API ที่ส่งกลับมา
-local toggleApi = createChatSideToggle({
+createChatSideToggle({
     Window = Window, -- ใช้เมธอด Window:ToggleUI() ที่เรา export ไว้
     position = UDim2.new(0, 55, 0.449999988, -132),
-    startText = "Toggle" -- ตั้งข้อความปุ่มเองได้
+    -- startText = "Toggle", -- จะตั้งข้อความปุ่มเองก็ได้
 })
 
 
@@ -158,6 +157,25 @@ local Settings = Window:AddTab({
     Title = "Settings",
     Section = "Settings",
     Icon = "rbxassetid://11293977610",
+})
+
+-- เพิ่มในหน้า Settings ให้ผู้ใช้เปิด/ปิดการลาก
+Window:AddDropdown({
+    Title = "Floating Button Drag",
+    Description = "ตั้งค่าการย้ายปุ่มลอย",
+    Tab = Settings,
+    Options = {
+        ["Locked (ห้ามย้าย)"] = false,
+        ["Draggable (ย้ายได้)"] = true,
+    },
+    Callback = function(isDraggable)
+        toggleApi.SetDraggable(isDraggable)
+        Window:Notify({
+            Title = "Floating Button",
+            Description = isDraggable and "เปิดให้ย้ายได้แล้ว" or "ล็อกไม่ให้ย้าย",
+            Duration = 3
+        })
+    end,
 })
 
 Window:AddKeybind({
