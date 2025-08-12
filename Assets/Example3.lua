@@ -12,15 +12,16 @@ local Window = Library:CreateWindow({
     MinimizeKeybind = Enum.KeyCode.LeftAlt
 })
 
--- ปุ่มลอย Toggle UI (ไม่ต้องประกาศ Close ใด ๆ)
+-- ปุ่มลอย Toggle UI
 local createChatSideToggle = loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/TaeBanna/Script/main/Assets/ToggleChatSide1.lua"
 ))()
 
-createChatSideToggle({
+-- เก็บ API ที่ส่งกลับมา
+local toggleApi = createChatSideToggle({
     Window = Window, -- ใช้เมธอด Window:ToggleUI() ที่เรา export ไว้
     position = UDim2.new(0, 55, 0.449999988, -132),
-    -- startText = "Toggle", -- จะตั้งข้อความปุ่มเองก็ได้
+    startText = "Toggle" -- ตั้งข้อความปุ่มเองได้
 })
 
 
