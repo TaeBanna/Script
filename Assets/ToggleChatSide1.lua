@@ -1,13 +1,11 @@
 return function(options)
     local Players = game:GetService("Players")
     local UserInputService = game:GetService("UserInputService")
-    local VirtualInputManager = game:GetService("VirtualInputManager")
 
     local LocalPlayer = Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
     options = options or {}
-    local keyToPress  = options.keyToPress or Enum.KeyCode.LeftAlt
     local position    = options.position or UDim2.new(0, 55, 0.449999988, -132) -- ตำแหน่งเริ่มต้น
     local size        = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
@@ -92,15 +90,13 @@ return function(options)
         end
     end)
 
-    -- คลิกเพื่อจำลองการกดคีย์
+    -- คลิกเพื่อรัน Close()
     Toggle.MouseButton1Click:Connect(function()
         if wasDragged then return end
-        if options.useLibrary and options.Library then
-            options.Library:ToggleUI()
+        if typeof(options.CloseFunction) == "function" then
+            options.CloseFunction() -- เรียกฟังก์ชัน Close() ที่ส่งมา
         else
-            VirtualInputManager:SendKeyEvent(true, keyToPress, false, game)
-            task.wait()
-            VirtualInputManager:SendKeyEvent(false, keyToPress, false, game)
+            warn("CloseFunction not provided!")
         end
     end)
 
