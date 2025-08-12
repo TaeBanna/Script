@@ -9,12 +9,11 @@ return function(options)
     local position     = options.position or UDim2.new(0, 55, 0.45, -132)
     local size         = options.size or UDim2.new(0, 80, 0, 38)
     local cornerRadius = options.cornerRadius or UDim.new(0, 8)
-    local closeFunc    = options.CloseFunction -- ฟังก์ชันที่ส่งมา
-    local window       = options.Window       -- ส่ง Window มาแทน CloseFunction ก็ได้
-    local draggable    = (options.draggable == nil) and false or not not options.draggable
-    -- ^ ค่าเริ่มต้น "ล็อก" ไม่ให้ลาก (false). ถ้าอยากให้ลากได้ตั้งแต่เริ่ม ส่ง draggable = true
+    local closeFunc    = options.CloseFunction          -- ส่งฟังก์ชันเองก็ได้
+    local window       = options.Window                 -- หรือส่ง Window แล้วใช้ Window:ToggleUI()
+    local draggable    = options.draggable == true      -- ค่าเริ่มต้น: ล็อก (false)
 
-    -- สร้าง GUI
+    -- GUI
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = options.name or "FloatingToggle"
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -37,7 +36,7 @@ return function(options)
     UICorner.CornerRadius = cornerRadius
     UICorner.Parent = Toggle
 
-    -- ระบบลาก (รองรับเปิด/ปิด)
+    -- Drag system (มีสวิตช์เปิด/ปิด)
     local dragging = false
     local dragStart = nil
     local startPos = nil
@@ -59,7 +58,7 @@ return function(options)
     end
 
     Toggle.InputBegan:Connect(function(input)
-        if not draggable then return end -- ล็อก: ไม่ให้เริ่มลาก
+        if not draggable then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -97,7 +96,7 @@ return function(options)
         end
     end)
 
-    -- คลิกเพื่อรันฟังก์ชันปิด/เปิด
+    -- Click => Toggle UI
     Toggle.MouseButton1Click:Connect(function()
         if wasDragged then return end
         if typeof(closeFunc) == "function" then
@@ -109,13 +108,12 @@ return function(options)
         end
     end)
 
-    -- API สำหรับเปิด/ปิดการลากภายหลัง
+    -- Public API
     local api = {
         Gui = ToggleGui,
         Button = Toggle,
         SetDraggable = function(state: boolean)
             draggable = not not state
-            -- ถ้าปิดระหว่างกำลังลากอยู่ ให้หยุดลากทันที
             if not draggable and dragging then
                 dragging = false
                 wasDragged = false
@@ -123,6 +121,12 @@ return function(options)
         end,
         IsDraggable = function()
             return draggable
+        end,
+        SetText = function(text: string)
+            Toggle.Text = text
+        end,
+        SetPosition = function(pos: UDim2)
+            Toggle.Position = pos
         end,
         Destroy = function()
             ToggleGui:Destroy()
