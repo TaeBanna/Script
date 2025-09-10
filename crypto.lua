@@ -75,7 +75,7 @@ local Main = Window:AddTab({
     Icon = "rbxassetid://11963373994"
 })
 
-Window:AddSection({ Name = "Non Interactable", Tab = Main })
+Window:AddSection({ Name = "ขอให้สนุก", Tab = Main })
 
 Window:AddParagraph({
     Title = "Paragraph",
@@ -104,9 +104,9 @@ Window:AddButton({
         -- วาปไปจุดเคลม
         hrp.CFrame = CFrame.new(1547, 264, 2132)
 
-        -- ยิง event claim
+        -- ยิง event claim (อันนี้สำคัญ)
         local args = { "Claim1" }
-        workspace:WaitForChild("GlobalReference"):WaitForChild("SamQuestPrompt"):FireServer(unpack(args))
+        game.ReplicatedStorage:WaitForChild("Connections"):WaitForChild("Claim_Sam"):FireServer(unpack(args))
 
         -- ดีเลย์นิดหน่อยแล้วกลับจุดเดิม
         task.delay(1, function()
@@ -121,6 +121,7 @@ Window:AddButton({
         end)
     end,
 })
+
 
 -- Dropdown เลือกเกาะ
 Window:AddDropdown({
