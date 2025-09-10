@@ -86,6 +86,42 @@ Window:AddParagraph({
 -- ตัวแปรเก็บเกาะที่เลือก
 local SelectedIsland = nil
 
+-- เก็บตำแหน่งเดิม
+local SavedPosition = nil
+
+Window:AddButton({
+    Title = "claim compass",
+    Tab = Main,
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        -- เซฟตำแหน่งปัจจุบัน
+        SavedPosition = hrp.CFrame
+
+        -- วาปไปจุดเคลม
+        hrp.CFrame = CFrame.new(1547, 264, 2132)
+
+        -- ยิง event claim
+        local args = { "Claim1" }
+        workspace:WaitForChild("GlobalReference"):WaitForChild("SamQuestPrompt"):FireServer(unpack(args))
+
+        -- ดีเลย์นิดหน่อยแล้วกลับจุดเดิม
+        task.delay(1, function()
+            if hrp and SavedPosition then
+                hrp.CFrame = SavedPosition
+                Window:Notify({
+                    Title = "Claim Compass",
+                    Description = "Compass claimed and returned to original position!",
+                    Duration = 5
+                })
+            end
+        end)
+    end,
+})
+
 -- Dropdown เลือกเกาะ
 Window:AddDropdown({
     Title = "Select Island",
