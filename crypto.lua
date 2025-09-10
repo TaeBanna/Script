@@ -76,84 +76,101 @@ local Main = Window:AddTab({
 })
 
 Window:AddSection({ Name = "Non Interactable", Tab = Main })
+
 Window:AddParagraph({
     Title = "Paragraph",
     Description = "Insert any important text here.",
     Tab = Main
 })
 
+-- ตัวแปรเก็บเกาะที่เลือก
+local SelectedIsland = nil
 
-Window:AddButton({
-    Title = "sellCrypto",
+-- Dropdown เลือกเกาะ
+Window:AddDropdown({
+    Title = "Select Island",
+    Description = "Choose where to teleport",
     Tab = Main,
-    Callback = function()
-        local args = {
-            "All"
-        }
-        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Events"):WaitForChild("SellCrypto"):FireServer(unpack(args))
-        
-        -- แจ้งเตือน
-        Window:Notify({
-            Title = "SellCrypto",
-            Description = "Sold all crypto successfully!",
-            Duration = 5
-        })
+    Options = {
+        ["Island1"] = "A",
+        ["Island2"] = "B",
+        ["sam10k"] = "C",
+        ["spawn1"] = "D",
+        ["spawn2"] = "E",
+        ["spawn3"] = "F",
+        ["bubble"] = "G",
+        ["Moon"] = "H",
+        ["Purple"] = "I",
+        ["treeTall"] = "J",
+        ["MoutanRock"] = "K",
+        ["smallIslandrock"] = "L",
+        ["sandisland"] = "M",
+        ["snowsmall"] = "N",
+        ["snowbig"] = "O",
+        ["treeangryisland"] = "P",
+
+    },
+    Callback = function(Value)
+        SelectedIsland = Value
+        warn("Selected Island: " .. Value)
     end,
 })
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local toggleRunning = false
-
-Window:AddToggle({
-    Title = "Toggle",
-    Description = "Switching",
+-- ปุ่ม TP island
+Window:AddButton({
+    Title = "TP island",
     Tab = Main,
-    Callback = function(Boolean)
-        warn("Toggle state:", Boolean)
-        toggleRunning = Boolean
+    Callback = function()
+        if not SelectedIsland then
+            Window:Notify({
+                Title = "Error",
+                Description = "Please select an island first!",
+                Duration = 5
+            })
+            return
+        end
 
-        if toggleRunning then
-            task.spawn(function()
-                while toggleRunning do
-                    local placedFolder = Players.LocalPlayer.PlayerData:WaitForChild("Placed")
+        local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
 
-                    for _, child in ipairs(placedFolder:GetChildren()) do
-                        local uuid = child.Name -- ชื่อคือ UUID
-                        local args = { uuid }
+        -- พิกัดของแต่ละเกาะ
+        local IslandPositions = {
+            A = CFrame.new(786, 216, -1349),
+            B = CFrame.new(-1260, 216, 597),
+            C = CFrame.new(1453, 263, 2092),
+            D = CFrame.new(-127, 216, -779),
+            E = CFrame.new(-237, 226, -1108),
+            F = CFrame.new(720, 241, 1192),
+            G = CFrame.new(4483, 217, 5459),
+            H = CFrame.new(3202, 357, 1655),
+            I = CFrame.new(-5192, 518, -7778),
+            J = CFrame.new(-5852, 216, -220),
+            K = CFrame.new(2028, 300, -480),
+            L = CFrame.new(-28, 229, 2151),
+            M = CFrame.new(1028, 224, -3344),
+            N = CFrame.new(-1881, 230, 3339),
+            O = CFrame.new(6232, 539, -1232),
+            P = CFrame.new(1033, 217, 3386),
+        }
 
-                        -- ส่ง Event ClaimCrypto
-                        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Events"):WaitForChild("ClaimCrypto"):FireServer(unpack(args))
-                        task.wait(0.1) -- เว้นระยะ 0.1 วินาที กันเซิร์ฟเวอร์รับไม่ทัน
-                    end
-                end
-            end)
+        -- ถ้ามีพิกัดตรงกับที่เลือก
+        if IslandPositions[SelectedIsland] then
+            hrp.CFrame = IslandPositions[SelectedIsland]
+            Window:Notify({
+                Title = "Teleport",
+                Description = "Teleported to island: " .. SelectedIsland,
+                Duration = 5
+            })
+        else
+            Window:Notify({
+                Title = "Error",
+                Description = "No position set for island: " .. SelectedIsland,
+                Duration = 5
+            })
         end
     end,
 })
 
-Window:AddDropdown({
-    Title = "Dropdown",
-    Description = "Selecting",
-    Tab = Main,
-    Options = {
-        ["An Option"] = "hi",
-        ["And another"] = "hi",
-        ["Another"] = "hi",
-    },
-    Callback = function(Number)
-        warn(Number)
-    end,
-})
-
-Window:AddKeybind({
-    Title = "Keybind",
-    Description = "Binding",
-    Tab = Main,
-    Callback = function(Key)
-        warn("Key Set")
-    end,
-})
 
 -- Tab Settings
 local Keybind = nil
@@ -213,9 +230,3 @@ Window:Notify({
     Duration = 10
 })
 
--- Keybind Example
-UserInputService.InputBegan:Connect(function(Key)
-    if Key == Keybind then
-        warn("You have pressed the minimize keybind!");
-    end
-end)
